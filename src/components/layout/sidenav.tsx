@@ -2,9 +2,9 @@ import Link from "next/link";
 
 export function SideNav() {
     return (
-        <div>
+        <nav>
             <Link className="" href="/" >
             </Link>
-        </div>
+        </nav>
     );
 }
