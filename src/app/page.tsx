@@ -1,32 +1,46 @@
 'use client'
 
-import Image from "next/image";
-import LocalImage from "@/public/next.svg";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import type { NextPage } from "next";
+import { LoginAction } from "@/app/actions/form-action";
 
-export default function Home() {
-  const router = useRouter();
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src={LocalImage}
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-
+const Login: NextPage = () => {
+    return (
         <div>
-          <Button className="mt-4 w-full" onClick={() => {
-            router.push('/login');
-          }}>
-            Log in
-          </Button>
+            <form className="flex flex-col justify-center items-center min-h-screen mx-10" action={LoginAction}>
+                <div className="bg-cyan-50 p-22">
+                    <div>
+                        <h1 className="text-5xl">Login</h1>
+                    </div>
+
+                    <div className="mb-5">
+                        <div className="">
+                            <h1>mail address</h1>
+                        </div>
+                        <input className="rounded-lg border-2 bg-white w-64 p-1" name="mailAddress"></input>
+                    </div>
+
+                    <div className="mt-5 mb-20">
+                        <div>
+                            <h1>password</h1>
+                        </div>
+                        <input className="rounded-lg outline-2 bg-white w-64 p-1" name="password"></input>
+                    </div>
+
+                    <div className="flex flex-row ">
+                        <Button className="mt-4" type="submit">
+                            Login
+                        </Button>
+
+                        <Button className="mt-4">
+                            Register
+                        </Button>
+                    </div>
+                </div>
+
+            </form>
         </div>
-      </main>
-    </div>
-  );
+    );
 }
+
+export default Login
