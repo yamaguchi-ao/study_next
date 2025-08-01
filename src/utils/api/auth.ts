@@ -1,26 +1,27 @@
-import { PrismaClient } from "@prisma/client"
-import { NextResponse } from "next/server";
 
-const prisma = new PrismaClient();
 
-/** DB接続用 **/
-export const connect = async () => {
-    try {
-        prisma.$connect();
-    } catch (error) {
-        return Error("DB接続失敗");
-    }
+export const signUp = async (body: { username: string, email: string, password: string }) => {
+    const url = "http://localhost:3000/api/auth/signup";
+
+    const data = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    return data.json();
 }
 
-export const GET = async (req: Request) => {
-    try {
-        await connect();
-        const users = await prisma.users.findMany();
+export const signIn = async (body: { email: string, password: string }) => {
+    const url = "http://localhost:3000/api/auth/signin";
 
-        return NextResponse.json({ users }, { status: 200 });
-    } catch (error) {
-        return NextResponse.json({message: "Error"}, {status: 500});
-    } finally {
-        await prisma.$disconnect();
-    }
+    const data = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(body),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+    return data.json();
 }

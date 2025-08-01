@@ -1,5 +1,8 @@
 // フォーム取得
 import { redirect } from "next/navigation";
+import { signUp, signIn } from "@/utils/api/auth";
+import { userSchema } from "@/utils/validation";
+import { z } from "zod";
 
 // ログイン情報取得
 export async function LoginAction(formData: FormData) {
@@ -9,6 +12,7 @@ export async function LoginAction(formData: FormData) {
     if (mailAddress && password) {
         // ログイン処理
         console.log(mailAddress + ":" + password);
+
         redirect('/list')
     } else {
         // バリデーション処理
@@ -17,19 +21,18 @@ export async function LoginAction(formData: FormData) {
 }
 
 // 登録情報取得
-export async function RegisterAction(formData: FormData) {
-    const account = formData.get("account");
-    const mailAddress = formData.get("mailAddress");
-    const password = formData.get("password");
+export async function RegisterAction(prevState: any, formData: FormData) {
+    const username = formData.get("username") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const confirm = formData.get("confirm") as string;
 
-    if (account) {
-        if (mailAddress) {
-            if (password) {
-                // DBに登録後
-                redirect("/login");
-            }
-        }
+    const test = userSchema.safeParse(formData);
+
+    if (!test.success) {
+        console.log(test.error.message);        
     } else {
-        // バリデーション
-    }   
+        // const res = await signUp({ username: username, email: email, password: password });
+        // return res;
+    }
 }
