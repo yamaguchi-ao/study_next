@@ -1,19 +1,13 @@
 import { toast } from "react-toastify";
 
 export const errorToast = (message: string) => {
-    return toast.error(message, {
-        autoClose: 1500,
-        closeButton: false,
-        hideProgressBar: true,
-        pauseOnHover: false,
-    });
+    return toast.error(message);
 };
 
 export const successToast = (message: string) => {
-    return toast.success(message, {
-        autoClose: 1500,
-        closeButton: false,
-        hideProgressBar: true,
-        pauseOnHover: false,
-    });
+    return toast.success(message);
 };
+
+export const infoToast = (message: string) => {
+    return toast.info(message);
+}

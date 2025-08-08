@@ -1,27 +1,21 @@
-
-
-export const signUp = async (body: { username: string, email: string, password: string }) => {
+// 新規登録API呼び出し
+export const signUp = async (userData: { username: string, email: string, password: string }) => {
     const url = "http://localhost:3000/api/auth/signup";
 
     const data = await fetch(url, {
         method: "POST",
-        body: JSON.stringify(body),
-        headers: {
-            "Content-Type": "application/json",
-        },
+        body: JSON.stringify(userData)
     });
     return data.json();
 }
 
-export const signIn = async (body: { email: string, password: string }) => {
+// ログインAPI呼び出し
+export const signIn = async (loginData: { email: string, password: string }) => {
     const url = "http://localhost:3000/api/auth/signin";
 
     const data = await fetch(url, {
         method: "POST",
-        body: JSON.stringify(body),
-        headers: {
-            "Content-Type": "application/json",
-        },
+        body: JSON.stringify(loginData)
     });
     return data.json();
 }

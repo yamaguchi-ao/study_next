@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import ToastProvider from "@/lib/react-toastify";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,10 +14,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body
-        className=""
-      >
-        {children}
+      <body className="">
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </body>
     </html>
   );
