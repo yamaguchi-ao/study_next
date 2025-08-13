@@ -24,3 +24,11 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.border {
+  border-radius: var(--radius-lg);
+  border-style: var(--tw-border-style);
+  border-width: 2px;
+  padding: calc(var(--spacing) * 1);
+  background: var(--color-white);
+}
