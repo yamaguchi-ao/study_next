@@ -1,0 +1,7 @@
+/* トーストの中身の変更用CSS */
+
+@import 'react-toastify/dist/ReactToastify.css';
+
+:root {
+  --toastify-toast-width: auto;
+}

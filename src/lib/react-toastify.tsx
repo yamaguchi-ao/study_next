@@ -1,7 +1,7 @@
 "use client"
 
-import { Bounce, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
+import '@/lib/toast.css';
 
 interface ToastProviderProps {
   children: React.ReactNode;
@@ -14,15 +14,9 @@ export default function ToastProvider({ children }: ToastProviderProps) {
       {children}
       <ToastContainer
         position="bottom-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        theme="light"
-        transition={Bounce} />
+        autoClose={3000}
+        pauseOnHover={false}
+        closeOnClick={true} />
     </>
   );
 }

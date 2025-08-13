@@ -7,7 +7,7 @@ import { errorToast, successToast } from "@/utils/toast";
 
 // ログイン情報取得
 export async function LoginAction(_prevState: any, formData: FormData) {
-    
+
     const loginData = {
         email: formData.get("email") as string,
         password: formData.get("password") as string
@@ -18,24 +18,23 @@ export async function LoginAction(_prevState: any, formData: FormData) {
 
     // バリデーションエラー時
     if (!issues.success) {
-        const error = z.flattenError(issues.error);
-        return error.fieldErrors;
+        const validation = z.flattenError(issues.error);
+        return validation.fieldErrors;
     } else {
         // ログイン実行
         const res = await signIn(loginData);
         const token = res?.token;
-        const status = res?.status;
+        const success = res?.success;
+        const message = res?.message;
 
-        if (token) {
+        if (success) {
+            // ログイン成功時
             localStorage.setItem("access_token", token);
-            successToast("ログイン 成功！");
+            successToast(message);
             redirect("/list");
         } else {
-            if (status === 404) {
-                errorToast("ユーザーが存在しません。")
-            } else if (status === 401) {
-                errorToast("メールアドレス、またはパスワードが違います。")
-            }
+            // ログイン失敗時
+            errorToast(message);
         }
     }
 }
@@ -55,27 +54,24 @@ export async function RegisterAction(_prevState: any, formData: FormData) {
 
     // バリデーションエラー時
     if (!issues.success) {
-        const test = z.flattenError(issues.error);
-        return test.fieldErrors;
+        const validation = z.flattenError(issues.error);
+        return validation.fieldErrors;
 
     } else {
         //　ユーザー登録実施
         const res = await signUp(userData);
         const token = res?.token;
-        const existingEmail = res?.existingEmail;
+        const success = res?.success;
+        const message = res?.message;
 
         // 作成したトークンがある場合
-        if (token) {
+        if (success) {
             localStorage.setItem("access_token", token);
-            successToast("新規登録 成功！");
+            successToast(message);
             redirect("/list");
         } else {
             // ない場合
-            if (existingEmail) {
-                errorToast("そのメールアドレスは既に登録済みです。");
-            } else {
-                errorToast("新規登録 失敗...");
-            }
+            errorToast(message);
         }
     }
 }

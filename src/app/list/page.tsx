@@ -1,11 +1,27 @@
+"use client"
 
-import { Button } from "@/components/ui/button";
-import { infoToast } from "@/utils/toast";
+import { Header } from "@/components/layout/header";
+import { errorToast, infoToast } from "@/utils/toast";
 import type { NextPage } from "next";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const List: NextPage = () => {
   const router = useRouter();
+  const [token, setToken] = useState(false);
+
+  useEffect(() => {
+    // ローカルストレージにある情報取得
+    const signIn = localStorage.getItem("access_token");
+
+    if (!signIn) {
+      // 無いならログインに戻る
+      errorToast("ログインしていません。");
+      router.replace('/login');
+    } else {
+      setToken(true);
+    }
+  }, [router]);
 
   const logout = () => {
     localStorage.removeItem("access_token");
@@ -13,17 +29,17 @@ const List: NextPage = () => {
     router.push("/login");
   }
 
-  return (
+  return token ? (
     <>
       <title>一覧</title>
       <div>
-        <h1>まだ何も決めてない</h1>
-        <Button className="" onClick={logout}>
-          ログアウト
-        </Button>
+        <Header title={"一覧"} onClick={(() => logout())}>
+          
+        </Header>
+
       </div>
     </>
-  )
+  ) : (<></>)
 }
 
 export default List
