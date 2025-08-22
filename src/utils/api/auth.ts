@@ -1,5 +1,3 @@
-"use server"
-
 const node = process.env.NODE_ENV;
 const local = process.env.LOCAL_URL;
 
