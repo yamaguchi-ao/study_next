@@ -16,7 +16,7 @@ export const signUp = async (userData: { username: string, email: string, passwo
 // ログインAPI呼び出し
 export const signIn = async (loginData: { email: string, password: string }) => {
 
-    let url = "api/auth/signin";
+    const url = "api/auth/signin";
 
     const data = await fetch(url, {
         method: "POST",
