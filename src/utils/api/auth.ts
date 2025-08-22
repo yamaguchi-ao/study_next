@@ -20,8 +20,6 @@ export const signIn = async (loginData: { email: string, password: string }) => 
 
     if (node !== "production") {
         url = local + url;
-    } else {
-        url = api + url;
     }
 
     const data = await fetch(url, {
