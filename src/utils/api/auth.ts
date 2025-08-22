@@ -1,3 +1,9 @@
+'use server'
+
+const node = process.env.NODE_ENV;
+const local = process.env.LOCAL_URL;
+const api = process.env.API_URL;
+
 // 新規登録API呼び出し
 export const signUp = async (userData: { username: string, email: string, password: string }) => {
     const url = "https://yamaguchi-ao.github.io/study_next/api/auth/signup";
@@ -11,7 +17,14 @@ export const signUp = async (userData: { username: string, email: string, passwo
 
 // ログインAPI呼び出し
 export const signIn = async (loginData: { email: string, password: string }) => {
-    const url = "https://yamaguchi-ao.github.io/study_next/api/auth/signin";
+
+    let url = "api/auth/signin";
+    
+    if (node !== "production") {
+        url = local + url;
+    } else {
+        url = api + url;
+    }
 
     const data = await fetch(url, {
         method: "POST",
