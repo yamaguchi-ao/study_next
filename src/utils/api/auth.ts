@@ -1,5 +1,3 @@
-'use server'
-
 const node = process.env.NODE_ENV;
 const local = process.env.LOCAL_URL;
 const api = process.env.API_URL;
@@ -19,7 +17,7 @@ export const signUp = async (userData: { username: string, email: string, passwo
 export const signIn = async (loginData: { email: string, password: string }) => {
 
     let url = "api/auth/signin";
-    
+
     if (node !== "production") {
         url = local + url;
     } else {
