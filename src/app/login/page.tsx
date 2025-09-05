@@ -3,13 +3,15 @@
 import { Button } from "@/components/ui/button";
 import type { NextPage } from "next";
 import { LoginAction } from "@/app/actions/form-action";
-import { useRouter } from "next/navigation";
-import { useActionState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useActionState, useEffect } from "react";
+import { errorToast } from "@/utils/toast";
 
 const Login: NextPage = () => {
     const router = useRouter();
-
     const [state, Login, isPending] = useActionState(LoginAction, null);
+    const param = useSearchParams();
+    const errorCode = param.get("error");
 
     // バリデーションメッセージ表示
     const errorText = (data: string[]) => {
@@ -20,6 +22,17 @@ const Login: NextPage = () => {
 
         return list;
     }
+
+    useEffect(() => {
+        if (errorCode) {
+            errorToast("ログインしていません。");
+        }
+
+        const newSearchParams = new URLSearchParams(window.location.search);
+        newSearchParams.delete("error");
+        router.replace(
+            `${window.location.pathname}?${newSearchParams.toString()}`);
+    }, [errorCode, router]);
 
     return (
         <>
@@ -57,7 +70,6 @@ const Login: NextPage = () => {
                             </Button>
                         </div>
                     </div>
-
                 </form>
             </div>
         </>

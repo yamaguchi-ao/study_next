@@ -32,3 +32,8 @@ body {
   padding: calc(var(--spacing) * 1);
   background: var(--color-white);
 }
+
+.slide-20 {
+  --tw-translate-x: calc(var(--spacing) * -20);
+  translate: var(--tw-translate-x) var(--tw-translate-y);
+}
