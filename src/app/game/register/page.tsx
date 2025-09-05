@@ -1,10 +1,11 @@
 "use client"
 
+import { getCookies } from "@/app/actions/action";
+import { Logout } from "@/app/actions/form-action";
 import { GameRegister } from "@/app/actions/game-action";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button } from "@/components/ui/button";
-import { errorToast, infoToast } from "@/utils/toast";
 import type { NextPage } from "next";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
@@ -15,50 +16,34 @@ const GameRegist: NextPage = () => {
     const [name, setName] = useState(String);
     const [id, setId] = useState(Number);
 
-    const [state, Register, isPending] = useActionState(
-        async (_prev: any, formData: FormData) => {
-            await GameRegister(_prev, formData, id);
-        },
-        null,
-    );
+    const data = (async () => {
+        const data = await getCookies();
+        setId(data.id);
+        setName(data.name);
+    });
 
     useEffect(() => {
-        // ローカルストレージにある情報取得
-        const signIn = localStorage.getItem("access_token");
+        data();
 
-        if (!signIn) {
-            // 無いならログインに戻る
-            errorToast("ログインしていません。");
-            router.replace('/login');
-        } else {
+    }, [id]);
 
-            // JWTからペイロードのみを取得
-            const payload = signIn?.split('.')[1];
+    const [state, Register, isPending] = useActionState(GameRegister, null);
 
-            // JWTをデコード
-            const decodePayload = atob(payload!);
-
-            // 元がJSONなのでパース
-            const userData = JSON.parse(decodePayload);
-
-            setName(userData.name);
-            setId(userData.id);
-            setToken(true);
+    const errorText = (data: string[]) => {
+        const list = [];
+        for (let i = 0; i < data.length; i++) {
+            list.push(<p key={i} className="p-1 text-xs text-red-600">{data[i]}</p>)
         }
-    }, [router]);
 
-    const logout = () => {
-        localStorage.removeItem("access_token");
-        infoToast("ログアウトしました。");
-        router.push("/login");
+        return list;
     }
 
-    return token ? (
+    return (
         <>
             <title>ゲーム 登録</title>
             <div className="h-screen flex">
                 <div className="flex-1 flex flex-col">
-                    <Header title={"ゲーム 登録"} username={name} onClick={(() => logout())} />
+                    <Header title={"ゲーム 登録"} username={name ? name : ""} onClick={(() => Logout())} />
                     <div className="flex-1 flex overflow-hidden">
                         <Sidebar />
                         <form className="flex-1 flex flex-col" action={Register}>
@@ -66,11 +51,13 @@ const GameRegist: NextPage = () => {
                                 <div className="">
                                     <div className="flex pb-10">
                                         <div className="w-35">ゲームタイトル</div>
-                                        <input className="border w-64" name="name"></input>
+                                        <input className="border w-64" name="game"></input>
+                                        {state?.game ? errorText(state?.game) : null}
                                     </div>
                                     <div className="flex pb-10">
                                         <div className="w-35">ランク</div>
                                         <input className="border w-64" name="rank"></input>
+                                        {state?.rank ? errorText(state?.rank) : null}
                                     </div>
                                     <div className="flex justify-end items-end">
                                         <Button disabled={isPending} type="submit">
@@ -84,7 +71,7 @@ const GameRegist: NextPage = () => {
                 </div>
             </div>
         </>
-    ) : (<></>)
+    )
 }
 
 export default GameRegist

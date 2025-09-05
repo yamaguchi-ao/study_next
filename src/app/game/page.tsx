@@ -1,59 +1,37 @@
 "use client"
 
+import { Logout } from "@/app/actions/form-action";
 import { GameSearch } from "@/app/actions/game-action";
 import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button } from "@/components/ui/button";
-import { errorToast, infoToast } from "@/utils/toast";
 import type { NextPage } from "next";
-import { redirect, useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getCookies } from "../actions/action";
 
 const Game: NextPage = () => {
     const router = useRouter();
-    const [token, setToken] = useState(false);
-    const [name, setName] = useState(String);
+    const [username, setUsername] = useState(String);
 
-    const [state, Search, isPending] = useActionState(GameSearch, null);
+    const data = (async () => {
+        const cookies = await getCookies();
+        setUsername(cookies.name);
+    });
 
     useEffect(() => {
-        // ローカルストレージにある情報取得
-        const signIn = localStorage.getItem("access_token");
+        data();
+    }, [username]);
 
-        if (!signIn) {
-            // 無いならログインに戻る
-            errorToast("ログインしていません。");
-            router.replace('/login');
-        } else {
-            // JWTからペイロードのみを取得
-            const payload = signIn?.split('.')[1];
-
-            // JWTをデコード
-            const decodePayload = atob(payload!);
-
-            // 元がJSONなのでパース
-            const userData = JSON.parse(decodePayload);
-
-            setName(userData.name);
-            setToken(true);
-        }
-    }, [router]);
-
-    const logout = () => {
-        localStorage.removeItem("access_token");
-        infoToast("ログアウトしました。");
-        router.push("/login");
-    }
-
-    return token ? (
+    return (
         <>
             <title>ゲーム一覧</title>
             <div className="h-screen flex">
                 <div className="flex-1 flex flex-col">
-                    <Header title={"ゲーム 一覧"} username={name} onClick={(() => logout())} />
+                    <Header title={"ゲーム 一覧"} username={username ? username : ""} onClick={(() => Logout())} />
                     <div className="flex-1 flex overflow-hidden">
                         <Sidebar />
-                        <form className="flex-1 flex flex-col" action={Search}>
+                        <form className="flex-1 flex flex-col" action={GameSearch}>
                             <div className="h-full items-center">
                                 <div className="flex p-5 justify-center">
 
@@ -75,7 +53,7 @@ const Game: NextPage = () => {
                                         </div>
 
                                         <div className="pl-5">
-                                            <Button onClick={(() => router.push("/list/game/register"))}>
+                                            <Button onClick={(() => router.push("/game/register"))}>
                                                 新規登録
                                             </Button>
                                         </div>
@@ -86,7 +64,7 @@ const Game: NextPage = () => {
                                 </div>
                                 <table>
                                     <caption>
-                                        
+
                                     </caption>
                                 </table>
                             </div>
@@ -95,7 +73,7 @@ const Game: NextPage = () => {
                 </div>
             </div>
         </>
-    ) : (<></>)
+    )
 }
 
 export default Game

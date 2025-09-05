@@ -1,12 +1,16 @@
 // 
 
-export const Register = async (gameData: { name: string, rank: string, id: number }) => {
+export const Register = async (gameData: { game: string, rank: string, id: number }) => {
 
     const url = "/api/game";
 
     const data = await fetch(url, {
         method: "POST",
-        body: JSON.stringify(gameData)
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: JSON.stringify(gameData),
+        credentials: "include"
     });
     return data.json();
 }

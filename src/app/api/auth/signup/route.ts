@@ -36,7 +36,16 @@ export async function POST(req: NextRequest) {
 
         if (JWT_SECRET) {
             const token = jwt.sign({ id: user.id, name: user.name }, JWT_SECRET, { algorithm: "HS256", expiresIn: "1h" });
-            return NextResponse.json({ message: "新規登録　成功！", success: true, user, token }, { status: 200 });
+            const response = NextResponse.json({ message: "新規登録　成功！", success: true}, { status: 200 });
+
+            response.cookies.set("auth_token", token, {
+                httpOnly: true,
+                secure: true,
+                sameSite: "strict",
+                maxAge: 3600
+            })
+
+            return response;
         }
     } catch (e) {
         return NextResponse.json({ message: "新規登録　失敗...", success: false, e }, { status: 500 });
