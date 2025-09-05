@@ -1,6 +1,5 @@
-// フォーム取得
 import { redirect } from "next/navigation";
-import { signUp, signIn } from "@/utils/api/auth";
+import { signUp, signIn, logout } from "@/utils/api/auth";
 import { LoginSchema, UserSchema } from "@/utils/validation";
 import { z } from "zod";
 import { errorToast, successToast } from "@/utils/toast";
@@ -23,15 +22,13 @@ export async function LoginAction(_prevState: any, formData: FormData) {
     } else {
         // ログイン実行
         const res = await signIn(loginData);
-        const token = res?.token;
         const success = res?.success;
         const message = res?.message;
 
         if (success) {
             // ログイン成功時
-            localStorage.setItem("access_token", token);
             successToast(message);
-            redirect("/list");
+            redirect("/post");
         } else {
             // ログイン失敗時
             errorToast(message);
@@ -60,18 +57,28 @@ export async function RegisterAction(_prevState: any, formData: FormData) {
     } else {
         //　ユーザー登録実施
         const res = await signUp(userData);
-        const token = res?.token;
         const success = res?.success;
         const message = res?.message;
 
         // 作成したトークンがある場合
         if (success) {
-            localStorage.setItem("access_token", token);
             successToast(message);
-            redirect("/list");
+            redirect("/post");
         } else {
             // ない場合
             errorToast(message);
         }
+    }
+}
+
+export async function Logout() {
+    const res = await logout();
+    const success = res?.success;
+    const message = res?.message;
+
+    // 作成したトークンがある場合
+    if (success) {
+        successToast(message);
+        redirect("/login");
     }
 }
