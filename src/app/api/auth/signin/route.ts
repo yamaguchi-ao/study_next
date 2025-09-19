@@ -45,6 +45,8 @@ export async function POST(req: NextRequest) {
                 )
 
                 return response;
+            } else {
+                return NextResponse.json({ message: "ログイン　失敗...", success: false }, { status: 500 });
             }
         }
     } catch (e) {
