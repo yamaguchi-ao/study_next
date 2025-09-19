@@ -32,6 +32,7 @@ export default function List() {
             <div className="flex-1 flex flex-col">
               <Image src={Img} alt="" width="100" height="100" priority={true} className="">
               </Image>
+              
             </div>
           </div>
         </div>

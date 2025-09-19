@@ -23,7 +23,7 @@ export const LoginSchema = z.object({
 export type LoginSchema = z.infer<typeof LoginSchema>;
 
 export const GameSchema = z.object({
-    game: z.string().min(1, "ゲームタイトルを入力してください。"),
+    name: z.string().min(1, "ゲームタイトルを入力してください。"),
     rank: z.string().min(1, "ランクを入力してください。"),
 });
 

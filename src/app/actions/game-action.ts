@@ -8,13 +8,13 @@ import { getCookies } from "./action";
 // ゲームとランク登録
 export async function GameRegister(_prevState: any, formData: FormData) {
 
-    const gameData = {
-        game: formData.get("game") as string,
-        rank: formData.get("rank") as string,
-        id: formData.get("id") as unknown as number
-    }
+    const userId = (await getCookies()).id;
 
-    console.log("中身確認：" + gameData.id);
+    const gameData = {
+        name: formData.get("name") as string,
+        rank: formData.get("rank") as string,
+        id: userId
+    }
 
     const issues = GameSchema.safeParse(gameData);
 
@@ -40,16 +40,10 @@ export async function GameRegister(_prevState: any, formData: FormData) {
     }
 }
 
-export async function GameSearch(formData: FormData) {
-    // ゲームを検索
-
-    const subject = {
-        game: formData.get("game") as string,
-        rank: formData.get("rank") as string
-    }
+export async function GameSearch(game: string, rank: string) {
 
     // やっているゲームとランクを登録
-    const res = await Search(subject);
+    const res = await Search(game, rank);
 
     const success = res?.success;
     const message = res?.success;
@@ -66,11 +60,12 @@ export async function GameSearch(formData: FormData) {
 
 export async function GameUpdate(_prevState: any, formData: FormData, id: number) {
     // ゲームとランクを更新
+    const userId = (await getCookies()).id;
 
     const gameData = {
         game: formData.get("name") as string,
         rank: formData.get("rank") as string,
-        id: id
+        id: userId
     };
 
     const res = await Update(gameData);

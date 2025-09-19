@@ -37,10 +37,10 @@ model Posts {
 }
 
 model Games {
-  id     Int    @id@default(autoincrement())
-  name   String 
-  rank   String?
-  user   Users  @relation(fields: [userId], references:[id], onDelete:Cascade)
+  id     Int     @id@default(autoincrement())
+  name   String  @unique
+  rank   String? @unique
+  user   Users   @relation(fields: [userId], references:[id], onDelete:Cascade)
   userId Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
