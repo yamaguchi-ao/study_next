@@ -7,12 +7,10 @@ import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button } from "@/components/ui/button";
 import type { NextPage } from "next";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 
 const GameRegist: NextPage = () => {
-    const router = useRouter();
-    const [token, setToken] = useState(false);
     const [name, setName] = useState(String);
     const [id, setId] = useState(Number);
 
@@ -51,15 +49,19 @@ const GameRegist: NextPage = () => {
                                 <div className="">
                                     <div className="flex pb-10">
                                         <div className="w-35">ゲームタイトル</div>
-                                        <input className="border w-64" name="game"></input>
-                                        {state?.game ? errorText(state?.game) : null}
+                                        <input className="border w-64" name="name"></input>
+                                        {state?.name ? errorText(state?.name) : null}
                                     </div>
                                     <div className="flex pb-10">
                                         <div className="w-35">ランク</div>
                                         <input className="border w-64" name="rank"></input>
                                         {state?.rank ? errorText(state?.rank) : null}
                                     </div>
-                                    <div className="flex justify-end items-end">
+                                    <div className="flex justify-around items-end">
+                                        <Button onClick={() => redirect('/game')}>
+                                            戻る
+                                        </Button>
+
                                         <Button disabled={isPending} type="submit">
                                             {isPending ? "登録中..." : "登録"}
                                         </Button>
