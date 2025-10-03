@@ -7,7 +7,7 @@ export default function RootLayout({
   }>) {
   return (
     <html lang="ja">
-      <body className="">
+      <body className="h-screen">
         <ToastProvider>
           {children}
         </ToastProvider>

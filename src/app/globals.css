@@ -37,3 +37,7 @@ body {
   --tw-translate-x: calc(var(--spacing) * -20);
   translate: var(--tw-translate-x) var(--tw-translate-y);
 }
+
+.h-main {
+  height: calc(100vh - 60px);
+}
