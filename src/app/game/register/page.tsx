@@ -22,8 +22,7 @@ const GameRegist: NextPage = () => {
 
     useEffect(() => {
         data();
-
-    }, [id]);
+    }, []);
 
     const [state, Register, isPending] = useActionState(GameRegister, null);
 
@@ -39,38 +38,34 @@ const GameRegist: NextPage = () => {
     return (
         <>
             <title>ゲーム 登録</title>
-            <div className="h-screen flex">
-                <div className="flex-1 flex flex-col">
-                    <Header title={"ゲーム 登録"} username={name ? name : ""} onClick={(() => Logout())} />
-                    <div className="flex-1 flex overflow-hidden">
-                        <Sidebar />
-                        <form className="flex-1 flex flex-col" action={Register}>
-                            <div className="flex flex-col h-full justify-center items-center">
-                                <div className="">
-                                    <div className="flex pb-10">
-                                        <div className="w-35">ゲームタイトル</div>
-                                        <input className="border w-64" name="name"></input>
-                                        {state?.name ? errorText(state?.name) : null}
-                                    </div>
-                                    <div className="flex pb-10">
-                                        <div className="w-35">ランク</div>
-                                        <input className="border w-64" name="rank"></input>
-                                        {state?.rank ? errorText(state?.rank) : null}
-                                    </div>
-                                    <div className="flex justify-around items-end">
-                                        <Button onClick={() => redirect('/game')}>
-                                            戻る
-                                        </Button>
-
-                                        <Button disabled={isPending} type="submit">
-                                            {isPending ? "登録中..." : "登録"}
-                                        </Button>
-                                    </div>
-                                </div>
+            <Header title={"ゲーム 登録"} username={name ? name : ""} onClick={(() => Logout())} />
+            <div className="flex h-main overflow-hidden">
+                <Sidebar />
+                <form className="flex-1 flex flex-col" action={Register}>
+                    <div className="flex flex-col h-full justify-center items-center">
+                        <div className="">
+                            <div className="flex pb-10">
+                                <div className="w-35">ゲームタイトル</div>
+                                <input className="border w-64" name="name"></input>
+                                {state?.name ? errorText(state?.name) : null}
                             </div>
-                        </form>
+                            <div className="flex pb-10">
+                                <div className="w-35">ランク</div>
+                                <input className="border w-64" name="rank"></input>
+                                {state?.rank ? errorText(state?.rank) : null}
+                            </div>
+                            <div className="flex justify-around items-end">
+                                <Button onClick={() => redirect('/game')}>
+                                    戻る
+                                </Button>
+
+                                <Button disabled={isPending} type="submit">
+                                    {isPending ? "登録中..." : "登録"}
+                                </Button>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
         </>
     )
