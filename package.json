@@ -6,6 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build",
     "lint": "next lint"
   },
   "dependencies": {
@@ -35,6 +36,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
+    "prisma": "^6.15.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
