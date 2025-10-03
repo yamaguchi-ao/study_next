@@ -1,11 +1,11 @@
 /**
  * @type {import('next').NextConfig}
  */
-const allow_origin = process.env.ALLOW_ORIGIN
 
 const nextConfig = {
 
   async headers() {
+    const allow_origin = process.env.ALLOW_ORIGIN;
     return [
       {
         source: '/api/:path*',
