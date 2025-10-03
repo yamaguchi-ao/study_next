@@ -1,4 +1,4 @@
-import { Register, Search, Update } from "@/utils/api/game"
+import { Register, listSearch, Update, gameSearch } from "@/utils/api/game"
 import { errorToast, successToast } from "@/utils/toast";
 import { GameSchema } from "@/utils/validation";
 import { redirect } from "next/navigation";
@@ -32,7 +32,6 @@ export async function GameRegister(_prevState: any, formData: FormData) {
             // 成功時
             successToast(message);
             redirect("/game");
-
         } else {
             // 失敗時
             errorToast(message);
@@ -40,10 +39,10 @@ export async function GameRegister(_prevState: any, formData: FormData) {
     }
 }
 
-export async function GameSearch(game: string, rank: string) {
+export async function GameListSearch(game: string, rank: string) {
 
-    // やっているゲームとランクを登録
-    const res = await Search(game, rank);
+    // やっているゲームとランクを検索
+    const res = await listSearch(game, rank);
 
     const success = res?.success;
     const message = res?.success;
@@ -58,33 +57,54 @@ export async function GameSearch(game: string, rank: string) {
     }
 }
 
-export async function GameUpdate(_prevState: any, formData: FormData, id: number) {
-    // ゲームとランクを更新
-    const userId = (await getCookies()).id;
+export async function getGame(gameId: Number) {
 
-    const gameData = {
-        game: formData.get("name") as string,
-        rank: formData.get("rank") as string,
-        id: userId
-    };
-
-    const res = await Update(gameData);
+    // やっているゲームとランクを取得
+    const res = await gameSearch(gameId);
 
     const success = res?.success;
-    const message = res?.message;
+    const message = res?.success;
+    const data = res?.data;
 
-    try {
-
-    } catch (e) {
-
+    if (success) {
+        // 成功時
+        return data;
+    } else {
+        // 失敗時
+        errorToast(message);
     }
 }
 
-export async function GameDelete() {
-    // ゲームを削除
-    try {
+export async function GameUpdate(_prevState: any, formData: FormData, id: Number) {
 
-    } catch (e) {
+    // ゲームとランクを更新
+    const gameId = id;
 
+    const gameData = {
+        name: formData.get("name") as string,
+        rank: formData.get("rank") as string,
+        gameId: gameId as unknown as Number
+    }
+
+    const issues = GameSchema.safeParse(gameData);
+
+    if (!issues.success) {
+        const validation = z.flattenError(issues.error);
+        return validation.fieldErrors;
+    } else {
+        // やっているゲームとランクを更新
+        const res = await Update(gameData);
+
+        const success = res?.success;
+        const message = res?.message;
+
+        if (success) {
+            // 成功時
+            successToast(message);
+            redirect("/game");
+        } else {
+            // 失敗時
+            errorToast(message);
+        }
     }
 }

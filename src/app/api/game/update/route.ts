@@ -2,15 +2,16 @@ import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
+const JWT_SECRET = process.env.JWT_SECRET;
+
 export async function POST(req: NextRequest) {
-    const { name, rank, id } = await req.json();
-    const JWT_SECRET = process.env.JWT_SECRET;
+    const { name, rank, gameId } = await req.json();
 
     try {
         // ログインしているかどうかの判定
         const token = req.cookies.get("auth_token")?.value;
 
-        const data = await jwt.verify(token!, JWT_SECRET!);
+        const data = jwt.verify(token!, JWT_SECRET!);
 
         if (!data) {
             return NextResponse.json({ message: "ログインしていません。", success: false }, { status: 404 });
@@ -18,25 +19,32 @@ export async function POST(req: NextRequest) {
 
         // ゲームタイトルの既存確認
         const existingGame = await prisma.games.findUnique({
-            where: { userId: id, name: name }
+            where: { name: name },
+            select: {
+                id: true,
+                name: true,
+                rank: true
+            }
         });
 
         if (existingGame) {
             return NextResponse.json({ message: "そのゲームタイトルは既に登録されています。", success: false }, { status: 500 });
         }
 
-        // ゲームとランクの登録
-        await prisma.games.create({
+        // ゲームとランクの更新
+        const test = await prisma.games.update({
+            where: { id: Number(gameId) },
             data: {
-                userId: id,
                 name: name,
                 rank: rank
-            }
+            },
         });
 
-        return NextResponse.json({ message: "新規登録　成功！", success: true }, { status: 200 });
+        console.log("処理来ているか", test);
+
+        return NextResponse.json({ message: "ゲーム更新　成功！", success: true }, { status: 200 });
 
     } catch (e) {
-        return NextResponse.json({ message: "ゲーム 登録失敗...", e }, { status: 500 });
+        return NextResponse.json({ message: "ゲーム 更新失敗...", e }, { status: 500 });
     }
 }
