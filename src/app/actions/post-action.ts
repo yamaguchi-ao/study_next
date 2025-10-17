@@ -1,7 +1,7 @@
 import { PostSchema } from "@/utils/validation";
 import { getCookies } from "./action";
 import { z } from "zod";
-import { post } from "@/utils/api/post";
+import { post, Search } from "@/utils/api/post";
 import { errorToast, successToast } from "@/utils/toast";
 import { redirect } from "next/navigation";
 
@@ -37,14 +37,21 @@ export async function postRegister(_prevState: any, formData: FormData) {
     }
 }
 
-export async function postUpdate() {
+export async function postSearch(_prevState: any, formData: FormData) {
 
+    const game = { game: formData.get("game") as string };
+
+    const res = await Search(game);
+    // const message = res?.message;
+    // const success = res?.success;    
 }
 
-export async function postSearch() {
+export async function postUpdate() {
+
 
 }
 
 export async function postDelete() {
+
 
 }

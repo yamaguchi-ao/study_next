@@ -12,15 +12,17 @@ export async function GET(req: NextRequest) {
     try {
         if (searchParams.toString().includes("id")) {
             const test = await getDetail(gameIdParams!);
-            return NextResponse.json({ message: "取得成功", success: true, data: test }, { status: 200 })
+            return NextResponse.json({ message: "取得成功", success: true, data: test }, { status: 200 });
         } else {
             const test = await getList(gameParams!, rankParams!);
-            return NextResponse.json({ message: "検索成功", success: true, data: test }, { status: 200 })
+            return NextResponse.json({ message: "検索成功", success: true, data: test }, { status: 200 });
         }
     } catch (e) {
-        return NextResponse.json({ message: "ゲームデータ 取得失敗...", e }, { status: 500 })
+        return NextResponse.json({ message: "ゲームデータ 取得失敗...", e }, { status: 500 });
     }
 }
+
+// 一覧用検索
 async function getList(gameParams: string, rankParams: string) {
     const whereConditions: Prisma.GamesWhereInput = {};
 
@@ -44,6 +46,7 @@ async function getList(gameParams: string, rankParams: string) {
     return data;
 }
 
+//　詳細用検索
 async function getDetail(gameId: string) {
 
     const data = await prisma.games.findUnique({

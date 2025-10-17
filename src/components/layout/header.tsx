@@ -1,11 +1,13 @@
-"use client"
-
 import { Button } from "../ui/button";
 import Image from "next/image";
 import icon from "@/public/test_icon.png"
+import { getCookies } from "@/app/actions/action";
 
 // ヘッダー
-export function Header({ title, username, onClick }: any) {
+export async function Header({ title }: any) {
+    const user = await getCookies();
+    const username = user?.name;
+
     return (
         <header>
             <div className="w-auto h-15 bg-cyan-500/50 flex justify-between items-center">
@@ -15,9 +17,7 @@ export function Header({ title, username, onClick }: any) {
                 </div>
                 <div className="flex pr-5 items-center">
                     <h2 className="pr-5">{username}</h2>
-                    <Button className="" onClick={onClick} >
-                        ログアウト
-                    </Button>
+                    <Button onClick={"logout"}>ログアウト</Button>
                 </div>
             </div>
         </header>

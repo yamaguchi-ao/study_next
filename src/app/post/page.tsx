@@ -13,7 +13,6 @@ export default function List() {
   const router = useRouter();
   const [username, setUsername] = useState(String);
   const [game, setGame] = useState(String);
-  const [rank, setRank] = useState(String);
 
   const data = (async () => {
     const cookies = await getCookies();
@@ -27,7 +26,6 @@ export default function List() {
   return (
     <>
       <title>投稿 一覧</title>
-      <Header title={"投稿 一覧"} username={username ? username : ""} onClick={(() => Logout())} />
       <div className="flex h-main overflow-hidden">
         <Sidebar />
         <form className="flex-1 flex flex-col">
@@ -55,10 +53,11 @@ export default function List() {
               <thead>
                 <tr className="border-1">
                   <th className="border-1 w-[50px] bg-blue-700/10">番号</th>
-                  <th className="border-1 w-[300px] bg-blue-700/20 text-center">投稿タイトル</th>
-                  <th className="border-1 w-[200px] bg-blue-700/50">作成者</th>
-                  <th className="border-1 w-[200px] bg-blue-700/30">投稿日時</th>
-                  <th className="border-1 w-[100px] bg-blue-700/20"></th>
+                  <th className="border-1 w-[100px] bg-blue-700/20">ゲームタイトル</th>
+                  <th className="border-1 w-[300px] bg-blue-700/30 text-center">投稿タイトル</th>
+                  <th className="border-1 w-[200px] bg-blue-700/40">作成者</th>
+                  <th className="border-1 w-[200px] bg-blue-700/50">投稿日時</th>
+                  <th className="border-1 w-[100px] bg-blue-700/60"></th>
                 </tr>
               </thead>
               <tbody>
@@ -70,4 +69,8 @@ export default function List() {
       </div>
     </>
   )
+}
+
+async function postTable() {
+  
 }

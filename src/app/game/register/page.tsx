@@ -38,7 +38,6 @@ const GameRegist: NextPage = () => {
     return (
         <>
             <title>ゲーム 登録</title>
-            <Header title={"ゲーム 登録"} username={name ? name : ""} onClick={(() => Logout())} />
             <div className="flex h-main overflow-hidden">
                 <Sidebar />
                 <form className="flex-1 flex flex-col" action={Register}>

@@ -64,7 +64,6 @@ const Game: NextPage = () => {
     return (
         <>
             <title>ゲーム一覧</title>
-            <Header title={"ゲーム 一覧"} username={username?.name ? username.name : ""} onClick={(() => Logout())} />
             <div className="flex h-main overflow-hidden">
                 <Sidebar />
                 <form className="flex-1 flex flex-col" action={searchAction}>

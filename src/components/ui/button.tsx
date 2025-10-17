@@ -1,11 +1,9 @@
+"use client"
+import { Logout } from '@/app/actions/form-action';
 import clsx from 'clsx';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    children: React.ReactNode;
-}
-
 // ボタンレイアウト用
-export function Button({ children, className, type, ...rest }: ButtonProps) {
+export function Button({ children, className, type, onClick, ...rest }: any ) {
     return (
         <button
             {...rest}
@@ -14,6 +12,7 @@ export function Button({ children, className, type, ...rest }: ButtonProps) {
                 className,
             )}
             type={type ? type : "button"}
+            onClick={ onClick == "logout" ? (() => Logout()) : onClick}
         >
             {children }
         </button >

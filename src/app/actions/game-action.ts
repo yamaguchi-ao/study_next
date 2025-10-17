@@ -65,10 +65,11 @@ export async function getGame(gameId: Number) {
     const success = res?.success;
     const message = res?.success;
     const data = res?.data;
+    const { name, rank } = data;
 
     if (success) {
         // 成功時
-        return data;
+        return { name, rank };
     } else {
         // 失敗時
         errorToast(message);

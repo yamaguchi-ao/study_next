@@ -27,10 +27,9 @@ export default function List() {
   return (
     <>
       <title>投稿</title>
-      <Header title={"投稿 作成"} username={username ? username : ""} onClick={(() => Logout())} />
       <div className="flex h-main overflow-hidden">
         <Sidebar />
-        <form className="w-full p-7">
+        <form className="w-full p-7" action={postAction}>
           <div className="flex">
             <div className="font-bold">タイトル 入力</div>
           </div>
@@ -44,7 +43,9 @@ export default function List() {
 
           <div className="flex justify-between">
             <Button onClick={() => redirect('/post')}>戻る</Button>
-            <Button>登録</Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "投稿中..." : "投稿"}
+            </Button>
           </div>
         </form>
       </div>

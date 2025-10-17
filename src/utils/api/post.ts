@@ -19,7 +19,7 @@ export async function postDelete() {
     return data.json();
 }
 
-export async function postSearch(searchData: { game: string }) {
+export async function Search(searchData: { game: string }) {
     const url = "api/post/search";
 
     const data = await fetch(url, {
