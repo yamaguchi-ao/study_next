@@ -8,12 +8,13 @@ import { getCookies } from "./action";
 // ゲームとランク登録
 export async function GameRegister(_prevState: any, formData: FormData) {
 
-    const userId = (await getCookies()).id;
+    const cookie = await getCookies();
+    const userId = cookie?.id;
 
     const gameData = {
         name: formData.get("name") as string,
         rank: formData.get("rank") as string,
-        id: userId
+        id: userId as number
     }
 
     const issues = GameSchema.safeParse(gameData);

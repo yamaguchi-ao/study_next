@@ -7,12 +7,14 @@ import { redirect } from "next/navigation";
 
 export async function postRegister(_prevState: any, formData: FormData) {
 
-    const userId = (await getCookies()).id;
+    const cookie = await getCookies();
+    const userId = cookie?.id;
 
     const postData = {
         title: formData.get("title") as string,
         post: formData.get("post") as string,
-        userId: userId
+        game: formData.get("game") as string,
+        id: userId as number
     }
 
     // バリデーションチェック

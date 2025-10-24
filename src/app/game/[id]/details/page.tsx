@@ -1,18 +1,13 @@
 "use client"
 
-import { getCookies } from "@/app/actions/action";
-import { Logout } from "@/app/actions/form-action";
 import { GameUpdate } from "@/app/actions/game-action";
-import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button } from "@/components/ui/button";
 import { gameSearch } from "@/utils/api/game";
-import { redirect, useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { use, useActionState, useEffect, useState } from "react";
 
 export default function Detail({ params }: { params: Promise<{ id: Number }> }) {
-    const router = useRouter();
-    const [username, setUsername] = useState(String);
 
     const [rank, setRank] = useState(String);
     const gameId = use(params).id;
@@ -24,14 +19,7 @@ export default function Detail({ params }: { params: Promise<{ id: Number }> }) 
         null
     );
 
-    // ユーザー情報表示用
-    async function getLoginUser() {
-        const cookies = await getCookies();
-        setUsername(cookies.name);
-    }
-
     useEffect(() => {
-        getLoginUser();
     }, [gameId]);
 
     const errorText = (data: string[]) => {

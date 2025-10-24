@@ -1,9 +1,10 @@
 "use client"
 import { Logout } from '@/app/actions/form-action';
 import clsx from 'clsx';
+import { useRouter } from 'next/navigation';
 
 // ボタンレイアウト用
-export function Button({ children, className, type, onClick, ...rest }: any ) {
+export function Button({ children, className, type, onClick, ...rest }: any) {
     return (
         <button
             {...rest}
@@ -12,9 +13,14 @@ export function Button({ children, className, type, onClick, ...rest }: any ) {
                 className,
             )}
             type={type ? type : "button"}
-            onClick={ onClick == "logout" ? (() => Logout()) : onClick}
+            onClick={onClick == "logout" ? (() => Logout()) : onClick}
         >
-            {children }
+            {children}
         </button >
     );
+}
+
+export function Update({ type, id }: any) {
+    const router = useRouter();
+    return <Button onClick={() => router.push(`${type}/${id}/update`)}>更新</Button>
 }

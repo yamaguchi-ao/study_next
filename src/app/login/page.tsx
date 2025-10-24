@@ -32,6 +32,8 @@ const Login: NextPage = () => {
         newSearchParams.delete("error");
         router.replace(
             `${window.location.pathname}?${newSearchParams.toString()}`);
+
+        router.refresh();
     }, [errorCode, router]);
 
     return (

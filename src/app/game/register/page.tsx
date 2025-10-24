@@ -1,27 +1,15 @@
 "use client"
 
-import { getCookies } from "@/app/actions/action";
-import { Logout } from "@/app/actions/form-action";
 import { GameRegister } from "@/app/actions/game-action";
-import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button } from "@/components/ui/button";
 import type { NextPage } from "next";
-import { redirect, useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { redirect } from "next/navigation";
+import { useActionState, useEffect } from "react";
 
 const GameRegist: NextPage = () => {
-    const [name, setName] = useState(String);
-    const [id, setId] = useState(Number);
-
-    const data = (async () => {
-        const data = await getCookies();
-        setId(data.id);
-        setName(data.name);
-    });
-
+    
     useEffect(() => {
-        data();
     }, []);
 
     const [state, Register, isPending] = useActionState(GameRegister, null);

@@ -1,12 +1,10 @@
 import { Button } from "../ui/button";
 import Image from "next/image";
 import icon from "@/public/test_icon.png"
-import { getCookies } from "@/app/actions/action";
+import { Username } from "../ui/username";
 
 // ヘッダー
-export async function Header({ title }: any) {
-    const user = await getCookies();
-    const username = user?.name;
+export async function Header({ title, username }: any) {
 
     return (
         <header>
@@ -16,7 +14,7 @@ export async function Header({ title }: any) {
                     <h1 className="pl-5 text-2xl">{title}</h1>
                 </div>
                 <div className="flex pr-5 items-center">
-                    <h2 className="pr-5">{username}</h2>
+                    <Username username={username} />
                     <Button onClick={"logout"}>ログアウト</Button>
                 </div>
             </div>

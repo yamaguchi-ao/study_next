@@ -1,4 +1,4 @@
-export async function post(postData: { title: String, post: String }) {
+export async function post(postData: { title: String, post: String, game: string }) {
     const url = "api/post/register";
 
     const data = await fetch(url, {

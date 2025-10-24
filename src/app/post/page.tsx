@@ -1,27 +1,17 @@
 "use client"
 
-import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
-import { Logout } from "../actions/form-action";
 import { useEffect, useState } from "react";
-import { getCookies } from "../actions/action";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 
-
 export default function List() {
   const router = useRouter();
-  const [username, setUsername] = useState(String);
   const [game, setGame] = useState(String);
 
-  const data = (async () => {
-    const cookies = await getCookies();
-    setUsername(cookies.name);
-  });
-
   useEffect(() => {
-    data();
-  }, [username]);
+    router.refresh();
+  }, [router]);
 
   return (
     <>
