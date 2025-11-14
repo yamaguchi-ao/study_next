@@ -33,7 +33,7 @@ export type GameSchema = z.infer<typeof GameSchema>;
 export const PostSchema = z.object({
     title: z.string().min(1, "タイトルを入力してください。"),
     post: z.string().min(1, "投稿内容は必ず1文字以上入力してください。"),
-    game: z.string().min(1, "ゲームタグを入力してください。"),
+    game: z.string().min(1, "ゲームタグを入力してください。").nullish(),
 });
 
 export type PostSchema = z.infer<typeof PostSchema>;

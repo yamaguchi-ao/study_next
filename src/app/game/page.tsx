@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import type { NextPage } from "next";
 import { useRouter } from "next/navigation";
 import { Suspense, useActionState, useEffect, useState } from "react";
-import { getCookies } from "../actions/action";
 import { GameListSearch } from "../actions/game-action";
 import Loading from "../loading";
 import Link from "next/link";

@@ -1,7 +1,7 @@
 "use client"
 import { Logout } from '@/app/actions/form-action';
 import clsx from 'clsx';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 
 // ボタンレイアウト用
 export function Button({ children, className, type, onClick, ...rest }: any) {
@@ -20,7 +20,14 @@ export function Button({ children, className, type, onClick, ...rest }: any) {
     );
 }
 
-export function Update({ type, id }: any) {
+/** 更新用ボタン */
+export function UpdateButton({ type, id }: any) {
     const router = useRouter();
-    return <Button onClick={() => router.push(`${type}/${id}/update`)}>更新</Button>
+    return <Button onClick={() => router.push(`/${type}/${id}/update`)}>更新</Button>
+}
+
+/** 戻る用ボタン */
+export function ReturnButton({ type }: any) {
+    const router = useRouter();
+    return <Button onClick={() => router.back()}>戻る</Button>
 }
