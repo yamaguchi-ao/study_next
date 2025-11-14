@@ -1,40 +1,27 @@
 "use client"
 
-import { Logout } from "@/app/actions/form-action";
-import { Header } from "@/components/layout/header";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button } from "@/components/ui/button";
 import type { NextPage } from "next";
 import { useRouter } from "next/navigation";
 import { Suspense, useActionState, useEffect, useState } from "react";
-import { getCookies } from "../actions/action";
 import { GameListSearch } from "../actions/game-action";
 import Loading from "../loading";
 import Link from "next/link";
 import { Delete } from "@/utils/api/game";
 import { errorToast, successToast } from "@/utils/toast";
 
-type user = {
-    id: number,
-    name: string
-}
-
 const Game: NextPage = () => {
     const router = useRouter();
-    const [username, setUsername] = useState<user>();
+    
     const [game, setGame] = useState('');
     const [rank, setRank] = useState('');
     const [search, setSearch] = useState(Array);
     const [state, searchAction, isPending] = useActionState(GetSearch, null);
 
-    const data = (async () => {
-        const user = await getCookies();
-        setUsername(user);
-    });
-
     useEffect(() => {
-        data();
-    }, [router]);
+        router.refresh();
+    }, [router, search]);
 
     // 検索
     async function GetSearch() {
@@ -58,13 +45,11 @@ const Game: NextPage = () => {
             // 失敗時
             errorToast(message);
         }
-        router.refresh();
     }
 
     return (
         <>
             <title>ゲーム一覧</title>
-            <Header title={"ゲーム 一覧"} username={username?.name ? username.name : ""} onClick={(() => Logout())} />
             <div className="flex h-main overflow-hidden">
                 <Sidebar />
                 <form className="flex-1 flex flex-col" action={searchAction}>

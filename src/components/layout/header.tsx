@@ -1,11 +1,11 @@
-"use client"
-
 import { Button } from "../ui/button";
 import Image from "next/image";
 import icon from "@/public/test_icon.png"
+import { Username } from "../ui/username";
 
 // ヘッダー
-export function Header({ title, username, onClick }: any) {
+export async function Header({ title, username }: any) {
+
     return (
         <header>
             <div className="w-auto h-15 bg-cyan-500/50 flex justify-between items-center">
@@ -14,10 +14,8 @@ export function Header({ title, username, onClick }: any) {
                     <h1 className="pl-5 text-2xl">{title}</h1>
                 </div>
                 <div className="flex pr-5 items-center">
-                    <h2 className="pr-5">{username}</h2>
-                    <Button className="" onClick={onClick} >
-                        ログアウト
-                    </Button>
+                    <Username username={username} />
+                    <Button onClick={"logout"}>ログアウト</Button>
                 </div>
             </div>
         </header>

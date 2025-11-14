@@ -6,15 +6,14 @@ import type { Prisma } from "@prisma/client";
 export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const gameParams = searchParams.get('game');
-    const rankParams = searchParams.get('rank');
-    const gameIdParams = searchParams.get('id');
+    const postIdParams = searchParams.get('id');
 
     try {
         if (searchParams.toString().includes("id")) {
-            const detailData = await getDetail(gameIdParams!);
+            const detailData = await getDetail(postIdParams!);
             return NextResponse.json({ message: "取得成功", success: true, data: detailData }, { status: 200 });
         } else {
-            const listData = await getList(gameParams!, rankParams!);
+            const listData = await getList(gameParams!);
             return NextResponse.json({ message: "検索成功", success: true, data: listData }, { status: 200 });
         }
     } catch (e) {
@@ -23,38 +22,42 @@ export async function GET(req: NextRequest) {
 }
 
 // 一覧用検索
-async function getList(gameParams: string, rankParams: string) {
-    const whereConditions: Prisma.GamesWhereInput = {};
+async function getList(gameParams: string) {
+    const whereConditions: Prisma.PostsWhereInput = {};
 
     if (gameParams) {
-        whereConditions.name = { contains: gameParams };
+        whereConditions.gameTag = { contains: gameParams };
     }
 
-    if (rankParams) {
-        whereConditions.rank = { contains: rankParams };
-    }
-
-    const data = await prisma.games.findMany({
+    const data = await prisma.posts.findMany({
         where: whereConditions,
         select: {
             id: true,
-            name: true,
-            rank: true
+            title: true,
+            gameTag: true,
+            userId: true,
+            user: {
+                select: {
+                    name: true,
+                }
+            }
         },
     });
-    
+
     return data;
 }
 
 //　詳細用検索
-async function getDetail(gameId: string) {
+async function getDetail(postId: string) {
 
-    const data = await prisma.games.findUnique({
-        where: { id: Number(gameId) },
+    const data = await prisma.posts.findUnique({
+        where: { id: Number(postId) },
         select: {
             id: true,
-            name: true,
-            rank: true
+            title: true,
+            content: true,
+            gameTag: true,
+            userId: true
         }
     });
 

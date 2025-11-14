@@ -40,8 +40,6 @@ export async function POST(req: NextRequest) {
             },
         });
 
-        console.log("処理来ているか", test);
-
         return NextResponse.json({ message: "ゲーム更新　成功！", success: true }, { status: 200 });
 
     } catch (e) {

@@ -1,19 +1,15 @@
 "use client"
 
-import { getCookies } from "@/app/actions/action";
-import { Logout } from "@/app/actions/form-action";
-import { GameUpdate, getGame } from "@/app/actions/game-action";
-import { Header } from "@/components/layout/header";
+import { GameUpdate } from "@/app/actions/game-action";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button } from "@/components/ui/button";
-import { redirect, useRouter } from "next/navigation";
+import { gameSearch } from "@/utils/api/game";
+import { redirect } from "next/navigation";
 import { use, useActionState, useEffect, useState } from "react";
 
 export default function Detail({ params }: { params: Promise<{ id: Number }> }) {
-    const router = useRouter();
-    const [username, setUsername] = useState(String);
-    const [game, setGame] = useState(String);
-    const [rank, setRank] = useState(String)
+
+    const [rank, setRank] = useState(String);
     const gameId = use(params).id;
 
     const [state, updataAction, isPending] = useActionState(
@@ -23,22 +19,7 @@ export default function Detail({ params }: { params: Promise<{ id: Number }> }) 
         null
     );
 
-    // ユーザー情報表示用
-    async function getLoginUser() {
-        const cookies = await getCookies();
-        setUsername(cookies.name);
-    }
-
-    async function getGameData(gameId: Number) {
-        // 詳細用ゲーム検索
-        const data = await getGame(gameId);
-        setGame(data?.name);
-        setRank(data?.rank);
-    }
-
     useEffect(() => {
-        getLoginUser();
-        getGameData(gameId);
     }, [gameId]);
 
     const errorText = (data: string[]) => {
@@ -53,7 +34,6 @@ export default function Detail({ params }: { params: Promise<{ id: Number }> }) 
     return (
         <>
             <title>ゲーム 詳細</title>
-            <Header title={"ゲーム 詳細"} username={username ? username : ""} onClick={(() => Logout())} />
             <div className="flex h-main overflow-hidden">
                 <Sidebar />
                 <form className="flex-1 flex flex-col" action={updataAction}>
@@ -61,7 +41,7 @@ export default function Detail({ params }: { params: Promise<{ id: Number }> }) 
                         <div className="">
                             <div className="flex pb-10">
                                 <div className="w-35">ゲームタイトル</div>
-                                <input className="border w-64" name="name" value={game} onChange={(e) => setGame(e.target.value)}></input>
+                                <TestGame gameId={gameId}></TestGame>
                                 {state?.name ? errorText(state?.name) : null}
                             </div>
                             <div className="flex pb-10">
@@ -81,4 +61,16 @@ export default function Detail({ params }: { params: Promise<{ id: Number }> }) 
             </div>
         </>
     )
+}
+
+function TestGame({ gameId }: any) {
+    const [game, setGame] = useState(String);
+
+    useEffect(() => {
+        gameSearch(gameId).then(data => {
+            setGame(data?.data.name);
+        });
+    }, [gameId]);
+
+    return <input className="border w-64" name="name" value={game} onChange={(e) => setGame(e.target.value)}></input>
 }
