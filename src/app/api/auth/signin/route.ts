@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     try {
         // DBから特定のユーザを検索 
         const user = await prisma.users.findUnique({
-            where: { email: email }
+            where: { email: email },
         });
 
         // ユーザーが存在しない場合
