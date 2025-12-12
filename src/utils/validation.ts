@@ -22,9 +22,24 @@ export const LoginSchema = z.object({
 
 export type LoginSchema = z.infer<typeof LoginSchema>;
 
+// ゲーム用バリデーション
 export const GameSchema = z.object({
     name: z.string().min(1, "ゲームタイトルを入力してください。"),
     rank: z.string().min(1, "ランクを入力してください。"),
 });
 
 export type GameSchema = z.infer<typeof GameSchema>;
+
+export const GameUpdateSchema = z.object({
+    rank: z.string().min(1, "ランクを入力してください。"),
+});
+
+export type GameUpdateSchema = z.infer<typeof GameUpdateSchema>;
+
+export const PostSchema = z.object({
+    title: z.string().min(1, "タイトルを入力してください。"),
+    post: z.string().min(1, "投稿内容は必ず1文字以上入力してください。"),
+    game: z.string().min(1, "ゲームタグを入力してください。").nullish(),
+});
+
+export type PostSchema = z.infer<typeof PostSchema>;

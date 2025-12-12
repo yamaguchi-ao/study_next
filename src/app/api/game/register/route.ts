@@ -17,11 +17,11 @@ export async function POST(req: NextRequest) {
         }
 
         // ゲームタイトルの既存確認
-        const existingGame = await prisma.games.findUnique({
-            where: { userId: id, name: name }
+        const existingGame = await prisma.games.findMany({
+            where: { userId: id, AND: { name: name } }
         });
 
-        if (existingGame) {
+        if (existingGame.length > 0) {
             return NextResponse.json({ message: "そのゲームタイトルは既に登録されています。", success: false }, { status: 500 });
         }
 
@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: "新規登録　成功！", success: true }, { status: 200 });
 
     } catch (e) {
+        console.log("error", e);
         return NextResponse.json({ message: "ゲーム 登録失敗...", e }, { status: 500 });
     }
 }

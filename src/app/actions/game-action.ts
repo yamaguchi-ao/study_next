@@ -1,6 +1,6 @@
 import { Register, listSearch, Update, gameSearch } from "@/utils/api/game"
 import { errorToast, successToast } from "@/utils/toast";
-import { GameSchema } from "@/utils/validation";
+import { GameSchema, GameUpdateSchema } from "@/utils/validation";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getCookies } from "./action";
@@ -8,12 +8,13 @@ import { getCookies } from "./action";
 // ゲームとランク登録
 export async function GameRegister(_prevState: any, formData: FormData) {
 
-    const userId = (await getCookies()).id;
+    const cookie = await getCookies();
+    const userId = cookie?.id;
 
     const gameData = {
         name: formData.get("name") as string,
         rank: formData.get("rank") as string,
-        id: userId
+        id: userId as number
     }
 
     const issues = GameSchema.safeParse(gameData);
@@ -41,8 +42,12 @@ export async function GameRegister(_prevState: any, formData: FormData) {
 
 export async function GameListSearch(game: string, rank: string) {
 
+    // ログインしているユーザ取得
+    const cookie = await getCookies();
+    const userId = cookie?.id;
+
     // やっているゲームとランクを検索
-    const res = await listSearch(game, rank);
+    const res = await listSearch(game, rank, userId!);
 
     const success = res?.success;
     const message = res?.success;
@@ -65,10 +70,11 @@ export async function getGame(gameId: Number) {
     const success = res?.success;
     const message = res?.success;
     const data = res?.data;
+    const { name, rank } = data;
 
     if (success) {
         // 成功時
-        return data;
+        return { name, rank };
     } else {
         // 失敗時
         errorToast(message);
@@ -81,12 +87,11 @@ export async function GameUpdate(_prevState: any, formData: FormData, id: Number
     const gameId = id;
 
     const gameData = {
-        name: formData.get("name") as string,
         rank: formData.get("rank") as string,
         gameId: gameId as unknown as Number
     }
 
-    const issues = GameSchema.safeParse(gameData);
+    const issues = GameUpdateSchema.safeParse(gameData);
 
     if (!issues.success) {
         const validation = z.flattenError(issues.error);

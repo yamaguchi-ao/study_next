@@ -1,18 +1,29 @@
 "use client"
 
-import { GameRegister } from "@/app/actions/game-action";
+import { GameUpdate, getGame } from "@/app/actions/game-action";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button } from "@/components/ui/button";
-import type { NextPage } from "next";
 import { redirect } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { use, useActionState, useEffect, useState } from "react";
 
-const GameRegist: NextPage = () => {
-    
+export default function UpdatePage({ params }: { params: Promise<{ id: number }> }) {
+    const [name, setName] = useState(String);
+    const [rank, setRank] = useState(String);
+    const gameId = use(params).id;
+
+    const [state, gameAction, isPending] = useActionState(
+        async (_prevState: any, formData: FormData) => {
+            return GameUpdate(_prevState, formData, gameId);
+        }, null);
+
     useEffect(() => {
-    }, []);
-
-    const [state, Register, isPending] = useActionState(GameRegister, null);
+        async function getGames() {
+            const games = await getGame(gameId);
+            setName(games?.name);
+            setRank(games?.rank);
+        }
+        getGames();
+    }, [params, gameId]);
 
     const errorText = (data: string[]) => {
         const list = [];
@@ -25,29 +36,25 @@ const GameRegist: NextPage = () => {
 
     return (
         <>
-            <title>ゲーム 登録</title>
+            <title>ゲーム 更新</title>
             <div className="flex h-main overflow-hidden">
                 <Sidebar />
-                <form className="flex-1 flex flex-col" action={Register}>
+                <form className="flex-1 flex flex-col" action={gameAction}>
                     <div className="flex flex-col h-full justify-center items-center">
                         <div className="">
                             <div className="flex pb-10">
                                 <div className="w-35">ゲームタイトル</div>
-                                <input className="border w-64" name="name"></input>
-                                {state?.name ? errorText(state?.name) : null}
+                                <h1 className="text-2xl pl20">{name}</h1>
                             </div>
                             <div className="flex pb-10">
                                 <div className="w-35">ランク</div>
-                                <input className="border w-64" name="rank"></input>
+                                <input className="border w-64" name="rank" value={rank} onChange={(e) => setRank(e.target.value)}></input>
                                 {state?.rank ? errorText(state?.rank) : null}
                             </div>
                             <div className="flex justify-around items-end">
-                                <Button onClick={() => redirect('/game')}>
-                                    戻る
-                                </Button>
-
+                                <Button onClick={() => redirect('/game')}>戻る</Button>
                                 <Button disabled={isPending} type="submit">
-                                    {isPending ? "登録中..." : "登録"}
+                                    {isPending ? "更新中..." : "更新"}
                                 </Button>
                             </div>
                         </div>
@@ -57,5 +64,3 @@ const GameRegist: NextPage = () => {
         </>
     )
 }
-
-export default GameRegist

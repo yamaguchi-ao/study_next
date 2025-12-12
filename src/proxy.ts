@@ -11,7 +11,7 @@ export const menus = {
     ]
 }
 
-export default async function middleware(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
     const authToken = req.cookies.get("auth_token")?.value;
     
     if (authToken === undefined) {

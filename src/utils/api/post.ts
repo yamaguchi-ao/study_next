@@ -1,19 +1,15 @@
-/**
- * ゲーム用API 
- */
-
 "use server"
 
-import { cookies, headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 
-export const Register = async (gameData: { name: string, rank: string, id: number }) => {
+export async function post(postData: { title: string, post: string, game: string }) {
 
     const baseUrl = await getUrl();
-    const url = `${baseUrl}/api/game/register`;
+    const url = `${baseUrl}/api/post/register`;
     const cookie = await cookies();
     const data = await fetch(url, {
         method: "POST",
-        body: JSON.stringify(gameData),
+        body: JSON.stringify(postData),
         headers: {
             Cookie: cookie.toString(),
         },
@@ -22,10 +18,10 @@ export const Register = async (gameData: { name: string, rank: string, id: numbe
     return data.json();
 }
 
-export const listSearch = async (game: string, rank: string, userId: number) => {
+export const listSearch = async (game: string) => {
 
     const baseUrl = await getUrl();
-    const url = `${baseUrl}/api/game/search` + "?game=" + game + "&rank=" + rank + "&userId=" + userId;
+    const url = `${baseUrl}/api/post/search` + "?game=" + game;
 
     const data = await fetch(url, {
         method: "GET",
@@ -34,10 +30,10 @@ export const listSearch = async (game: string, rank: string, userId: number) => 
     return data.json();
 }
 
-export const gameSearch = async (gameId: Number) => {
+export const detailSearch = async (postId: Number) => {
 
-    const baseUrl = await getUrl();
-    const url = `${baseUrl}/api/game/search` + "?id=" + gameId;
+    const baseurl = await getUrl();
+    const url = `${baseurl}/api/post/search` + "?id=" + postId;
 
     const data = await fetch(url, {
         method: "GET",
@@ -46,14 +42,14 @@ export const gameSearch = async (gameId: Number) => {
     return data.json();
 }
 
-export const Update = async (subject: { rank: string, gameId: Number }) => {
+export async function Update(postData: { title: string, post: string, id: number }) {
 
     const baseUrl = await getUrl();
-    const url = `${baseUrl}/api/game/update`;
+    const url = `${baseUrl}/api/post/update`;
     const cookie = await cookies();
     const data = await fetch(url, {
         method: "POST",
-        body: JSON.stringify(subject),
+        body: JSON.stringify(postData),
         headers: {
             Cookie: cookie.toString(),
         },
@@ -62,14 +58,17 @@ export const Update = async (subject: { rank: string, gameId: Number }) => {
     return data.json();
 }
 
-export const Delete = async (id: number) => {
+export async function Delete(postId: number) {
 
     const baseUrl = await getUrl();
-    const url = `${baseUrl}/api/game/delete`;
-
+    const url = `${baseUrl}/api/post/delete`;
+    const cookie = await cookies();
     const data = await fetch(url, {
         method: "POST",
-        body: JSON.stringify({ id: id }),
+        body: JSON.stringify({ id: postId }),
+        headers: {
+            Cookie: cookie.toString(),
+        },
         credentials: "include"
     });
     return data.json();
@@ -77,7 +76,7 @@ export const Delete = async (id: number) => {
 
 async function getUrl() {
     const headersData = headers();
-    const protocol = (await headersData).get("x-forwarded-protocol") || "http";
+    const protocol = (await headersData).get("x-forwarded-proto") || "http";
     const host = (await headersData).get("host");
 
     const baseUrl = `${protocol}://${host}`;
