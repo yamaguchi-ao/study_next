@@ -55,7 +55,9 @@ export default function List() {
 
             <div className="flex">
               <div className="pl-5">
-                <Button type="submit">検索</Button>
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? "検索中..." : "検索"}
+                  </Button>
               </div>
 
               <div className="pl-5">

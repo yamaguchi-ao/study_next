@@ -1,6 +1,6 @@
 import { Register, listSearch, Update, gameSearch } from "@/utils/api/game"
 import { errorToast, successToast } from "@/utils/toast";
-import { GameSchema } from "@/utils/validation";
+import { GameSchema, GameUpdateSchema } from "@/utils/validation";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getCookies } from "./action";
@@ -42,8 +42,12 @@ export async function GameRegister(_prevState: any, formData: FormData) {
 
 export async function GameListSearch(game: string, rank: string) {
 
+    // ログインしているユーザ取得
+    const cookie = await getCookies();
+    const userId = cookie?.id;
+
     // やっているゲームとランクを検索
-    const res = await listSearch(game, rank);
+    const res = await listSearch(game, rank, userId!);
 
     const success = res?.success;
     const message = res?.success;
@@ -83,12 +87,11 @@ export async function GameUpdate(_prevState: any, formData: FormData, id: Number
     const gameId = id;
 
     const gameData = {
-        name: formData.get("name") as string,
         rank: formData.get("rank") as string,
         gameId: gameId as unknown as Number
     }
 
-    const issues = GameSchema.safeParse(gameData);
+    const issues = GameUpdateSchema.safeParse(gameData);
 
     if (!issues.success) {
         const validation = z.flattenError(issues.error);
