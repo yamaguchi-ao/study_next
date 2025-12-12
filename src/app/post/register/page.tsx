@@ -3,7 +3,7 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { useActionState, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { redirect, useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import { postRegister } from "@/app/actions/post-action";
 import { GameListSearch } from "@/app/actions/game-action";
 
