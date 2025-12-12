@@ -9,8 +9,7 @@ export async function POST(req: NextRequest) {
     try {
         // ログインしているかどうかの判定
         const token = req.cookies.get("auth_token")?.value;
-
-        const data = jwt.verify(token!, JWT_SECRET!);
+        const data = await jwt.verify(token!, JWT_SECRET!);
 
         if (!data) {
             return NextResponse.json({ message: "ログインしていません。", success: false }, { status: 404 });
