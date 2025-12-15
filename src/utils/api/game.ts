@@ -66,10 +66,13 @@ export const Delete = async (id: number) => {
 
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/game/delete`;
-
+    const cookie = await cookies();
     const data = await fetch(url, {
         method: "POST",
         body: JSON.stringify({ id: id }),
+                headers: {
+            Cookie: cookie.toString(),
+        },
         credentials: "include"
     });
     return data.json();
@@ -77,7 +80,7 @@ export const Delete = async (id: number) => {
 
 async function getUrl() {
     const headersData = headers();
-    const protocol = (await headersData).get("x-forwarded-protocol") || "http";
+    const protocol = (await headersData).get("x-forwarded-proto") || "http";
     const host = (await headersData).get("host");
 
     const baseUrl = `${protocol}://${host}`;
