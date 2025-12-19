@@ -35,7 +35,7 @@ const Game: NextPage = () => {
         const res = await Delete(gameId);
 
         const success = res?.success;
-        const message = res?.success;
+        const message = res?.message;
 
         if (success) {
             // 成功時

@@ -1,9 +1,10 @@
-import { PostSchema } from "@/utils/validation";
+import { CommentSchema, PostSchema } from "@/utils/validation";
 import { getCookies } from "./action";
 import { z } from "zod";
 import { Delete, detailSearch, listSearch, post, Update } from "@/utils/api/post";
 import { errorToast, successToast } from "@/utils/toast";
 import { redirect } from "next/navigation";
+import { comment } from "@/utils/api/comment";
 
 export async function postRegister(_prevState: any, formData: FormData) {
 
@@ -45,7 +46,7 @@ export async function postListSearch(game: string) {
     const res = await listSearch(game);
 
     const success = res?.success;
-    const message = res?.success;
+    const message = res?.message;
     const data = res?.data;
 
     if (success) {
@@ -63,7 +64,7 @@ export async function getPost(postId: Number) {
     const res = await detailSearch(postId);
 
     const success = res?.success;
-    const message = res?.success;
+    const message = res?.message;
     const data = res?.data;
 
     if (success) {
@@ -94,7 +95,7 @@ export async function postUpdate(_prevState: any, formData: FormData, id: number
         const res = await Update(postData);
 
         const success = res?.success;
-        const message = res?.success;
+        const message = res?.message;
 
         if (success) {
             // 成功時
@@ -113,7 +114,35 @@ export async function postDelete(postId: number) {
     const res = await Delete(postId);
 
     const success = res?.success;
-    const message = res?.success;
+    const message = res?.message;
 
     return {success, message};
+}
+
+export async function addComment(_prevState: any, formData: FormData, postId: number, userId: number) {
+    
+    const commentData = {
+        comment: formData.get("comment") as string,
+        postId: postId,
+        userId: userId
+    }
+
+    const issues = CommentSchema.safeParse(commentData);
+
+    if (!issues.success) {
+        const validation = z.flattenError(issues.error);
+        return validation.fieldErrors;
+    } else {
+        // コメント追加処理
+        const res = await comment(commentData);
+
+        const success = res?.success;
+        const message = res?.message;
+
+        if (success) {
+            successToast(message);
+        } else {
+            errorToast(message);
+        }
+    }
 }

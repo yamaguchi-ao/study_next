@@ -1,7 +1,9 @@
 "use client"
 import { Logout } from '@/app/actions/form-action';
 import clsx from 'clsx';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import Modal from './modal';
 
 // ボタンレイアウト用
 export function Button({ children, className, type, onClick, ...rest }: any) {
@@ -29,5 +31,22 @@ export function UpdateButton({ type, id }: any) {
 /** 戻る用ボタン */
 export function ReturnButton({ type }: any) {
     const router = useRouter();
-    return <Button onClick={() => router.back()}>戻る</Button>
+
+    if (type) {
+        return <Button onClick={() => router.push(`/${type}`)}>戻る</Button>
+    } else {
+        return <Button onClick={() => router.back()}>戻る</Button>
+    }
+}
+
+/** モーダル用ボタン */
+export function ModalButton({ className, data }: any) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <>
+            <Button onClick={() => setIsOpen(true)} className={className}>コメント</Button>
+            <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} data={data}></Modal>
+        </>
+    );
 }

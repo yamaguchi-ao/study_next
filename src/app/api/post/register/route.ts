@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
                 content: post,
                 gameTag: game,
                 userId: id,
+                rankFlg: false,
             }
         })
 

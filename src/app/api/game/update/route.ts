@@ -10,8 +10,6 @@ export async function POST(req: NextRequest) {
         // ログインしているかどうかの判定
         const token = req.cookies.get("auth_token")?.value;
 
-        console.log("取得されるべき対象：" ,[token!, JWT_SECRET!]);
-
         const data = await jwt.verify(token!, JWT_SECRET!);
 
         if (!data) {

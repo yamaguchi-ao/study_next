@@ -8,6 +8,7 @@ import Link from "next/link";
 import Loading from "../loading";
 import { postDelete, postListSearch } from "../actions/post-action";
 import { getCookies } from "../actions/action";
+import { SearchIcon } from "@/components/ui/icons";
 
 export default function List() {
   const router = useRouter();
@@ -56,6 +57,7 @@ export default function List() {
             <div className="flex">
               <div className="pl-5">
                 <Button type="submit" disabled={isPending}>
+                  <SearchIcon className="mr-[2px] size-4"/>
                   {isPending ? "検索中..." : "検索"}
                   </Button>
               </div>

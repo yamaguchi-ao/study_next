@@ -22,7 +22,6 @@ export async function POST(req: NextRequest) {
             });
             return NextResponse.json({ message: "ゲーム削除", success: true }, { status: 200 });
         } else {
-            console.log("対象なし");
             return NextResponse.json({ message: "対象なし", success: false }, { status: 500 });
         }
 

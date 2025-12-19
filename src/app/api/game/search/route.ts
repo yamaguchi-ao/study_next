@@ -19,7 +19,6 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ message: "検索成功", success: true, data: listData }, { status: 200 });
         }
     } catch (e) {
-        console.log("error", e);
         return NextResponse.json({ message: "ゲームデータ 取得失敗...", e }, { status: 500 });
     }
 }
