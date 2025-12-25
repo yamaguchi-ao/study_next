@@ -5,8 +5,6 @@ import { getPost } from "@/app/actions/post-action";
 import { Sidebar } from "@/components/layout/sidebar";
 import { DeleteButton, ModalButton, ReturnButton, UpdateButton } from "@/components/ui/button";
 import { dateformat } from "@/constants/dateFormat";
-import { isString } from "util";
-import { isDate, isStringObject } from "util/types";
 
 export default async function details({ params }: { params: Promise<{ id: number }> }) {
     const postId = (await params).id;
@@ -18,7 +16,7 @@ export default async function details({ params }: { params: Promise<{ id: number
     const myGames = await GameListSearch(posts!.gameTag, "");
     const game = myGames ? myGames[0]?.name : "";
 
-    const comments = await getCommentList(postId);
+    const comments = await getCommentList(postId, game);
 
     return (
         <>
@@ -66,9 +64,9 @@ function Comment({ data, userId }: any) {
     return (
         <>
             {data.length > 0 ? data.map((value: any, idx: any) => {
-                               
+
                 const date = dateformat(value.createdAt);
-                
+
                 return (
                     <div key={idx}>
                         <div className="flex text-xs p-3" >
