@@ -1,7 +1,12 @@
 import { getCookies } from "@/app/actions/action";
+import { getCommentList } from "@/app/actions/comment-action";
+import { GameListSearch } from "@/app/actions/game-action";
 import { getPost } from "@/app/actions/post-action";
 import { Sidebar } from "@/components/layout/sidebar";
-import { Button, ModalButton, ReturnButton, UpdateButton } from "@/components/ui/button";
+import { DeleteButton, ModalButton, ReturnButton, UpdateButton } from "@/components/ui/button";
+import { dateformat } from "@/constants/dateFormat";
+import { isString } from "util";
+import { isDate, isStringObject } from "util/types";
 
 export default async function details({ params }: { params: Promise<{ id: number }> }) {
     const postId = (await params).id;
@@ -9,6 +14,11 @@ export default async function details({ params }: { params: Promise<{ id: number
 
     const cookies = await getCookies();
     const userId = cookies?.id;
+
+    const myGames = await GameListSearch(posts!.gameTag, "");
+    const game = myGames ? myGames[0]?.name : "";
+
+    const comments = await getCommentList(postId);
 
     return (
         <>
@@ -35,22 +45,13 @@ export default async function details({ params }: { params: Promise<{ id: number
                     <h1 className="font-bold mb-5">コメント</h1>
 
                     <div className="border-1 p-3">
-                        <div className="flex text-xs p-3">
-                            <div className="row">ユーザ名：test</div>
-                            <div className="row pl-3">コメント日：2025/12/16 10:52:35</div>
-                            <div className="row pl-3">ランク：ROOKIE</div>
-                        </div>
-                        <div className="pl-7">てすとだよ～</div>
-
-                        <div className="flex justify-end">
-                            {userId == posts.userId ? <Button className="mt-3">返信</Button> : ""}
-                        </div>
+                        <Comment data={comments} userId={userId!} />
                     </div>
 
                     <div className="flex">
                         <div className="flex-1 mt-5"><ReturnButton type="post" role="back" /></div>
                         <div className="flex justify-end mt-5">
-                            <ModalButton className={userId == posts.userId ? "mr-5" : ""} data={{ postId, userId }} />
+                            {game === posts.gameTag ? <ModalButton className={userId == posts.userId ? "mr-5" : ""} data={{ postId, userId }} /> : ""}
                             {userId == posts.userId ? <UpdateButton type={"post"} id={postId} role="update" /> : ""}
                         </div>
                     </div>
@@ -60,11 +61,31 @@ export default async function details({ params }: { params: Promise<{ id: number
     );
 }
 
-function comment() {
-    
+function Comment({ data, userId }: any) {
 
     return (
         <>
+            {data.length > 0 ? data.map((value: any, idx: any) => {
+                               
+                const date = dateformat(value.createdAt);
+                
+                return (
+                    <div key={idx}>
+                        <div className="flex text-xs p-3" >
+                            <div className="row">ユーザ名：{value.hiddenFlg ? "匿名ユーザー" : value.user.name}</div>
+                            <div className="row pl-3">コメント日：{date}</div>
+                            <div className="row pl-3">ランク：{value.user.games[0].rank}</div>
+                        </div>
+                        <div className="pl-7">{value.comment}</div>
+                        <div className="flex justify-end mb-3">
+                            {userId == value.user.id ? <DeleteButton type={"comment"} id={value.id} /> : ""}
+                        </div>
+                    </div>
+                )
+            }) :
+                <>
+                    <div className="text-center p-5 text-gray-500">コメントはまだありません。</div>
+                </>}
         </>
     )
 }

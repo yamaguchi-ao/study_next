@@ -1,6 +1,7 @@
 "use server"
 
-import { headers, cookies } from "next/headers";
+import { getUrl } from "@/constants/getUrl";
+import { cookies } from "next/headers";
 
 export async function post(postData: { title: string, post: string, game: string }) {
 
@@ -72,13 +73,4 @@ export async function Delete(postId: number) {
         credentials: "include"
     });
     return data.json();
-}
-
-async function getUrl() {
-    const headersData = headers();
-    const protocol = (await headersData).get("x-forwarded-proto") || "http";
-    const host = (await headersData).get("host");
-
-    const baseUrl = `${protocol}://${host}`;
-    return baseUrl;
 }

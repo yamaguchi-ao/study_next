@@ -7,9 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // コメント追加API
 export async function POST(req: NextRequest) {
 
-    const { comment, postId, userId } = await req.json();
-
-    console.log("取得対象：", comment, postId, userId);
+    const { comment, postId, userId, hiddenFlg } = await req.json();
 
     try {
         // ログインしているかどうかの判定
@@ -25,7 +23,8 @@ export async function POST(req: NextRequest) {
             data: {
                 comment: comment,
                 postId: Number(postId),
-                userId: Number(userId)
+                userId: Number(userId),
+                hiddenFlg: hiddenFlg ? true : false
             }
         });
 

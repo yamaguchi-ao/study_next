@@ -25,7 +25,7 @@ export default async function Detail({ params }: { params: Promise<{ id: Number 
                                 <h1 className="text-2xl pl20">{games?.rank}</h1>
                             </div>
                             <div className="flex justify-around items-end">
-                                <ReturnButton type={"/game"} />
+                                <ReturnButton />
                                 <UpdateButton type={"game"} id={gameId} />
                             </div>
                         </div>

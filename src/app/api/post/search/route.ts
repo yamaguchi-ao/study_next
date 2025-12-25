@@ -29,8 +29,6 @@ async function getList(gameParams: string) {
         whereConditions.gameTag = { contains: gameParams };
     }
 
-    console.log("取得対象", whereConditions);
-
     const data = await prisma.posts.findMany({
         where: whereConditions,
         select: {

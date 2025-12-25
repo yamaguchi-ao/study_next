@@ -1,7 +1,7 @@
 "use client"
 
 import { Sidebar } from "@/components/layout/sidebar";
-import { Button } from "@/components/ui/button";
+import { Button, SearchButton } from "@/components/ui/button";
 import type { NextPage } from "next";
 import { useRouter } from "next/navigation";
 import { Suspense, useActionState, useEffect, useState } from "react";
@@ -66,9 +66,7 @@ const Game: NextPage = () => {
 
                         <div className="flex">
                             <div className="pl-5">
-                                <Button type="submit" disabled={isPending}>
-                                    {isPending ? "検索中..." : "検索"}
-                                </Button>
+                                <SearchButton type="submit" disabled={isPending}></SearchButton>
                             </div>
 
                             <div className="pl-5">

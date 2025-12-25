@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
 
 // ゲームとランクの検索
 export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
-    const postIdParams = searchParams.get('postId');    
+    const postIdParams = searchParams.get('postId');
 
     try {
         if (searchParams.toString().includes("postId")) {
@@ -19,17 +18,25 @@ export async function GET(req: NextRequest) {
     }
 }
 
-//　詳細用検索
+//　投稿に記載されているコメント全検索
 async function getDetail(postId: string) {
 
-    const data = await prisma.comments.findUnique({
-        where: { id: Number(postId) },
+    const data = await prisma.comments.findMany({
+        where: { postId: Number(postId) },
         select: {
             id: true,
             comment: true,
-            user:{
+            createdAt: true,
+            hiddenFlg: true,
+            user: {
                 select: {
-                    name: true
+                    name: true,
+                    id: true,
+                    games: {
+                        select: {
+                            rank: true
+                        },
+                    }
                 }
             },
         }
