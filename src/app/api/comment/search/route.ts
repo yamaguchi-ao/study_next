@@ -5,10 +5,11 @@ import prisma from "@/lib/prisma";
 export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const postIdParams = searchParams.get('postId');
+    const gameParams = searchParams.get('game');
 
     try {
         if (searchParams.toString().includes("postId")) {
-            const detailData = await getDetail(postIdParams!);
+            const detailData = await getDetail(postIdParams!, gameParams!);
             return NextResponse.json({ message: "取得成功", success: true, data: detailData }, { status: 200 });
         } else {
             return NextResponse.json({ message: "パラメータが不正です。", success: false }, { status: 400 });
@@ -19,7 +20,7 @@ export async function GET(req: NextRequest) {
 }
 
 //　投稿に記載されているコメント全検索
-async function getDetail(postId: string) {
+async function getDetail(postId: string, game: string) {
 
     const data = await prisma.comments.findMany({
         where: { postId: Number(postId) },
@@ -33,6 +34,7 @@ async function getDetail(postId: string) {
                     name: true,
                     id: true,
                     games: {
+                        where: { name: game },
                         select: {
                             rank: true
                         },

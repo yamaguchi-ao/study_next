@@ -32,9 +32,9 @@ export async function addComment(_prevState: any, formData: FormData, postId: nu
     }
 }
 
-export async function getCommentList(postId: number) {
+export async function getCommentList(postId: number, game: string) {
     // コメント取得処理
-    const res = await getComments(postId);
+    const res = await getComments(postId, game);
 
     const success = res?.success;
     const message = res?.message;

@@ -23,9 +23,9 @@ export const comment = async (commentData: { comment: string, postId: number, us
 }
 
 // コメント取得
-export async function getComments(postId: number) {
+export async function getComments(postId: number, game: string) {
     const baseUrl = await getUrl();
-    const url = `${baseUrl}/api/comment/search?postId=${postId}`;
+    const url = `${baseUrl}/api/comment/search?postId=${postId}&game=${game}`;
     const cookie = await cookies();
     const data = await fetch(url, {
         method: "GET",
