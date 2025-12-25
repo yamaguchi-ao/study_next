@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { Bar3Icon } from "../ui/icons";
 
 const navigation = [
     { id: 1, name: "投稿", href: "/post" },
@@ -24,7 +25,9 @@ export function Sidebar() {
     return (
         <>
             <div className={`bg-cyan-50 border-r duration-800 ${!state ? "w-10" : "w-30"}`}>
-                <button className={`flex justify-end p-3 duration-800 ${!state ? "w-10" : "w-30"}`} onClick={onClick}>三</button>
+                <button className={`flex justify-end p-3 duration-800 ${!state ? "w-10" : "w-30"}`} onClick={onClick}>
+                    <Bar3Icon className="size-7" />
+                </button>
                 <aside className={`overflow-y-auto pt-4 pb-4 font-semibold duration-800 ${!state ? "-translate-x-20" : ""}`} id="sidenav">
                     <ul className="text-[18px] ">
                         {navigation.map(({ href, name, id }) => (

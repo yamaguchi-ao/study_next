@@ -4,7 +4,8 @@
 
 "use server"
 
-import { cookies, headers } from "next/headers";
+import { getUrl } from "@/constants/getUrl";
+import { cookies } from "next/headers";
 
 export const Register = async (gameData: { name: string, rank: string, id: number }) => {
 
@@ -76,13 +77,4 @@ export const Delete = async (id: number) => {
         credentials: "include"
     });
     return data.json();
-}
-
-async function getUrl() {
-    const headersData = headers();
-    const protocol = (await headersData).get("x-forwarded-proto") || "http";
-    const host = (await headersData).get("host");
-
-    const baseUrl = `${protocol}://${host}`;
-    return baseUrl;
 }

@@ -34,32 +34,34 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
 
         return list;
     }
-    
+
     return (
         <>
             <title>投稿 更新</title>
             <div className="flex h-main overflow-hidden">
                 <Sidebar />
                 <form className="w-full p-7" action={postAction}>
-
                     <div className="flex">
                         <div className="row">
                             <div className="font-bold">タイトル 入力</div>
-                            <input className="mt-2 mb-2 w-[400px] h-[50px] p-2 border-1" name="title" defaultValue={title}
+                            <input className="mt-3 mb-3 w-[400px] h-[50px] p-3 border-1" name="title" defaultValue={title}
                                 onChange={(e) => setTitle(e.target.value)}></input>
                             {state?.title ? errorText(state?.title) : null}
-                        </div>
-
-                        <div className="row pl-20">
-                            <div className="font-bold">ゲームタグ</div>
-                            <h1 className="text-2xl pl-20 m-3">{gameTag}</h1>
                         </div>
                     </div>
 
                     <div className="font-bold">投稿内容</div>
-                    <textarea name="post" placeholder="投稿の内容を入力..." className="border-1 w-full h-[350px] mt-3 mb-5 p-3"
+                    <textarea name="post" placeholder="投稿の内容を入力..." className="border-1 w-full h-[290px] mt-3 mb-3 p-3 resize-none"
                         defaultValue={post} onChange={(e) => setPost(e.target.value)}></textarea>
                     {state?.post ? errorText(state?.post) : null}
+
+                    <div className="flex text-sm text-gray-500 justify-end">
+                        {/* <div className="row">投稿者: {name}</div> */}
+                        <div className="row pl-3">ゲーム: {gameTag}</div>
+                        {/* <div className="row pl-3">ランク: {rank}</div> */}
+                    </div>
+
+                    <div className="border-t w-full mt-3 mb-5"></div>
 
                     <div className="flex justify-between">
                         <ReturnButton />

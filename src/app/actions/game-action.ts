@@ -50,7 +50,7 @@ export async function GameListSearch(game: string, rank: string) {
     const res = await listSearch(game, rank, userId!);
 
     const success = res?.success;
-    const message = res?.success;
+    const message = res?.message;
     const data = res?.data;
 
     if (success) {
@@ -68,7 +68,7 @@ export async function getGame(gameId: Number) {
     const res = await gameSearch(gameId);
 
     const success = res?.success;
-    const message = res?.success;
+    const message = res?.message;
     const data = res?.data;
     const { name, rank } = data;
 
