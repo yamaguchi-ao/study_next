@@ -37,7 +37,6 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ message: "新規登録　成功！", success: true }, { status: 200 });
 
     } catch (e) {
-        console.log("error", e);
         return NextResponse.json({ message: "ゲーム 登録失敗...", e }, { status: 500 });
     }
 }

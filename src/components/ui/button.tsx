@@ -1,7 +1,12 @@
 "use client"
 import { Logout } from '@/app/actions/form-action';
 import clsx from 'clsx';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import Modal from './modal';
+import { errorToast, successToast } from '@/utils/toast';
+import { commentDelete } from '@/app/actions/comment-action';
+import { ReplyIcon, SearchIcon } from './icons';
 
 // ボタンレイアウト用
 export function Button({ children, className, type, onClick, ...rest }: any) {
@@ -20,6 +25,14 @@ export function Button({ children, className, type, onClick, ...rest }: any) {
     );
 }
 
+/** 検索用ボタン */
+export function SearchButton({ type, disabled }: any) {
+    return <Button type={type} disabled={disabled}>
+        <SearchIcon className="mr-[2px] size-4" />
+        {disabled ? "検索中..." : "検索"}
+    </Button>
+}
+
 /** 更新用ボタン */
 export function UpdateButton({ type, id }: any) {
     const router = useRouter();
@@ -29,5 +42,51 @@ export function UpdateButton({ type, id }: any) {
 /** 戻る用ボタン */
 export function ReturnButton({ type }: any) {
     const router = useRouter();
-    return <Button onClick={() => router.back()}>戻る</Button>
+
+    if (type) {
+        return <Button onClick={() => router.push(`/${type}`)}>
+            <ReplyIcon className='mr-[4px]' />戻る
+        </Button>
+    } else {
+        return <Button onClick={() => router.back()}>
+            <ReplyIcon className='mr-[4px]' />戻る
+        </Button>
+    }
+}
+
+/** 削除用ボタン */
+export function DeleteButton({ type, id }: any) {
+    const router = useRouter();
+
+    async function onDelete(id: number) {
+        // 取得したタイプの条件で削除する
+        if (type == "comment") {
+            const req = await commentDelete(id);
+
+            const success = req.success ? req.success : "";
+            const message = req.message ? req.message : "";
+
+            router.refresh();
+
+            if (success) {
+                successToast(message);
+            } else {
+                errorToast(message);
+            }
+        }
+    }
+
+    return <Button onClick={() => onDelete(id)}>削除</Button>
+}
+
+/** モーダル用ボタン */
+export function ModalButton({ className, data }: any) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <>
+            <Button onClick={() => setIsOpen(true)} className={className}>コメント</Button>
+            <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} data={data}></Modal>
+        </>
+    );
 }

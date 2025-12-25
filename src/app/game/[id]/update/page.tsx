@@ -2,7 +2,7 @@
 
 import { GameUpdate, getGame } from "@/app/actions/game-action";
 import { Sidebar } from "@/components/layout/sidebar";
-import { Button } from "@/components/ui/button";
+import { Button, ReturnButton } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import { use, useActionState, useEffect, useState } from "react";
 
@@ -52,7 +52,7 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
                                 {state?.rank ? errorText(state?.rank) : null}
                             </div>
                             <div className="flex justify-around items-end">
-                                <Button onClick={() => redirect('/game')}>戻る</Button>
+                                <ReturnButton />
                                 <Button disabled={isPending} type="submit">
                                     {isPending ? "更新中..." : "更新"}
                                 </Button>

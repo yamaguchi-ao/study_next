@@ -1,0 +1,46 @@
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+
+// ゲームとランクの検索
+export async function GET(req: NextRequest) {
+    const searchParams = req.nextUrl.searchParams;
+    const postIdParams = searchParams.get('postId');
+
+    try {
+        if (searchParams.toString().includes("postId")) {
+            const detailData = await getDetail(postIdParams!);
+            return NextResponse.json({ message: "取得成功", success: true, data: detailData }, { status: 200 });
+        } else {
+            return NextResponse.json({ message: "パラメータが不正です。", success: false }, { status: 400 });
+        }
+    } catch (e) {
+        return NextResponse.json({ message: "ゲームデータ 取得失敗...", e }, { status: 500 });
+    }
+}
+
+//　投稿に記載されているコメント全検索
+async function getDetail(postId: string) {
+
+    const data = await prisma.comments.findMany({
+        where: { postId: Number(postId) },
+        select: {
+            id: true,
+            comment: true,
+            createdAt: true,
+            hiddenFlg: true,
+            user: {
+                select: {
+                    name: true,
+                    id: true,
+                    games: {
+                        select: {
+                            rank: true
+                        },
+                    }
+                }
+            },
+        }
+    });
+
+    return data;
+}

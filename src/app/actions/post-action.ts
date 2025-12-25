@@ -1,4 +1,4 @@
-import { PostSchema } from "@/utils/validation";
+import { CommentSchema, PostSchema } from "@/utils/validation";
 import { getCookies } from "./action";
 import { z } from "zod";
 import { Delete, detailSearch, listSearch, post, Update } from "@/utils/api/post";
@@ -45,7 +45,7 @@ export async function postListSearch(game: string) {
     const res = await listSearch(game);
 
     const success = res?.success;
-    const message = res?.success;
+    const message = res?.message;
     const data = res?.data;
 
     if (success) {
@@ -63,7 +63,7 @@ export async function getPost(postId: Number) {
     const res = await detailSearch(postId);
 
     const success = res?.success;
-    const message = res?.success;
+    const message = res?.message;
     const data = res?.data;
 
     if (success) {
@@ -94,7 +94,7 @@ export async function postUpdate(_prevState: any, formData: FormData, id: number
         const res = await Update(postData);
 
         const success = res?.success;
-        const message = res?.success;
+        const message = res?.message;
 
         if (success) {
             // 成功時
@@ -113,7 +113,7 @@ export async function postDelete(postId: number) {
     const res = await Delete(postId);
 
     const success = res?.success;
-    const message = res?.success;
+    const message = res?.message;
 
     return {success, message};
 }

@@ -50,6 +50,11 @@ async function getList(gameParams: string) {
 //　詳細用検索
 async function getDetail(postId: string) {
 
+    const gameTag = await prisma.posts.findUnique({
+        where: { id: Number(postId) },
+        select: { gameTag: true }
+    });
+
     const data = await prisma.posts.findUnique({
         where: { id: Number(postId) },
         select: {
@@ -57,7 +62,17 @@ async function getDetail(postId: string) {
             title: true,
             content: true,
             gameTag: true,
-            userId: true
+            userId: true,
+            user: {
+                select: {
+                    name: true,
+                    games: {
+                        where: {
+                            name: gameTag?.gameTag || ""
+                        },
+                    }
+                }
+            }
         }
     });
 
