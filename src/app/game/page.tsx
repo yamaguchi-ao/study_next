@@ -10,10 +10,12 @@ import Loading from "../loading";
 import Link from "next/link";
 import { Delete } from "@/utils/api/game";
 import { errorToast, successToast } from "@/utils/toast";
+import { CancelIcon } from "@/components/ui/icons";
+import Modal from "@/components/ui/modal";
 
 const Game: NextPage = () => {
     const router = useRouter();
-    
+
     const [game, setGame] = useState('');
     const [rank, setRank] = useState('');
     const [search, setSearch] = useState(Array);
@@ -89,29 +91,32 @@ const Game: NextPage = () => {
 export default Game
 
 function SearchTable({ data, onClick }: any) {
+    const [isOpen, setIsOpen] = useState(false);
+
     // 削除処理
     return (
-        <table className="w-full">
-            <thead>
-                <tr className="border-1">
-                    <th className="border-1 w-[50px] bg-blue-700/10">番号</th>
-                    <th className="border-1 w-[500px] bg-blue-700/20 text-center">ゲームタイトル</th>
-                    <th className="border-1 w-[200px] bg-blue-700/50">ランク</th>
-                    <th className="border-1 w-[100px] bg-blue-700/30"></th>
-                </tr>
-            </thead>
-            <tbody>
+        <>
+            <Modal isOpen={isOpen} data={data} setIsOpenAction={setIsOpen} type="confirm"></Modal>
+            <div className="grid grid-cols-5 justify-items-center gap-y-10">
                 {data !== undefined ? data.map((value: { rank: String; name: String; id: number }, idx: any) => {
                     return (
-                        <tr key={value.id} className="border-1">
-                            <td className="text-center">{idx + 1}</td>
-                            <td className="text-center text-blue-400"><Link href={`game/${value.id}/details`} className="underline underline-offset-1">{value.name}</Link></td>
-                            <td className="text-center">{value.rank}</td>
-                            <td className="justify-items-center"><Button onClick={() => onClick(value.id)}>削除</Button></td>
-                        </tr>
+                        <div key={value.id} className="flex-wrap transition delay-70 duration-300 hover:scale-110">
+                            <div className="w-[11em] h-[8em] rounded-t-lg bg-sky-300">
+                                <div className="relative -top-[5px] left-[150px] size-8 rounded-full bg-white">
+                                    <CancelIcon className="relative size-7 rounded-full bg-gray-300 top-[2px] left-[2px] hover:fill-current hover:text-red-500" color="white"
+                                        onClick={() => setIsOpen(true)} />
+                                </div>
+                            </div>{/* そのゲームに対応する画像みたいなのにする */}
+                            <Link href={`game/${value.id}/details`} >
+                                <div className="w-[11em] h-25 p-[13px] rounded-b-lg bg-gray-200 text-wrap">
+                                    <p className="h-[50px] font-bold truncate">{value.name}</p>
+                                    <p className="h-[50px] font-bold">{value.rank}</p>
+                                </div>
+                            </Link>
+                        </div>
                     )
                 }) : <></>}
-            </tbody>
-        </table>
+            </div>
+        </>
     );
 }

@@ -80,13 +80,13 @@ export function DeleteButton({ type, id }: any) {
 }
 
 /** モーダル用ボタン */
-export function ModalButton({ className, data }: any) {
+export function ModalButton({ className, data, type }: any) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
         <>
             <Button onClick={() => setIsOpen(true)} className={className}>コメント</Button>
-            <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} data={data}></Modal>
+            <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} data={data} type={type}></Modal>
         </>
     );
 }

@@ -49,7 +49,7 @@ export default async function details({ params }: { params: Promise<{ id: number
                     <div className="flex">
                         <div className="flex-1 mt-5"><ReturnButton type="post" role="back" /></div>
                         <div className="flex justify-end mt-5">
-                            {game === posts.gameTag ? <ModalButton className={userId == posts.userId ? "mr-5" : ""} data={{ postId, userId }} /> : ""}
+                            {game === posts.gameTag ? <ModalButton className={userId == posts.userId ? "mr-5" : ""} data={{ postId, userId } } type={"comment"}/> : ""}
                             {userId == posts.userId ? <UpdateButton type={"post"} id={postId} role="update" /> : ""}
                         </div>
                     </div>

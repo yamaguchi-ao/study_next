@@ -40,7 +40,8 @@ async function getList(gameParams: string) {
                 select: {
                     name: true,
                 }
-            }
+            },
+            comments: true
         },
     });
 

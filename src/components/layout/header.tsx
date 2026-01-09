@@ -2,6 +2,7 @@ import { Button } from "../ui/button";
 import Image from "next/image";
 import icon from "@/public/test_icon.png"
 import { Username } from "../ui/username";
+import { LogOutIcon } from "../ui/icons";
 
 // ヘッダー
 export async function Header({ title, username }: any) {
@@ -15,7 +16,9 @@ export async function Header({ title, username }: any) {
                 </div>
                 <div className="flex pr-5 items-center">
                     <Username username={username} />
-                    <Button onClick={"logout"}>ログアウト</Button>
+                    <Button onClick={"logout"}>ログアウト
+                        <LogOutIcon className="ml-[5px] size-4"/>
+                    </Button>
                 </div>
             </div>
         </header>
