@@ -4,47 +4,29 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { Button, SearchButton } from "@/components/ui/button";
 import type { NextPage } from "next";
 import { useRouter } from "next/navigation";
-import { Suspense, useActionState, useEffect, useState } from "react";
-import { GameListSearch } from "../actions/game-action";
+import { Suspense, useActionState, useEffect, useRef, useState } from "react";
+import { gameDelete, GameListSearch } from "../actions/game-action";
 import Loading from "../loading";
-import Link from "next/link";
-import { Delete } from "@/utils/api/game";
+import { CancelIcon } from "@/components/ui/icons";
+import Modal, { ConfirmModalContent } from "@/components/ui/modal";
 import { errorToast, successToast } from "@/utils/toast";
 
 const Game: NextPage = () => {
     const router = useRouter();
-    
+
     const [game, setGame] = useState('');
     const [rank, setRank] = useState('');
     const [search, setSearch] = useState(Array);
     const [state, searchAction, isPending] = useActionState(GetSearch, null);
 
     useEffect(() => {
-        router.refresh();
-    }, [router, search]);
+        GetSearch();
+    }, [router]);
 
     // 検索
     async function GetSearch() {
         const getData = await GameListSearch(game, rank);
         setSearch(getData!);
-    }
-
-    // 削除
-    async function onDelete(gameId: number) {
-
-        const res = await Delete(gameId);
-
-        const success = res?.success;
-        const message = res?.message;
-
-        if (success) {
-            // 成功時
-            successToast(message);
-            await GetSearch();
-        } else {
-            // 失敗時
-            errorToast(message);
-        }
     }
 
     return (
@@ -77,7 +59,7 @@ const Game: NextPage = () => {
                     <div className="w-full p-5">
                         <div className="p-1 bg-gray-600/20 mb-5">{`検索結果：${search !== undefined ? search.length + "件" : "0件"}`}</div>
                         <Suspense fallback={<Loading />}>
-                            <SearchTable data={search} onClick={onDelete} />
+                            <SearchTable data={search} search={GetSearch} />
                         </Suspense>
                     </div>
                 </form>
@@ -88,30 +70,60 @@ const Game: NextPage = () => {
 
 export default Game
 
-function SearchTable({ data, onClick }: any) {
+function SearchTable({ data, search }: any) {
+
+    const router = useRouter();
+    const modalRef = useRef(null);
+    const [isOpen, setIsOpen] = useState(false);
+    const [selectedId, setSelectedId] = useState<number | null>(null);
+
     // 削除処理
+    async function onDelete(id: number) {
+        setIsOpen(false);
+        const res = await gameDelete(id);
+
+        if (res.success) {
+            search();
+            successToast(res.message);
+        } else {
+            errorToast(res.message);
+        }
+    }
+
+    // 詳細遷移とモーダル表示の競合防止
+    const openModal = (id: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        setSelectedId(id);
+        setIsOpen(true);
+    }
+
     return (
-        <table className="w-full">
-            <thead>
-                <tr className="border-1">
-                    <th className="border-1 w-[50px] bg-blue-700/10">番号</th>
-                    <th className="border-1 w-[500px] bg-blue-700/20 text-center">ゲームタイトル</th>
-                    <th className="border-1 w-[200px] bg-blue-700/50">ランク</th>
-                    <th className="border-1 w-[100px] bg-blue-700/30"></th>
-                </tr>
-            </thead>
-            <tbody>
-                {data !== undefined ? data.map((value: { rank: String; name: String; id: number }, idx: any) => {
+        <>
+            <div className="grid grid-cols-5 justify-items-center gap-y-10">
+                {selectedId && (
+                    <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} ref={modalRef} >
+                        <ConfirmModalContent handleClick={() => onDelete(selectedId)} ref={modalRef} />
+                    </Modal>
+                )}
+                {data !== undefined ? data.map((value: any, idx: any) => {
                     return (
-                        <tr key={value.id} className="border-1">
-                            <td className="text-center">{idx + 1}</td>
-                            <td className="text-center text-blue-400"><Link href={`game/${value.id}/details`} className="underline underline-offset-1">{value.name}</Link></td>
-                            <td className="text-center">{value.rank}</td>
-                            <td className="justify-items-center"><Button onClick={() => onClick(value.id)}>削除</Button></td>
-                        </tr>
+                        <div key={value.id} className="flex-wrap transition delay-70 duration-300 hover:scale-110 hover:cursor-pointer"
+                            onClick={() => router.push(`/game/${value.id}/details`)}>
+                            <div className="w-[11em] h-[8em] rounded-t-lg bg-sky-300">
+                                <div className="relative -top-[5px] left-[150px] size-8 rounded-full bg-white">
+                                    <CancelIcon className="relative size-7 rounded-full bg-gray-300 top-[2px] left-[2px] hover:fill-current hover:text-red-500" color="white"
+                                        onClick={(e) => openModal(value.id, e)} />
+                                </div>
+                            </div>{/* そのゲームに対応する画像みたいなのにする */}
+                            <div className="w-[11em] h-25 p-[13px] rounded-b-lg bg-gray-200 text-wrap">
+                                <p className="h-[50px] font-bold truncate">{value.name}</p>
+                                <p className="h-[50px] font-bold">{value.rank}</p>
+                            </div>
+                        </div>
                     )
                 }) : <></>}
-            </tbody>
-        </table>
+            </div>
+        </>
     );
 }

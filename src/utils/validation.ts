@@ -1,6 +1,5 @@
 // バリデーション用
 import { z } from "zod";
-import { comment } from "./api/comment";
 
 // 新規登録用バリデーション
 export const UserSchema = z.object({
@@ -37,6 +36,7 @@ export const GameUpdateSchema = z.object({
 
 export type GameUpdateSchema = z.infer<typeof GameUpdateSchema>;
 
+// 投稿用バリデーション
 export const PostSchema = z.object({
     title: z.string().min(1, "タイトルを入力してください。"),
     post: z.string().min(1, "投稿内容は必ず1文字以上入力してください。"),
@@ -45,6 +45,7 @@ export const PostSchema = z.object({
 
 export type PostSchema = z.infer<typeof PostSchema>;
 
+// コメント用バリデーション
 export const CommentSchema = z.object({
     comment: z.string().min(1, "コメントは必ず1文字以上入力してください。"),
 });

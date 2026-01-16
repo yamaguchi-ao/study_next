@@ -1,4 +1,4 @@
-import { Register, listSearch, Update, gameSearch } from "@/utils/api/game"
+import { Register, listSearch, Update, gameSearch, Delete } from "@/utils/api/game"
 import { errorToast, successToast } from "@/utils/toast";
 import { GameSchema, GameUpdateSchema } from "@/utils/validation";
 import { redirect } from "next/navigation";
@@ -112,4 +112,15 @@ export async function GameUpdate(_prevState: any, formData: FormData, id: Number
             errorToast(message);
         }
     }
+}
+
+// 削除
+export async function gameDelete(gameId: number) {
+
+    const res = await Delete(gameId);
+
+    const success = res?.success;
+    const message = res?.message;
+
+    return {success, message};
 }
