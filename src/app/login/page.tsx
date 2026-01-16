@@ -65,7 +65,7 @@ const Login: NextPage = () => {
                                 <div className="mb-2">
                                     <h1>パスワード</h1>
                                 </div>
-                                <input className={`border ${state?.password ? "border-red-600" : ""} w-64`} name="password" type="password"></input>
+                                <input className={`border ${state?.password ? "border-red-600" : ""} w-64`} name="password" type="password" autoComplete="current-password"></input>
                                 {state?.password ? errorText(state?.password) : null}
                             </div>
 

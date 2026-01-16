@@ -22,11 +22,11 @@ export async function POST(req: NextRequest) {
             await prisma.games.delete({
                 where: { id: id }
             });
-            return NextResponse.json({ message: "ゲーム削除", success: true }, { status: 200 });
+            return NextResponse.json({ message: "登録したゲームは正常に削除されました。", success: true }, { status: 200 });
         } else {
             return NextResponse.json({ message: "対象なし", success: false }, { status: 500 });
         }
     } catch (e) {
-        return NextResponse.json({ message: "ゲームデータ 取得失敗...", e }, { status: 500 })
+        return NextResponse.json({ message: "登録したゲームの削除は失敗しました。", e }, { status: 500 })
     }
 }

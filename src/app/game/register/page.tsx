@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 import { useActionState, useEffect } from "react";
 
 const GameRegist: NextPage = () => {
-    
+
     useEffect(() => {
     }, []);
 
@@ -31,15 +31,20 @@ const GameRegist: NextPage = () => {
                 <form className="flex-1 flex flex-col" action={Register}>
                     <div className="flex flex-col h-full justify-center items-center">
                         <div className="">
-                            <div className="flex pb-10">
+                            <div className="flex pb-10 items-center">
                                 <div className="w-35">ゲームタイトル</div>
-                                <input className="border w-64" name="name"></input>
-                                {state?.name ? errorText(state?.name) : null}
+                                <div className="flex flex-col mt-3">
+                                    <input className="border w-64" name="name"></input>
+                                    {state?.name ? errorText(state?.name) : null}
+                                </div>
                             </div>
-                            <div className="flex pb-10">
+                            <div className="flex pb-10 items-center">
                                 <div className="w-35">ランク</div>
-                                <input className="border w-64" name="rank"></input>
-                                {state?.rank ? errorText(state?.rank) : null}
+                                <div className="flex flex-col mt-3">
+                                    <input className="border w-64" name="rank"></input>
+                                    {state?.rank ? errorText(state?.rank) : null}
+                                </div>
+
                             </div>
                             <div className="flex justify-around items-end">
                                 <Button onClick={() => redirect('/game')}>

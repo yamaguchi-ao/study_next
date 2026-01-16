@@ -1,7 +1,7 @@
 "use client"
 
 import { Sidebar } from "@/components/layout/sidebar";
-import { Suspense, useActionState, useEffect, useState } from "react";
+import { Suspense, useActionState, useEffect, useRef, useState } from "react";
 import { Button, SearchButton } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Loading from "../loading";
@@ -9,7 +9,8 @@ import { postDelete, postListSearch } from "../actions/post-action";
 import { getCookies } from "../actions/action";
 import { CancelIcon, CommentIcon } from "@/components/ui/icons";
 import Link from "next/link";
-import Modal from "@/components/ui/modal";
+import Modal, { ConfirmModalContent } from "@/components/ui/modal";
+import { errorToast, successToast } from "@/utils/toast";
 
 export default function List() {
   const router = useRouter();
@@ -20,6 +21,7 @@ export default function List() {
 
   useEffect(() => {
     getUserId();
+    GetSearch();
     router.refresh();
   }, [router]);
 
@@ -34,13 +36,6 @@ export default function List() {
     const cookies = await getCookies();
     const userId = cookies?.id;
     setUserId(userId!);
-  }
-
-  // 削除
-  async function onDelete(postId: number) {
-    await postDelete(postId);
-    // 再検索
-    await GetSearch();
   }
 
   return (
@@ -69,36 +64,66 @@ export default function List() {
           <div className="w-full p-5">
             <div className="p-1 bg-gray-600/20 mb-5">{`検索結果：${search !== undefined ? search.length + "件" : "0件"}`}</div>
             <Suspense fallback={<Loading />}>
-              <PostTable userId={userId} data={search} onClick={onDelete}></PostTable>
+              <PostTable userId={userId} data={search} search={GetSearch}></PostTable>
             </Suspense>
           </div>
-
-          
         </form>
       </div>
     </>
   )
 }
 
-function PostTable({ userId, data, onClick }: any) {
+function PostTable({ userId, data, search }: any) {
+
   const router = useRouter();
+  const modalRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  // 削除処理
+  async function onDelete(id: number) {
+    setIsOpen(false);
+    const res = await postDelete(id);
+    if (res.success) {
+      search();
+      successToast(res.message);
+    } else {
+      errorToast(res.message);
+    }
+  }
+
+  // 詳細遷移とモーダル表示の競合防止
+  const openModal = (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    setSelectedId(id);
+    setIsOpen(true);
+  }
 
   // 投稿一覧取得
   return (
     <>
-      <Modal isOpen={isOpen} data={data} setIsOpenAction={setIsOpen} type="confirm"></Modal>
       <div className="grid grid-cols-3 justify-items-center gap-y-10">
+        {selectedId && (
+          <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} ref={modalRef} >
+            <ConfirmModalContent handleClick={() => onDelete(selectedId)} ref={modalRef} />
+          </Modal>
+        )}
         {data !== undefined ? data.map((value: any, idx: any) => {
           return (
-            <div key={value.id} className="flex flex-col flex-wrap transition delay-70 duration-300 hover:scale-110">
-              <div className="w-[20em] h-[8em] rounded-t-lg bg-blue-900">
-                <div className="relative -top-[5px] left-[295px] size-8 rounded-full bg-white">
-                  <CancelIcon className="relative size-7 rounded-full bg-gray-300 top-[2px] left-[2px] hover:fill-current hover:text-red-500" color="white"
-                  onClick={() => setIsOpen(true)}/>
+            <div key={value.id}>
+              <div key={value.id} className="flex flex-col flex-wrap transition delay-70 duration-300 hover:scale-110 hover:cursor-pointer"
+                onClick={() => router.push(`/post/${value.id}/details`)}>
+                <div className="w-[20em] h-[8em] rounded-t-lg bg-blue-900">
+                  { // 自身のみ削除可能
+                    userId === value.userId && (
+                      <div className="relative -top-[5px] left-[295px] size-8 rounded-full bg-white">
+                        <CancelIcon className="relative size-7 rounded-full bg-gray-300 top-[2px] left-[2px] hover:fill-current hover:text-red-500" color="white"
+                          onClick={(e) => openModal(value.id, e)} />
+                      </div>
+                    )
+                  }
                 </div>
-              </div>
-              <Link href={`post/${value.id}/details`} >
                 <div className="w-[20em] h-25 p-[13px] rounded-b-lg bg-gray-200">
                   <p className="h-[50px] font-bold truncate">{value.title}</p>
                   <div className="flex justify-between">
@@ -113,7 +138,7 @@ function PostTable({ userId, data, onClick }: any) {
                     </div>
                   </div>
                 </div>
-              </Link>
+              </div>
             </div>
           )
         }) : <></>}

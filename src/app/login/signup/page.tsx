@@ -55,7 +55,7 @@ const Register: NextPage = () => {
                             <div className="mb-1">
                                 <h1>パスワード</h1>
                             </div>
-                            <input type="password" className={`border ${state?.password ? "border-red-600" : ""} w-64`} name="password"></input>
+                            <input type="password" className={`border ${state?.password ? "border-red-600" : ""} w-64`} name="password" autoComplete="new-password"></input>
                             {state?.password ? errorText(state?.password) : null}
                         </div>
 
@@ -63,7 +63,7 @@ const Register: NextPage = () => {
                             <div className="mb-1">
                                 <h1>パスワード 再確認</h1>
                             </div>
-                            <input type="password" className={`border ${state?.confirm ? "border-red-600" : ""} w-64`} name="confirm"></input>
+                            <input type="password" className={`border ${state?.confirm ? "border-red-600" : ""} w-64`} name="confirm" autoComplete="new-password"></input>
                             {state?.confirm ? errorText(state?.confirm) : null}
                         </div>
 

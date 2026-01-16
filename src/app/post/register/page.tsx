@@ -38,24 +38,24 @@ export default function List() {
           <div className="flex">
             <div className="row">
               <div className="font-bold">タイトル 入力</div>
-              <input className="mt-3 mb-3 w-[400px] h-[50px] p-3 border-1" name="title"></input>
+              <input className="mt-2 w-[400px] h-[50px] p-3 border-1" name="title"></input>
               {state?.title ? errorText(state?.title) : null}
             </div>
 
             <div className="row pl-20">
               <div className="font-bold">ゲームタグ</div>
-              <select className="mt-3 mb-3 w-[400px] h-[50px] p-3 border-1" name="game">
+              <select className="mt-2 w-[400px] h-[50px] p-3 border-1" name="game">
                 <SelectGameTag data={gameData}></SelectGameTag>
               </select>
               {state?.game ? errorText(state?.game) : null}
             </div>
           </div>
 
-          <div className="font-bold">投稿内容</div>
-          <textarea name="post" placeholder="投稿の内容を入力..." className="border-1 w-full h-[350px] mt-3 mb-3 p-3 resize-none"></textarea>
+          <div className="font-bold mt-2">投稿内容</div>
+          <textarea name="post" placeholder="投稿の内容を入力..." className="border-1 w-full h-[350px] mt-2 p-3 resize-none"></textarea>
           {state?.post ? errorText(state?.post) : null}
 
-          <div className="flex justify-between">
+          <div className="flex justify-between mt-4">
             <Button onClick={() => redirect('/post')}>戻る</Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? "投稿中..." : "投稿"}

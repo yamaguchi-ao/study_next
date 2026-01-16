@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         await prisma.posts.create({
             data: {
                 title: title,
-                content: post,
+                content: post.replace(/r?\n/g, "\n"),
                 gameTag: game,
                 userId: id,
                 rankFlg: false,

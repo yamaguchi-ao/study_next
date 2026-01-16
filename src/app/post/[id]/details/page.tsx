@@ -30,7 +30,7 @@ export default async function details({ params }: { params: Promise<{ id: number
                         </div>
                     </div>
 
-                    <div className="w-full mt-3 mb-5 p-3">{posts.content}</div>
+                    <div className="w-full mt-3 mb-5 p-3 leading-4 whitespace-pre-wrap">{posts.content}</div>
 
                     <div className="flex text-sm text-gray-500 justify-end">
                         <div className="row">投稿者: {posts.user.name}</div>
@@ -42,14 +42,14 @@ export default async function details({ params }: { params: Promise<{ id: number
 
                     <h1 className="font-bold mb-5">コメント</h1>
 
-                    <div className="border-1 p-3">
+                    <div className="border-1 h-[280px] p-3 overflow-y-scroll">
                         <Comment data={comments} userId={userId!} />
                     </div>
 
-                    <div className="flex">
-                        <div className="flex-1 mt-5"><ReturnButton type="post" role="back" /></div>
-                        <div className="flex justify-end mt-5">
-                            {game === posts.gameTag ? <ModalButton className={userId == posts.userId ? "mr-5" : ""} data={{ postId, userId } } type={"comment"}/> : ""}
+                    <div className="flex mt-7">
+                        <div className="flex-1"><ReturnButton type="post" role="back" /></div>
+                        <div className="flex justify-end">
+                            {game === posts.gameTag ? <ModalButton className={userId == posts.userId ? "mr-5" : ""} data={{ id: postId, userId: posts.userId }} type={"comment"} /> : ""}
                             {userId == posts.userId ? <UpdateButton type={"post"} id={postId} role="update" /> : ""}
                         </div>
                     </div>

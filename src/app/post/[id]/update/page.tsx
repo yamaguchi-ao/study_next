@@ -51,14 +51,12 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
                     </div>
 
                     <div className="font-bold">投稿内容</div>
-                    <textarea name="post" placeholder="投稿の内容を入力..." className="border-1 w-full h-[290px] mt-3 mb-3 p-3 resize-none"
+                    <textarea name="post" placeholder="投稿の内容を入力..." className="border-1 w-full h-[290px] mt-3 mb-3 p-3 resize-none leading-4"
                         defaultValue={post} onChange={(e) => setPost(e.target.value)}></textarea>
                     {state?.post ? errorText(state?.post) : null}
 
                     <div className="flex text-sm text-gray-500 justify-end">
-                        {/* <div className="row">投稿者: {name}</div> */}
                         <div className="row pl-3">ゲーム: {gameTag}</div>
-                        {/* <div className="row pl-3">ランク: {rank}</div> */}
                     </div>
 
                     <div className="border-t w-full mt-3 mb-5"></div>

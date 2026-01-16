@@ -1,18 +1,17 @@
 "use client";
 
-import React, { useActionState, useEffect, useRef, useState } from "react";
+import React, {useActionState, useEffect, useState } from "react";
 import { Button } from "./button";
 import { addComment } from "@/app/actions/comment-action";
 import { useRouter } from "next/navigation";
 import { WarningIcon } from "./icons";
 
-// モーダル本体
-export default function Modal({ isOpen, setIsOpenAction, data, type }: { data: { id: number, userId: number }, isOpen: boolean, setIsOpenAction: React.Dispatch<React.SetStateAction<boolean>>, type: string }) {
-    const modalRef = useRef(null);
+// モーダル本体（モーダル外を押下時の処理等と中身の表示）
+export default function Modal({ isOpen, setIsOpenAction, children, ref }: { isOpen: boolean, setIsOpenAction: React.Dispatch<React.SetStateAction<boolean>>, children: React.ReactNode, ref: React.RefObject<null> }) {
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
-            if (modalRef.current && !(modalRef.current as HTMLElement).contains(event.target as Node)
+            if (ref.current && !(ref.current as HTMLElement).contains(event.target as Node)
                 || (event.target as HTMLElement).getAttribute("name") === "cancel") {
                 setIsOpenAction(false);
             }
@@ -22,7 +21,7 @@ export default function Modal({ isOpen, setIsOpenAction, data, type }: { data: {
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [modalRef, setIsOpenAction]);
+    }, [ref, setIsOpenAction]);
 
     useEffect(() => {
         if (!isOpen) {
@@ -34,12 +33,11 @@ export default function Modal({ isOpen, setIsOpenAction, data, type }: { data: {
 
     return (
         <>
-            {isOpen &&
+            {isOpen && (
                 <div className="fixed z-10 top-0 left-0 w-full h-full bg-black/50 backdrop-blur-sm">
-                    {type === "comment" ? <CommentModalContent data={data} setIsOpenAction={setIsOpenAction} ref={modalRef} /> : null}
-                    {type === "confirm" ? <ConfirmModalContent data={data} setIsOpenAction={setIsOpenAction} ref={modalRef} /> : null}
+                    {children}
                 </div>
-            }
+            )}
         </>
     )
 }
@@ -58,14 +56,19 @@ export function CommentModalContent({ data, setIsOpenAction, ref }: { data?: { i
         }
     }
 
+    // コメント追加APIアクション
     const [state, commentAction, isPending] = useActionState(
         async (_prevState: any, formData: FormData) => {
-            const comment = addComment(_prevState, formData, data!.id, data!.userId);
+            const comment = await addComment(_prevState, formData, data!.id, data!.userId);
+            if (comment?.comment) {
+                return comment;
+            } 
             setIsOpenAction(false);
             router.refresh();
             return comment;
         }, null);
 
+    //　バリデーションエラー時のテキスト
     const errorText = (data: string[]) => {
         const list = [];
         for (let i = 0; i < data.length; i++) {
@@ -102,10 +105,8 @@ export function CommentModalContent({ data, setIsOpenAction, ref }: { data?: { i
     )
 }
 
-export function ConfirmModalContent({ data, setIsOpenAction, ref }: { data?: { id: number, userId: number }, setIsOpenAction: React.Dispatch<React.SetStateAction<boolean>>, ref: React.RefObject<null> }) {
-
-    // const [state, deleteAction, isPending] = useActionState(,);
-
+// 削除確認用モーダル内部
+export function ConfirmModalContent({ handleClick, ref }: { handleClick: any, ref: React.RefObject<null> }) {
     return (
         <div className="relative z-20 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-130 h-50 p-5 bg-slate-100 shadow-lg rounded-xl" ref={ref}>
             <div className="text-black">
@@ -118,7 +119,9 @@ export function ConfirmModalContent({ data, setIsOpenAction, ref }: { data?: { i
 
                 <p className="mb-10">削除いたしますがよろしいでしょうか？</p>
                 <div className="flex justify-end">
-                    <Button type="" className="bg-red-500 mr-4">はい</Button>
+                    <Button type="button" className="bg-red-500 mr-4 hover:opacity-75 hover:bg-red-400" onClick={handleClick}>
+                        はい
+                    </Button>
                     <Button type="button" name="cancel" className="">いいえ</Button>
                 </div>
             </div>

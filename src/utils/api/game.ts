@@ -27,10 +27,16 @@ export const listSearch = async (game: string, rank: string, userId: number) => 
 
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/game/search` + "?game=" + game + "&rank=" + rank + "&userId=" + userId;
-
+    const cookie = await cookies();
     const data = await fetch(url, {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
+        headers: {
+            Cookie: cookie.toString(),
+        },
+        next: {
+            tags: ["games"]
+        }
     });
     return data.json();
 }
@@ -39,10 +45,16 @@ export const gameSearch = async (gameId: Number) => {
 
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/game/search` + "?id=" + gameId;
-
+    const cookie = await cookies();
     const data = await fetch(url, {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
+        headers: {
+            Cookie: cookie.toString(),
+        },
+        next: {
+            tags: ["games"]
+        }
     });
     return data.json();
 }
@@ -71,10 +83,13 @@ export const Delete = async (id: number) => {
     const data = await fetch(url, {
         method: "POST",
         body: JSON.stringify({ id: id }),
-                headers: {
+        headers: {
             Cookie: cookie.toString(),
         },
-        credentials: "include"
+        credentials: "include",
+        next: {
+            tags: ["games"]
+        }
     });
     return data.json();
 }
