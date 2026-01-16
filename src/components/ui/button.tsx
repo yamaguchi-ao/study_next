@@ -2,8 +2,8 @@
 import { Logout } from '@/app/actions/form-action';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import Modal from './modal';
+import { SetStateAction, useRef, useState } from 'react';
+import Modal, { CommentModalContent } from './modal';
 import { errorToast, successToast } from '@/utils/toast';
 import { commentDelete } from '@/app/actions/comment-action';
 import { ReplyIcon, SearchIcon } from './icons';
@@ -81,12 +81,15 @@ export function DeleteButton({ type, id }: any) {
 
 /** モーダル用ボタン */
 export function ModalButton({ className, data }: any) {
+    const modalRef = useRef(null);
     const [isOpen, setIsOpen] = useState(false);
 
     return (
         <>
             <Button onClick={() => setIsOpen(true)} className={className}>コメント</Button>
-            <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} data={data}></Modal>
+            <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} ref={modalRef}>
+                <CommentModalContent data={data} setIsOpenAction={setIsOpen} ref={modalRef} />
+            </Modal>
         </>
     );
 }

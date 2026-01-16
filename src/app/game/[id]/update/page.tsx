@@ -42,14 +42,16 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
                 <form className="flex-1 flex flex-col" action={gameAction}>
                     <div className="flex flex-col h-full justify-center items-center">
                         <div className="">
-                            <div className="flex pb-10">
+                            <div className="flex pb-10 items-center">
                                 <div className="w-35">ゲームタイトル</div>
                                 <h1 className="text-2xl pl20">{name}</h1>
                             </div>
-                            <div className="flex pb-10">
+                            <div className="flex pb-10 items-center">
                                 <div className="w-35">ランク</div>
-                                <input className="border w-64" name="rank" value={rank} onChange={(e) => setRank(e.target.value)}></input>
-                                {state?.rank ? errorText(state?.rank) : null}
+                                <div className="flex flex-col mt-3">
+                                    <input className="border w-64" name="rank" value={rank} onChange={(e) => setRank(e.target.value)}></input>
+                                    {state?.rank ? errorText(state?.rank) : null}
+                                </div>
                             </div>
                             <div className="flex justify-around items-end">
                                 <ReturnButton />

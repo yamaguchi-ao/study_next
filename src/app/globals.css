@@ -41,3 +41,20 @@ body {
 .h-main {
   height: calc(100vh - 60px);
 }
+
+.swing-in-top {
+  animation: "swing-in-fwd" 1s cubic-bezier(0.175, 0.885, 0.320, 1.275) both;
+}
+
+@keyframes swing-in-fwd {
+  0% {
+    transform: rotateX(-100deg);
+    transform-origin: top;
+    opacity: 0;
+  }
+  to{
+    transform: rotateX(0deg);
+    transform-origin: top;
+    opacity: 1;
+  }
+}

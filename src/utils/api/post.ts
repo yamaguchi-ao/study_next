@@ -23,10 +23,13 @@ export const listSearch = async (game: string) => {
 
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/post/search` + "?game=" + game;
-
+    const cookie = await cookies();
     const data = await fetch(url, {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
+        headers: {
+            Cookie: cookie.toString(),
+        },
     });
     return data.json();
 }
@@ -35,10 +38,14 @@ export const detailSearch = async (postId: Number) => {
 
     const baseurl = await getUrl();
     const url = `${baseurl}/api/post/search` + "?id=" + postId;
+    const cookie = await cookies();
 
     const data = await fetch(url, {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
+        headers: {
+            Cookie: cookie.toString(),
+        },
     });
     return data.json();
 }
@@ -70,7 +77,10 @@ export async function Delete(postId: number) {
         headers: {
             Cookie: cookie.toString(),
         },
-        credentials: "include"
+        credentials: "include",
+        next: {
+            tags: ['posts']
+        }
     });
     return data.json();
 }
