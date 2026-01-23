@@ -48,13 +48,14 @@ model Games {
 }
 
 model Comments {
-  id        Int      @id@default(autoincrement())
-  comment   String
-  post      Posts    @relation(fields:[postId], references:[id], onDelete:Cascade)
-  postId    Int
-  user      Users    @relation(fields:[userId], references:[id], onDelete:Cascade)
-  userId    Int
-  hiddenFlg Boolean  @default(false)
+  id          Int      @id@default(autoincrement())
+  comment     String
+  post        Posts    @relation(fields:[postId], references:[id], onDelete:Cascade)
+  postId      Int
+  user        Users    @relation(fields:[userId], references:[id], onDelete:Cascade)
+  userId      Int
+  hiddenFlg   Boolean  @default(false)
+  dispRankFlg Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

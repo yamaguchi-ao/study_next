@@ -3,13 +3,15 @@
 import { GameUpdate, getGame } from "@/app/actions/game-action";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button, ReturnButton } from "@/components/ui/button";
-import { redirect } from "next/navigation";
+import { gameNameFixed, supportedGames, supportedGamesMap } from "@/constants/context";
 import { use, useActionState, useEffect, useState } from "react";
 
 export default function UpdatePage({ params }: { params: Promise<{ id: number }> }) {
     const [name, setName] = useState(String);
     const [rank, setRank] = useState(String);
     const gameId = use(params).id;
+
+    const supportedGameNames = Object.values(supportedGames);
 
     const [state, gameAction, isPending] = useActionState(
         async (_prevState: any, formData: FormData) => {
@@ -48,8 +50,9 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
                             </div>
                             <div className="flex pb-10 items-center">
                                 <div className="w-35">ランク</div>
-                                <div className="flex flex-col mt-3">
-                                    <input className="border w-64" name="rank" value={rank} onChange={(e) => setRank(e.target.value)}></input>
+                                <div className="flex flex-col">
+                                    {supportedGameNames.includes(gameNameFixed(name)) ? GameRankSelect(name, rank)
+                                        : <input className="border w-64" name="rank" value={rank} onChange={(e) => setRank(e.target.value)}></input>}
                                     {state?.rank ? errorText(state?.rank) : null}
                                 </div>
                             </div>
@@ -64,5 +67,24 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
                 </form>
             </div>
         </>
+    )
+}
+
+function GameRankSelect(game: string, rank: string) {
+
+    // 特定のランクマップを取得
+    const rankMap = supportedGamesMap(game);
+
+    return (
+        <select name="rank" className="border w-64" defaultValue={rank}>
+            {rankMap?.map((item) => {
+                if (isNaN(Number(item.key))) {
+                    return true;
+                }
+                return (
+                    <option key={item.key} value={item.value} selected={item.value === rank}>{item.value}</option>
+                );
+            })}
+        </select>
     )
 }

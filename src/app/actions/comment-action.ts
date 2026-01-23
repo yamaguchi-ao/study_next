@@ -9,7 +9,10 @@ export async function addComment(_prevState: any, formData: FormData, postId: nu
         comment: formData.get("comment") as string,
         postId: postId,
         userId: userId,
-        hiddenFlg: formData.get("anonymous") as string
+        hiddenFlg: formData.get("anonymous") as string,
+        dispRankFlg: formData.get("dispRank") as string,
+        postRank: Number(formData.get("postRank")),
+        yourRank: Number(formData.get("yourRank")),
     }
 
     const issues = CommentSchema.safeParse(commentData);

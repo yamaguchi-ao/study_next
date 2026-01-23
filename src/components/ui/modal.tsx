@@ -1,10 +1,11 @@
 "use client";
 
-import React, {useActionState, useEffect, useState } from "react";
+import React, { useActionState, useEffect, useState } from "react";
 import { Button } from "./button";
 import { addComment } from "@/app/actions/comment-action";
 import { useRouter } from "next/navigation";
 import { WarningIcon } from "./icons";
+import { gameNameFixed, supportedGamesMap } from "@/constants/context";
 
 // モーダル本体（モーダル外を押下時の処理等と中身の表示）
 export default function Modal({ isOpen, setIsOpenAction, children, ref }: { isOpen: boolean, setIsOpenAction: React.Dispatch<React.SetStateAction<boolean>>, children: React.ReactNode, ref: React.RefObject<null> }) {
@@ -43,9 +44,10 @@ export default function Modal({ isOpen, setIsOpenAction, children, ref }: { isOp
 }
 
 // コメント用モーダルの中身
-export function CommentModalContent({ data, setIsOpenAction, ref }: { data?: { id: number, userId: number }, setIsOpenAction: React.Dispatch<React.SetStateAction<boolean>>, ref: React.RefObject<null> }) {
+export function CommentModalContent({ data, setIsOpenAction, ref }: { data?: { id: number, userId: number, postRank: string, yourRank: string, game: string }, setIsOpenAction: React.Dispatch<React.SetStateAction<boolean>>, ref: React.RefObject<null> }) {
     const router = useRouter();
     const [anonymous, setAnonymous] = useState(Boolean);
+    const [dispRank, setDispRank] = useState(Boolean);
 
     // 匿名用
     function handleOnChange() {
@@ -56,13 +58,22 @@ export function CommentModalContent({ data, setIsOpenAction, ref }: { data?: { i
         }
     }
 
+    // ランク非表示用
+    function handleOnChangeDispRank() {
+        if (dispRank) {
+            setDispRank(false);
+        } else {
+            setDispRank(true);
+        }
+    }
+
     // コメント追加APIアクション
     const [state, commentAction, isPending] = useActionState(
         async (_prevState: any, formData: FormData) => {
             const comment = await addComment(_prevState, formData, data!.id, data!.userId);
-            if (comment?.comment) {
+            if (comment?.comment || comment?.yourRank) {
                 return comment;
-            } 
+            }
             setIsOpenAction(false);
             router.refresh();
             return comment;
@@ -77,6 +88,19 @@ export function CommentModalContent({ data, setIsOpenAction, ref }: { data?: { i
         return list;
     }
 
+    const rankToNumber = (game: string, rank: string) => {
+        // 取得したゲームからランクマップを取得
+        const rankMap = supportedGamesMap(game);
+
+        // 現在のランクを数値として取得
+        const rankNumber = rankMap?.find((item) => {
+            if (item.key === rank) {
+                return item.value;
+            }
+        });
+        return rankNumber ? Number(rankNumber.value) : 0;
+    }
+
     return (
         <div className="relative z-20 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-h-[95vh] md:max-h-[90vh] w-[97vw] md:w-[80vw] p-4 bg-slate-100 shadow-lg rounded-xl overflow-auto" ref={ref}>
             <div className="text-black">
@@ -85,16 +109,26 @@ export function CommentModalContent({ data, setIsOpenAction, ref }: { data?: { i
                     <div className="mb-4">
                         <textarea id="comment" name="comment" className="w-full p-3 h-[300px] resize-none border-1 border-gray-500 bg-white rounded-md"></textarea>
                         {state?.comment ? errorText(state?.comment) : null}
+                        {state?.yourRank ? errorText(state?.yourRank) : null}
                     </div>
                     <div className="flex">
-                        <div className="flex-1 justify-start items-center flex">
+                        <div className="justify-start items-center flex">
                             <label className="flex cursor-pointer mr-4">
                                 <input type="checkbox" className="peer sr-only mr-1" name="anonymous" onChange={() => handleOnChange()} />
                                 <span className="block w-[2em] bg-gray-400 rounded-full pt-[2px] pl-[1px] after:block after:h-[1em] after:w-[1em] after: after:rounded-full after:bg-white after:transition peer-checked:bg-blue-500 peer-checked:after:translate-x-[calc(100%-3px)]"></span>
                                 <span className="row ml-2 text-sm">匿名で投稿</span>
                             </label>
                         </div>
-                        <div className="flex justify-end">
+                        <div className="justify-start items-center flex">
+                            <label className="flex cursor-pointer mr-4">
+                                <input type="checkbox" className="peer sr-only mr-1" name="dispRank" onChange={() => handleOnChangeDispRank()} />
+                                <span className="block w-[2em] bg-gray-400 rounded-full pt-[2px] pl-[1px] after:block after:h-[1em] after:w-[1em] after: after:rounded-full after:bg-white after:transition peer-checked:bg-blue-500 peer-checked:after:translate-x-[calc(100%-3px)]"></span>
+                                <span className="row ml-2 text-sm">ランクを非表示</span>
+                            </label>
+                        </div>
+                        <input type="hidden" name="postRank" value={rankToNumber(data?.game ?? "", data?.postRank ?? "")} />
+                        <input type="hidden" name="yourRank" value={rankToNumber(data?.game ?? "", data?.yourRank ?? "")} />
+                        <div className="flex flex-1 justify-end">
                             <Button type="button" name="cancel" className="mr-4">キャンセル</Button>
                             <Button type="submit" disabled={isPending}>{isPending ? "投稿中..." : "投稿"}</Button>
                         </div>

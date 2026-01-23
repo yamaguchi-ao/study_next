@@ -1,24 +1,28 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { gameNameFixed } from "@/constants/context";
 
 export async function POST(req: NextRequest) {
     const { name, rank, id } = await req.json();
     const JWT_SECRET = process.env.JWT_SECRET;
+    let game: string | undefined = undefined;
 
     try {
         // ログインしているかどうかの判定
         const token = req.cookies.get("auth_token")?.value;
-
         const data = await jwt.verify(token!, JWT_SECRET!);
 
         if (!data) {
             return NextResponse.json({ message: "ログインしていません。", success: false }, { status: 404 });
         }
 
+        // ゲームタイトルの名称修正
+        game = gameNameFixed(name);
+
         // ゲームタイトルの既存確認
         const existingGame = await prisma.games.findMany({
-            where: { userId: id, AND: { name: name } }
+            where: { userId: id, AND: { name: game } }
         });
 
         if (existingGame.length > 0) {
@@ -29,7 +33,7 @@ export async function POST(req: NextRequest) {
         await prisma.games.create({
             data: {
                 userId: id,
-                name: name,
+                name: game as string,
                 rank: rank
             }
         });

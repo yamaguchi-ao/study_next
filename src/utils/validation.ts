@@ -1,5 +1,6 @@
 // バリデーション用
 import { z } from "zod";
+import { comment } from "./api/comment";
 
 // 新規登録用バリデーション
 export const UserSchema = z.object({
@@ -47,7 +48,12 @@ export type PostSchema = z.infer<typeof PostSchema>;
 
 // コメント用バリデーション
 export const CommentSchema = z.object({
-    comment: z.string().min(1, "コメントは必ず1文字以上入力してください。"),
+    comment: z.string().min(1, "コメントは必ず1文字以上入力してください。").max(500, "コメントは500文字以内で入力してください。"),
+    postRank: z.number().min(0, "ランクを入力してください。"),
+    yourRank: z.number().min(0, "ランクを入力してください。"),
+}).refine((data) => data.yourRank >= data.postRank, {
+    path: ["yourRank"],
+    message: "あなたのランクは投稿者のランク以上でなければなりません。",
 });
 
 export type CommentSchema = z.infer<typeof CommentSchema>;

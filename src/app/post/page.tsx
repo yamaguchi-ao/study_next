@@ -8,7 +8,6 @@ import Loading from "../loading";
 import { postDelete, postListSearch } from "../actions/post-action";
 import { getCookies } from "../actions/action";
 import { CancelIcon, CommentIcon } from "@/components/ui/icons";
-import Link from "next/link";
 import Modal, { ConfirmModalContent } from "@/components/ui/modal";
 import { errorToast, successToast } from "@/utils/toast";
 
@@ -134,7 +133,7 @@ function PostTable({ userId, data, search }: any) {
 
                     <div className="flex justify-end">
                       <CommentIcon className="size-5 mt-[3px]" />
-                      <p className="pl-2">{value.comments.length}</p>
+                      <p className="pl-2">{value.comments.length >= 99 ? "99+" : value.comments.length}</p>
                     </div>
                   </div>
                 </div>

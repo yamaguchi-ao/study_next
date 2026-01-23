@@ -73,6 +73,9 @@ async function getDetail(postId: string) {
             content: true,
             gameTag: true,
             userId: true,
+            createdAt: true,
+            updatedAt: true,
+            rankFlg: true,
             user: {
                 select: {
                     name: true,
