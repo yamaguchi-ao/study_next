@@ -2,7 +2,7 @@
 import { Logout } from '@/app/actions/form-action';
 import clsx from 'clsx';
 import { useRouter } from 'next/navigation';
-import { SetStateAction, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import Modal, { CommentModalContent } from './modal';
 import { errorToast, successToast } from '@/utils/toast';
 import { commentDelete } from '@/app/actions/comment-action';
@@ -55,13 +55,13 @@ export function ReturnButton({ type }: any) {
 }
 
 /** 削除用ボタン */
-export function DeleteButton({ type, id }: any) {
+export function DeleteButton({ type, id, userId }: any) {
     const router = useRouter();
 
-    async function onDelete(id: number) {
+    async function onDelete(id: number, userId: number) {
         // 取得したタイプの条件で削除する
         if (type == "comment") {
-            const req = await commentDelete(id);
+            const req = await commentDelete(id, userId);
 
             const success = req.success ? req.success : "";
             const message = req.message ? req.message : "";
@@ -76,7 +76,7 @@ export function DeleteButton({ type, id }: any) {
         }
     }
 
-    return <Button onClick={() => onDelete(id)}>削除</Button>
+    return <Button onClick={() => onDelete(id, userId)}>削除</Button>
 }
 
 /** モーダル用ボタン */

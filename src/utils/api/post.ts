@@ -66,14 +66,14 @@ export async function Update(postData: { title: string, post: string, id: number
     return data.json();
 }
 
-export async function Delete(postId: number) {
+export async function Delete(postId: number, userId: number) {
 
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/post/delete`;
     const cookie = await cookies();
     const data = await fetch(url, {
         method: "POST",
-        body: JSON.stringify({ id: postId }),
+        body: JSON.stringify({ id: postId, userId: userId }),
         headers: {
             Cookie: cookie.toString(),
         },

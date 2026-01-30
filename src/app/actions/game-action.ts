@@ -115,9 +115,9 @@ export async function GameUpdate(_prevState: any, formData: FormData, id: Number
 }
 
 // 削除
-export async function gameDelete(gameId: number) {
+export async function gameDelete(gameId: number, userId: number) {
 
-    const res = await Delete(gameId);
+    const res = await Delete(gameId, userId);
 
     const success = res?.success;
     const message = res?.message;

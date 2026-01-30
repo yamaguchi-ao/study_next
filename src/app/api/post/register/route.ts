@@ -10,6 +10,10 @@ export async function POST(req: NextRequest) {
         // ログインできているかの確認
         const token = req.cookies.get("auth_token")?.value;
         
+        if (token === null || token === undefined) {
+            return NextResponse.json({ message: "ログインしていない。", success: false }, { status: 500 });
+        }
+        
         const data = await jwt.verify(token!, JWT_SECRET!);
 
         if (!data) {

@@ -52,9 +52,9 @@ export async function getCommentList(postId: number, game: string) {
     }
 }
 
-export async function commentDelete(commentId: number) {
+export async function commentDelete(commentId: number, userId: number) {
     // コメント削除処理
-    const res = await deleteComment(commentId);
+    const res = await deleteComment(commentId, userId);
 
     const success = res?.success;
     const message = res?.message;

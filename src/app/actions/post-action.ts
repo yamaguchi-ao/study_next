@@ -108,9 +108,9 @@ export async function postUpdate(_prevState: any, formData: FormData, id: number
 
 }
 
-export async function postDelete(postId: number) {
+export async function postDelete(postId: number, userId: number) {
 
-    const res = await Delete(postId);
+    const res = await Delete(postId, userId);
 
     const success = res?.success;
     const message = res?.message;

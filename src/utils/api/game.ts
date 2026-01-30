@@ -75,14 +75,14 @@ export const Update = async (subject: { rank: string, gameId: Number }) => {
     return data.json();
 }
 
-export const Delete = async (id: number) => {
+export const Delete = async (id: number, userId: number) => {
 
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/game/delete`;
     const cookie = await cookies();
     const data = await fetch(url, {
         method: "POST",
-        body: JSON.stringify({ id: id }),
+        body: JSON.stringify({ id: id, userId: userId }),
         headers: {
             Cookie: cookie.toString(),
         },

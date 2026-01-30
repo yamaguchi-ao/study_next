@@ -3,15 +3,27 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import jwt from "jsonwebtoken";
 import bcrypt from 'bcrypt';
+import { UserSchema } from "@/utils/validation";
+import { z } from "zod";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // User Register API
 export async function POST(req: NextRequest) {
 
-    const { username, email, password } = await req.json();
+    const { username, email, password, confirm } = await req.json();
 
     try {
+
+        // API側のバリデーションチェック
+        const issue = UserSchema.safeParse({ username, email, password, confirm });
+
+        if (!issue.success) {
+            const validation = z.flattenError(issue.error);
+            const message = validation.fieldErrors ?? "何かしらのエラー";
+            return NextResponse.json({ message: message, success: false }, { status: 400 });
+        }
+
         // 取得したメアドの既存確認
         const existingEmail = await prisma.users.findUnique({
             where: { email: email }
@@ -19,7 +31,7 @@ export async function POST(req: NextRequest) {
 
         // 既存である場合
         if (existingEmail) {
-            return NextResponse.json({ message: "そのメールアドレスは既に登録済みです。", success: false }, { status: 500 });
+            return NextResponse.json({ message: "そのメールアドレスは既に登録済みです。", success: false }, { status: 409 });
         }
 
         // パスワードのハッシュ化

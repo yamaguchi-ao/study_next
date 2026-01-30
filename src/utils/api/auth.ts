@@ -1,5 +1,5 @@
 // 新規登録API呼び出し
-export const signUp = async (userData: { username: string, email: string, password: string }) => {
+export const signUp = async (userData: { username: string, email: string, password: string, confirm: string }) => {
 
     const url = "/api/auth/signup";
 

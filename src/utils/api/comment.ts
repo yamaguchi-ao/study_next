@@ -39,13 +39,13 @@ export async function getComments(postId: number, game: string) {
 }
 
 // コメント削除
-export async function deleteComment(id: number) {
+export async function deleteComment(id: number, userId: number) {
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/comment/delete`;
     const cookie = await cookies();
     const data = await fetch(url, {
         method: "POST",
-        body: JSON.stringify({ id: id }),
+        body: JSON.stringify({ id: id, userId: userId}),
         headers: {
             Cookie: cookie.toString(),
         },

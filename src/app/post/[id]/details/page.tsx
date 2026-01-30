@@ -5,6 +5,12 @@ import { getPost } from "@/app/actions/post-action";
 import { Sidebar } from "@/components/layout/sidebar";
 import { DeleteButton, ModalButton, ReturnButton, UpdateButton } from "@/components/ui/button";
 import { dateformat } from "@/constants/dateFormat";
+import type { CommentsWithUsers } from "@/types";
+
+interface CommentProps {
+    data: CommentsWithUsers[],
+    userId: number;
+}
 
 export default async function details({ params }: { params: Promise<{ id: number }> }) {
     const postId = (await params).id;
@@ -29,7 +35,7 @@ export default async function details({ params }: { params: Promise<{ id: number
                 <div className="w-full p-7 overflow-y-scroll">
                     <div className="flex flex-row justify-between">
                         <h1 className="text-3xl">{posts.title}</h1>
-                        
+
                         <div className="flex flex-col justify-end items-end mb-3">
                             <h1 className="text-[13px] text-gray-500">投稿日：{dateformat(posts.createdAt)}</h1>
                             <h1 className="text-[13px] text-gray-500">投稿更新日：{dateformat(posts.updatedAt)}</h1>
@@ -66,7 +72,7 @@ export default async function details({ params }: { params: Promise<{ id: number
     );
 }
 
-function Comment({ data, userId }: any) {
+function Comment({ data, userId }: CommentProps) {
     return (
         <>
             {data.length > 0 ? data.map((value: any, idx: any) => {
@@ -82,7 +88,7 @@ function Comment({ data, userId }: any) {
                         </div>
                         <div className="pl-7">{value.comment}</div>
                         <div className="flex justify-end mb-3">
-                            {userId == value.user.id ? <DeleteButton type={"comment"} id={value.id} /> : ""}
+                            {userId == value.user.id ? <DeleteButton type={"comment"} id={value.id} userId={userId} /> : ""}
                         </div>
                     </div>
                 )

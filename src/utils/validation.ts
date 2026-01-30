@@ -1,6 +1,5 @@
-// バリデーション用
+// フロント用バリデーション
 import { z } from "zod";
-import { comment } from "./api/comment";
 
 // 新規登録用バリデーション
 export const UserSchema = z.object({
@@ -57,3 +56,11 @@ export const CommentSchema = z.object({
 });
 
 export type CommentSchema = z.infer<typeof CommentSchema>;
+
+// 削除用APIバリデーション
+export const DeleteSchema = z.object({
+    userId: z.number().min(1, "ユーザは必ず指定してください。"),
+    id: z.number().min(1, "対象を必ず指定してください。")
+});
+
+export type DeleteSchema = z.infer<typeof DeleteSchema>;
