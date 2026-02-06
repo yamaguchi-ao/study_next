@@ -3,8 +3,17 @@
 import { getUrl } from "@/constants/getUrl";
 import { cookies } from "next/headers";
 
+interface Comment {
+    comment: string,
+    postId: number,
+    userId: number,
+    hiddenFlg: string,
+    postRank: number,
+    yourRank: number
+}
+
 // コメント追加
-export const comment = async (commentData: { comment: string, postId: number, userId: number, hiddenFlg: string }) => {
+export const comment = async (commentData: Comment) => {
 
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/comment/register`;
@@ -45,7 +54,7 @@ export async function deleteComment(id: number, userId: number) {
     const cookie = await cookies();
     const data = await fetch(url, {
         method: "POST",
-        body: JSON.stringify({ id: id, userId: userId}),
+        body: JSON.stringify({ id: id, userId: userId }),
         headers: {
             Cookie: cookie.toString(),
         },

@@ -13,16 +13,15 @@ export async function GET(req: NextRequest) {
     try {
         // ログインしているかどうかの判定
         const token = req.cookies.get("auth_token")?.value;
-        
         if (token === null || token === undefined) {
             return NextResponse.json({ message: "ログインしていない。", success: false }, { status: 500 });
         }
-        
+
         const data = await jwt.verify(token!, JWT_SECRET!);
         if (!data) {
             return NextResponse.json({ message: "ログインしていません。", success: false }, { status: 404 });
         }
-        
+
         if (searchParams.toString().includes("id")) {
             const detailData = await getDetail(postIdParams!);
             return NextResponse.json({ message: "取得成功", success: true, data: detailData }, { status: 200 });

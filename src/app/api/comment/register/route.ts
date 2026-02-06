@@ -9,7 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // コメント追加API
 export async function POST(req: NextRequest) {
 
-    const { comment, postId, userId, hiddenFlg, dispRankFlg } = await req.json();
+    const { comment, postId, userId, hiddenFlg, dispRankFlg, postRank, yourRank } = await req.json();
 
     try {
         // ログインしているかどうかの判定
@@ -26,11 +26,12 @@ export async function POST(req: NextRequest) {
         }
 
         //API側バリデーションチェック
-        const issue = CommentSchema.safeParse({ comment, postId, userId, hiddenFlg, dispRankFlg });
+        const issue = CommentSchema.safeParse({ comment, postId, userId, hiddenFlg, dispRankFlg, postRank, yourRank });
 
         if (!issue.success) {
             const validation = z.flattenError(issue.error);
             const message = validation.fieldErrors;
+            console.log("エラーメッセージ：", message);
             return NextResponse.json({ message: message, success: false }, { status: 400 });
         }
 

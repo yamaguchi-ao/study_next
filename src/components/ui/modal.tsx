@@ -5,10 +5,32 @@ import { Button } from "./button";
 import { addComment } from "@/app/actions/comment-action";
 import { useRouter } from "next/navigation";
 import { WarningIcon } from "./icons";
-import { gameNameFixed, supportedGamesMap } from "@/constants/context";
+import { supportedGamesMap } from "@/constants/context";
+import { ActionType, CommentsType, IsOpenActionType, RefType} from "@/types";
+
+//　モーダル本体用
+interface ModalProps {
+    isOpen: boolean,
+    setIsOpenAction: IsOpenActionType,
+    children: React.ReactNode,
+    ref: RefType
+}
+
+// コメント用
+interface CommentProps {
+    data: CommentsType,
+    setIsOpenAction: IsOpenActionType,
+    ref: RefType
+}
+
+// 削除モーダル用
+interface DeleteModalProps {
+    handleClickAction: ActionType,
+    ref: RefType
+}
 
 // モーダル本体（モーダル外を押下時の処理等と中身の表示）
-export default function Modal({ isOpen, setIsOpenAction, children, ref }: { isOpen: boolean, setIsOpenAction: React.Dispatch<React.SetStateAction<boolean>>, children: React.ReactNode, ref: React.RefObject<null> }) {
+export default function Modal({ isOpen, setIsOpenAction, children, ref }: ModalProps) {
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -44,7 +66,7 @@ export default function Modal({ isOpen, setIsOpenAction, children, ref }: { isOp
 }
 
 // コメント用モーダルの中身
-export function CommentModalContent({ data, setIsOpenAction, ref }: { data?: { id: number, userId: number, postRank: string, yourRank: string, game: string }, setIsOpenAction: React.Dispatch<React.SetStateAction<boolean>>, ref: React.RefObject<null> }) {
+export function CommentModalContent({ data, setIsOpenAction, ref }: CommentProps) {
     const router = useRouter();
     const [anonymous, setAnonymous] = useState(Boolean);
     const [dispRank, setDispRank] = useState(Boolean);
@@ -140,7 +162,7 @@ export function CommentModalContent({ data, setIsOpenAction, ref }: { data?: { i
 }
 
 // 削除確認用モーダル内部
-export function ConfirmModalContent({ handleClick, ref }: { handleClick: any, ref: React.RefObject<null> }) {
+export function ConfirmModalContent({ handleClickAction, ref }: DeleteModalProps) {
     return (
         <div className="relative z-20 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-130 h-50 p-5 bg-slate-100 shadow-lg rounded-xl" ref={ref}>
             <div className="text-black">
@@ -153,7 +175,7 @@ export function ConfirmModalContent({ handleClick, ref }: { handleClick: any, re
 
                 <p className="mb-10">削除いたしますがよろしいでしょうか？</p>
                 <div className="flex justify-end">
-                    <Button type="button" className="bg-red-500 mr-4 hover:opacity-75 hover:bg-red-400" onClick={handleClick}>
+                    <Button type="button" className="bg-red-500 mr-4 hover:opacity-75 hover:bg-red-400" onClick={handleClickAction}>
                         はい
                     </Button>
                     <Button type="button" name="cancel" className="">いいえ</Button>

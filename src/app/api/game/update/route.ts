@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { GameSchema } from "@/utils/validation";
+import { GameUpdateSchema } from "@/utils/validation";
 import { z } from "zod";
 
 export async function POST(req: NextRequest) {
@@ -23,11 +23,12 @@ export async function POST(req: NextRequest) {
         }
 
         //API側バリデーションチェック
-        const issue = GameSchema.safeParse({ rank, gameId });
+        const issue = GameUpdateSchema.safeParse({ rank, gameId });
 
         if (!issue.success) {
             const validation = z.flattenError(issue.error);
             const message = validation.fieldErrors;
+            console.log("エラーメッセージ：", message);
             return NextResponse.json({ message: message, success: false }, { status: 400 });
         }
 

@@ -76,13 +76,13 @@ function GameRankSelect(game: string, rank: string) {
     const rankMap = supportedGamesMap(game);
 
     return (
-        <select name="rank" className="border w-64" >
+        <select name="rank" className="border w-64" defaultValue={rank}>
             {rankMap?.map((item) => {
                 if (isNaN(Number(item.key))) {
                     return true;
                 }
                 return (
-                    <option key={item.key} value={rank} selected={item.value === rank} >{item.value}</option>
+                    <option key={item.key} value={item.value} >{item.value}</option>
                 );
             })}
         </select>

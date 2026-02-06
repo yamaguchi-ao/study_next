@@ -34,9 +34,9 @@ export default async function details({ params }: { params: Promise<{ id: number
                 <Sidebar />
                 <div className="w-full p-7 overflow-y-scroll">
                     <div className="flex flex-row justify-between">
-                        <h1 className="text-3xl">{posts.title}</h1>
+                        <h1 className="text-3xl w-[850px]">{posts.title}</h1>
 
-                        <div className="flex flex-col justify-end items-end mb-3">
+                        <div className="flex flex-col justify-end items-end ">
                             <h1 className="text-[13px] text-gray-500">投稿日：{dateformat(posts.createdAt)}</h1>
                             <h1 className="text-[13px] text-gray-500">投稿更新日：{dateformat(posts.updatedAt)}</h1>
                         </div>
@@ -59,11 +59,11 @@ export default async function details({ params }: { params: Promise<{ id: number
                     </div>
 
                     <div className="flex mt-7">
-                        <div className="flex-1"><ReturnButton type="post" role="back" /></div>
+                        <div className="flex-1"><ReturnButton type={"post"} /></div>
                         <div className="flex justify-end">
                             {game === posts.gameTag ? <ModalButton className={userId == posts.userId ? "mr-5" : ""}
-                                data={{ id: postId, userId: userId, postRank: posts.user.games[0].rank, yourRank: rank, game: game }} type={"comment"} /> : ""}
-                            {userId == posts.userId ? <UpdateButton type={"post"} id={postId} role="update" /> : ""}
+                                data={{ id: postId, userId: userId!, postRank: posts.user.games[0].rank, yourRank: rank, game: game }} /> : ""}
+                            {userId == posts.userId ? <UpdateButton type={"post"} id={Number(postId)} /> : ""}
                         </div>
                     </div>
                 </div>
@@ -75,7 +75,7 @@ export default async function details({ params }: { params: Promise<{ id: number
 function Comment({ data, userId }: CommentProps) {
     return (
         <>
-            {data.length > 0 ? data.map((value: any, idx: any) => {
+            {data.length > 0 ? data.map((value: any, idx: number) => {
 
                 const date = dateformat(value.createdAt);
 

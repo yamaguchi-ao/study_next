@@ -1,11 +1,15 @@
+"use client"
+
 import { Button } from "../ui/button";
 import Image from "next/image";
 import icon from "@/public/test_icon.png"
 import { Username } from "../ui/username";
 import { LogOutIcon } from "../ui/icons";
+import { UserNameType } from "@/types";
+import { Logout } from "@/app/actions/form-action";
 
 // ヘッダー
-export async function Header({ title, username }: any) {
+export function Header({ title, username }: UserNameType) {
 
     return (
         <header>
@@ -16,8 +20,8 @@ export async function Header({ title, username }: any) {
                 </div>
                 <div className="flex pr-5 items-center">
                     <Username username={username} />
-                    <Button onClick={"logout"}>ログアウト
-                        <LogOutIcon className="ml-[5px] size-4"/>
+                    <Button onClick={() => Logout()}>ログアウト
+                        <LogOutIcon className="ml-[5px] size-4" />
                     </Button>
                 </div>
             </div>

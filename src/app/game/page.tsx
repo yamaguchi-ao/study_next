@@ -11,13 +11,19 @@ import { CancelIcon } from "@/components/ui/icons";
 import Modal, { ConfirmModalContent } from "@/components/ui/modal";
 import { errorToast, successToast } from "@/utils/toast";
 import { getCookies } from "../actions/action";
+import type { GamesWithUsers } from "@/types";
+
+interface GameProps {
+    data: GamesWithUsers[],
+    search: () => Promise<void>
+}
 
 const Game: NextPage = () => {
     const router = useRouter();
 
     const [game, setGame] = useState('');
     const [rank, setRank] = useState('');
-    const [search, setSearch] = useState(Array);
+    const [search, setSearch] = useState<GamesWithUsers[]>([]);
     const [state, searchAction, isPending] = useActionState(GetSearch, null);
 
     useEffect(() => {
@@ -71,7 +77,7 @@ const Game: NextPage = () => {
 
 export default Game
 
-function SearchTable({ data, search }: any) {
+function SearchTable({ data, search }: GameProps) {
 
     const router = useRouter();
     const modalRef = useRef(null);
@@ -116,7 +122,7 @@ function SearchTable({ data, search }: any) {
             <div className="grid grid-cols-5 justify-items-center gap-y-10">
                 {selectedId && (
                     <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} ref={modalRef} >
-                        <ConfirmModalContent handleClick={() => onDelete(selectedId, userId)} ref={modalRef} />
+                        <ConfirmModalContent handleClickAction={() => onDelete(selectedId, userId)} ref={modalRef} />
                     </Modal>
                 )}
                 {data !== undefined ? data.map((value: any) => {
