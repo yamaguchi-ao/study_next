@@ -1,4 +1,4 @@
-import { CommentSchema, PostSchema } from "@/utils/validation";
+import { PostSchema } from "@/utils/validation";
 import { getCookies } from "./action";
 import { z } from "zod";
 import { Delete, detailSearch, listSearch, post, Update } from "@/utils/api/post";
@@ -34,7 +34,7 @@ export async function postRegister(_prevState: any, formData: FormData) {
             successToast(message);
             redirect("/post");
         } else {
-            errorToast(message);
+            redirect("/login?error=true");
         }
     }
 }
@@ -53,7 +53,7 @@ export async function postListSearch(game: string) {
         return data;
     } else {
         // 失敗時
-        errorToast(message);
+        redirect("/login?error=true");
     }
 }
 
@@ -71,7 +71,7 @@ export async function getPost(postId: Number) {
         return data;
     } else {
         // 失敗時
-        errorToast(message);
+        redirect("/login?error=true");
     }
 }
 
@@ -102,18 +102,18 @@ export async function postUpdate(_prevState: any, formData: FormData, id: number
             redirect("/post");
         } else {
             // 失敗時
-            errorToast(message);
+            redirect("/login?error=true");
         }
     }
 
 }
 
-export async function postDelete(postId: number) {
+export async function postDelete(postId: number, userId: number) {
 
-    const res = await Delete(postId);
+    const res = await Delete(postId, userId);
 
     const success = res?.success;
     const message = res?.message;
 
-    return {success, message};
+    return { success, message };
 }

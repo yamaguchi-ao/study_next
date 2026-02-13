@@ -29,6 +29,7 @@ async function getDetail(postId: string, game: string) {
             comment: true,
             createdAt: true,
             hiddenFlg: true,
+            dispRankFlg: true,
             user: {
                 select: {
                     name: true,

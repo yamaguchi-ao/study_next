@@ -3,16 +3,19 @@
 import { GameRegister } from "@/app/actions/game-action";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button } from "@/components/ui/button";
+import { gameNameFixed, supportedGames, supportedGamesMap } from "@/constants/context";
 import type { NextPage } from "next";
 import { redirect } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 
 const GameRegist: NextPage = () => {
+    const [state, Register, isPending] = useActionState(GameRegister, null);
+    const [inputGame, setInputGame] = useState<string | null>(null);
+
+    const supportedGameNames = Object.values(supportedGames);
 
     useEffect(() => {
     }, []);
-
-    const [state, Register, isPending] = useActionState(GameRegister, null);
 
     const errorText = (data: string[]) => {
         const list = [];
@@ -21,6 +24,10 @@ const GameRegist: NextPage = () => {
         }
 
         return list;
+    }
+
+    function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+        setInputGame(event.target.value);
     }
 
     return (
@@ -33,18 +40,18 @@ const GameRegist: NextPage = () => {
                         <div className="">
                             <div className="flex pb-10 items-center">
                                 <div className="w-35">ゲームタイトル</div>
-                                <div className="flex flex-col mt-3">
-                                    <input className="border w-64" name="name"></input>
+                                <div className="flex flex-col">
+                                    <input className="border w-64" name="name" value={inputGame ?? ""} onChange={handleInputChange}></input>
                                     {state?.name ? errorText(state?.name) : null}
                                 </div>
                             </div>
                             <div className="flex pb-10 items-center">
                                 <div className="w-35">ランク</div>
-                                <div className="flex flex-col mt-3">
-                                    <input className="border w-64" name="rank"></input>
+                                <div className="flex flex-col">
+                                    {supportedGameNames.includes(gameNameFixed(inputGame ?? "") ?? "") ? GameRankSelect(inputGame ?? "") :
+                                        <input className="border w-64" name="rank"></input>}
                                     {state?.rank ? errorText(state?.rank) : null}
                                 </div>
-
                             </div>
                             <div className="flex justify-around items-end">
                                 <Button onClick={() => redirect('/game')}>
@@ -64,3 +71,22 @@ const GameRegist: NextPage = () => {
 }
 
 export default GameRegist
+
+function GameRankSelect(game: string) {
+
+    // 特定のランクマップを取得
+    const rankMap = supportedGamesMap(game);
+
+    return (
+        <select name="rank" className="border w-64">
+            {rankMap?.map((item) => {
+                if (isNaN(Number(item.key))) {
+                    return true;
+                }
+                return (
+                    <option key={item.key} value={item.key}>{item.value}</option>
+                );
+            })}
+        </select>
+    )
+}

@@ -10,13 +10,20 @@ import Loading from "../loading";
 import { CancelIcon } from "@/components/ui/icons";
 import Modal, { ConfirmModalContent } from "@/components/ui/modal";
 import { errorToast, successToast } from "@/utils/toast";
+import { getCookies } from "../actions/action";
+import type { GamesWithUsers } from "@/types";
+
+interface GameProps {
+    data: GamesWithUsers[],
+    search: () => Promise<void>
+}
 
 const Game: NextPage = () => {
     const router = useRouter();
 
     const [game, setGame] = useState('');
     const [rank, setRank] = useState('');
-    const [search, setSearch] = useState(Array);
+    const [search, setSearch] = useState<GamesWithUsers[]>([]);
     const [state, searchAction, isPending] = useActionState(GetSearch, null);
 
     useEffect(() => {
@@ -70,17 +77,29 @@ const Game: NextPage = () => {
 
 export default Game
 
-function SearchTable({ data, search }: any) {
+function SearchTable({ data, search }: GameProps) {
 
     const router = useRouter();
     const modalRef = useRef(null);
     const [isOpen, setIsOpen] = useState(false);
+    const [userId, setUserId] = useState(Number);
     const [selectedId, setSelectedId] = useState<number | null>(null);
 
+    useEffect(() => {
+        getUserId();
+    });
+
+    // ログインユーザー取得用
+    async function getUserId() {
+        const cookies = await getCookies();
+        const userId = cookies?.id;
+        setUserId(userId!);
+    }
+
     // 削除処理
-    async function onDelete(id: number) {
+    async function onDelete(id: number, userId: number) {
         setIsOpen(false);
-        const res = await gameDelete(id);
+        const res = await gameDelete(id, userId);
 
         if (res.success) {
             search();
@@ -103,10 +122,10 @@ function SearchTable({ data, search }: any) {
             <div className="grid grid-cols-5 justify-items-center gap-y-10">
                 {selectedId && (
                     <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} ref={modalRef} >
-                        <ConfirmModalContent handleClick={() => onDelete(selectedId)} ref={modalRef} />
+                        <ConfirmModalContent handleClickAction={() => onDelete(selectedId, userId)} ref={modalRef} />
                     </Modal>
                 )}
-                {data !== undefined ? data.map((value: any, idx: any) => {
+                {data !== undefined ? data.map((value: any) => {
                     return (
                         <div key={value.id} className="flex-wrap transition delay-70 duration-300 hover:scale-110 hover:cursor-pointer"
                             onClick={() => router.push(`/game/${value.id}/details`)}>

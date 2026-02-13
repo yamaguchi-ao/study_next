@@ -1,4 +1,4 @@
-// バリデーション用
+// フロント用バリデーション
 import { z } from "zod";
 
 // 新規登録用バリデーション
@@ -47,7 +47,20 @@ export type PostSchema = z.infer<typeof PostSchema>;
 
 // コメント用バリデーション
 export const CommentSchema = z.object({
-    comment: z.string().min(1, "コメントは必ず1文字以上入力してください。"),
+    comment: z.string().min(1, "コメントは必ず1文字以上入力してください。").max(500, "コメントは500文字以内で入力してください。"),
+    postRank: z.number().min(0, "ランクを入力してください。"),
+    yourRank: z.number().min(0, "ランクを入力してください。"),
+}).refine((data) => data.yourRank >= data.postRank, {
+    path: ["yourRank"],
+    message: "あなたのランクは投稿者のランク以上でなければなりません。",
 });
 
 export type CommentSchema = z.infer<typeof CommentSchema>;
+
+// 削除用APIバリデーション
+export const DeleteSchema = z.object({
+    userId: z.number().min(1, "ユーザは必ず指定してください。"),
+    id: z.number().min(1, "対象を必ず指定してください。")
+});
+
+export type DeleteSchema = z.infer<typeof DeleteSchema>;
