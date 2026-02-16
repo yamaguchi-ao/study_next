@@ -9,6 +9,11 @@ import { getCookies } from "./action";
 export async function GameRegister(_prevState: any, formData: FormData) {
 
     const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
+
     const userId = cookie?.id;
 
     const gameData = {
@@ -28,14 +33,18 @@ export async function GameRegister(_prevState: any, formData: FormData) {
 
         const success = res?.success;
         const message = res?.message;
+        const login = res?.login;
 
         if (success) {
             // 成功時
             successToast(message);
             redirect("/game");
         } else {
-            // 失敗時
-            errorToast(message);
+            if (!login) {
+                redirect("/login?error=true");
+            } else {
+                errorToast(message);
+            }
         }
     }
 }
@@ -44,6 +53,11 @@ export async function GameListSearch(game: string, rank: string) {
 
     // ログインしているユーザ取得
     const cookie = await getCookies();
+    
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
+
     const userId = cookie?.id;
 
     // やっているゲームとランクを検索
@@ -51,14 +65,18 @@ export async function GameListSearch(game: string, rank: string) {
 
     const success = res?.success;
     const message = res?.message;
+    const login = res?.login;
     const data = res?.data;
 
     if (success) {
         // 成功時
         return data;
     } else {
-        // 失敗時
-        errorToast(message);
+        if (!login) {
+            redirect("/login?error=true");
+        } else {
+            errorToast(message);
+        }
     }
 }
 
@@ -69,6 +87,7 @@ export async function getGame(gameId: Number) {
 
     const success = res?.success;
     const message = res?.message;
+    const login = res?.login;
     const data = res?.data;
     const { name, rank } = data;
 
@@ -76,8 +95,11 @@ export async function getGame(gameId: Number) {
         // 成功時
         return { name, rank };
     } else {
-        // 失敗時
-        errorToast(message);
+        if (!login) {
+            redirect("/login?error=true");
+        } else {
+            errorToast(message);
+        }
     }
 }
 
@@ -102,14 +124,18 @@ export async function GameUpdate(_prevState: any, formData: FormData, id: Number
 
         const success = res?.success;
         const message = res?.message;
+        const login = res?.login;
 
         if (success) {
             // 成功時
             successToast(message);
             redirect("/game");
         } else {
-            // 失敗時
-            errorToast(message);
+            if (!login) {
+                redirect("/login?error=true");
+            } else {
+                errorToast(message);
+            }
         }
     }
 }
@@ -121,6 +147,15 @@ export async function gameDelete(gameId: number, userId: number) {
 
     const success = res?.success;
     const message = res?.message;
+    const login = res?.login;
 
-    return {success, message};
+    if (success) {
+        return { success, message };
+    } else {
+        if (!login) {
+            redirect("/login?error=true");
+        } else {
+            errorToast(message);
+        }
+    }
 }

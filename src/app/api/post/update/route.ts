@@ -3,26 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { PostSchema } from "@/utils/validation";
 import z from "zod";
+import { loginCheck } from "@/utils/loginCheck";
 
 export async function POST(req: NextRequest) {
     const { title, post, id } = await req.json();
-    const JWT_SECRET = process.env.JWT_SECRET;
 
     try {
-        // トークンの取得
-        const token = req.cookies.get("auth_token")?.value;
+        // ログインしているかの判定
+        const isLogin = await loginCheck(req);
 
-        // トークンのnullチェック
-        if (token === null || token === undefined) {
-            return NextResponse.json({ message: "ログインしていません", success: false }, { status: 500 });
-        }
-
-        // jwtの検証
-        const data = await jwt.verify(token!, JWT_SECRET!);
-
-        // jwt
-        if (data === null || data === undefined) {
-            return NextResponse.json({ message: "ログインしていません", success: false }, { status: 500 });
+        if (!isLogin) {
+            return NextResponse.json({message: "ログインしていません。", success: false, login: false}, {status: 401});
         }
 
         // API側のバリデーションチェック

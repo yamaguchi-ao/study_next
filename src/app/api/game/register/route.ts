@@ -1,27 +1,20 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import { gameNameFixed } from "@/constants/context";
 import { GameSchema } from "@/utils/validation";
 import z from "zod";
+import { loginCheck } from "@/utils/loginCheck";
 
 export async function POST(req: NextRequest) {
     const { name, rank, id } = await req.json();
-    const JWT_SECRET = process.env.JWT_SECRET;
     let game: string | undefined = undefined;
 
     try {
         // ログインしているかどうかの判定
-        const token = req.cookies.get("auth_token")?.value;
+        const isLogin = await loginCheck(req);
 
-        if (token === null || token === undefined) {
-            return NextResponse.json({ message: "ログインしていない。", success: false }, { status: 500 });
-        }
-
-        const data = await jwt.verify(token!, JWT_SECRET!);
-
-        if (!data) {
-            return NextResponse.json({ message: "ログインしていません。", success: false }, { status: 500 });
+        if (!isLogin) {
+            return NextResponse.json({message: "ログインしていません。", success: false, login: false}, {status: 401});
         }
 
         const issue = GameSchema.safeParse({ name, rank, id });

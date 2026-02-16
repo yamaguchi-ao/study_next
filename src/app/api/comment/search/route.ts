@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { loginCheck } from "@/utils/loginCheck";
 
 // ゲームとランクの検索
 export async function GET(req: NextRequest) {
@@ -8,6 +9,13 @@ export async function GET(req: NextRequest) {
     const gameParams = searchParams.get('game');
 
     try {
+        // ログインしているかどうかの判定
+        const isLogin = await loginCheck(req);
+
+        if (!isLogin) {
+            return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
+        }
+
         if (searchParams.toString().includes("postId")) {
             const detailData = await getDetail(postIdParams!, gameParams!);
             return NextResponse.json({ message: "取得成功", success: true, data: detailData }, { status: 200 });

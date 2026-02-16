@@ -89,13 +89,17 @@ export function DeleteButton({ type, id, userId }: ManyButtonProps) {
 
             const success = req.success ? req.success : "";
             const message = req.message ? req.message : "";
+            const login = req.login ? req.login : false;
 
             router.refresh();
 
             if (success) {
                 successToast(message);
             } else {
-                errorToast(message);
+                // ログインしているときのみエラー表示
+                if (login) {
+                    errorToast(message);
+                }
             }
         }
     }

@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
                         httpOnly: true,
                         secure: true,
                         sameSite: "strict",
-                        maxAge: 3600
+                        maxAge: 30
                     }
                 )
 
