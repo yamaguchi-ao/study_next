@@ -15,7 +15,7 @@ export default async function RootLayout({
     <html lang="ja">
       <body className="h-screen">
         <ToastProvider>
-            {username ? <Header username={username} /> : <></>}
+          {username ? <Header username={username} /> : <></>}
           {children}
         </ToastProvider>
       </body>

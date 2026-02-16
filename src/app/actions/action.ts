@@ -27,5 +27,6 @@ export async function getCookies() {
     } catch (error) {
         // verifyが正常に処理できなかった
         console.log("エラー内容：", error);
+        return null;
     }
 }

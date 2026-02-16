@@ -8,6 +8,11 @@ import { redirect } from "next/navigation";
 export async function postRegister(_prevState: any, formData: FormData) {
 
     const cookie = await getCookies();
+    
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
+
     const userId = cookie?.id;
 
     const postData = {
@@ -29,12 +34,17 @@ export async function postRegister(_prevState: any, formData: FormData) {
 
         const success = res?.success;
         const message = res?.message;
+        const login = res?.login;
 
         if (success) {
             successToast(message);
             redirect("/post");
         } else {
-            redirect("/login?error=true");
+            if (!login) {
+                redirect("/login?error=true");
+            } else {
+                errorToast(message);
+            }
         }
     }
 }
@@ -46,14 +56,18 @@ export async function postListSearch(game: string) {
 
     const success = res?.success;
     const message = res?.message;
+    const login = res?.login;
     const data = res?.data;
 
     if (success) {
         // 成功時
         return data;
     } else {
-        // 失敗時
-        redirect("/login?error=true");
+        if (!login) {
+            redirect("/login?error=true");
+        } else {
+            errorToast(message);
+        }
     }
 }
 
@@ -64,14 +78,18 @@ export async function getPost(postId: Number) {
 
     const success = res?.success;
     const message = res?.message;
+    const login = res?.login;
     const data = res?.data;
 
     if (success) {
         // 成功時
         return data;
     } else {
-        // 失敗時
-        redirect("/login?error=true");
+        if (!login) {
+            redirect("/login?error=true");
+        } else {
+            errorToast(message);
+        }
     }
 }
 
@@ -95,17 +113,20 @@ export async function postUpdate(_prevState: any, formData: FormData, id: number
 
         const success = res?.success;
         const message = res?.message;
+        const login = res?.login;
 
         if (success) {
             // 成功時
             successToast(message);
             redirect("/post");
         } else {
-            // 失敗時
-            redirect("/login?error=true");
+            if (!login) {
+                redirect("/login?error=true");
+            } else {
+                errorToast(message);
+            }
         }
     }
-
 }
 
 export async function postDelete(postId: number, userId: number) {
@@ -114,6 +135,15 @@ export async function postDelete(postId: number, userId: number) {
 
     const success = res?.success;
     const message = res?.message;
+    const login = res?.login;
 
-    return { success, message };
+    if (success) {
+        return { success, message };
+    } else {
+        if (!login) {
+            redirect("/login?error=true");
+        } else {
+            errorToast(message);
+        }
+    }
 }
