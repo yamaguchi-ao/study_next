@@ -1,4 +1,4 @@
-import { CommentSchema, PostSchema } from "@/utils/validation";
+import { PostSchema } from "@/utils/validation";
 import { getCookies } from "./action";
 import { z } from "zod";
 import { Delete, detailSearch, listSearch, post, Update } from "@/utils/api/post";
@@ -8,6 +8,11 @@ import { redirect } from "next/navigation";
 export async function postRegister(_prevState: any, formData: FormData) {
 
     const cookie = await getCookies();
+    
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
+
     const userId = cookie?.id;
 
     const postData = {
@@ -29,12 +34,17 @@ export async function postRegister(_prevState: any, formData: FormData) {
 
         const success = res?.success;
         const message = res?.message;
+        const login = res?.login;
 
         if (success) {
             successToast(message);
             redirect("/post");
         } else {
-            errorToast(message);
+            if (!login) {
+                redirect("/login?error=true");
+            } else {
+                errorToast(message);
+            }
         }
     }
 }
@@ -46,14 +56,18 @@ export async function postListSearch(game: string) {
 
     const success = res?.success;
     const message = res?.message;
+    const login = res?.login;
     const data = res?.data;
 
     if (success) {
         // 成功時
         return data;
     } else {
-        // 失敗時
-        errorToast(message);
+        if (!login) {
+            redirect("/login?error=true");
+        } else {
+            errorToast(message);
+        }
     }
 }
 
@@ -64,14 +78,18 @@ export async function getPost(postId: Number) {
 
     const success = res?.success;
     const message = res?.message;
+    const login = res?.login;
     const data = res?.data;
 
     if (success) {
         // 成功時
         return data;
     } else {
-        // 失敗時
-        errorToast(message);
+        if (!login) {
+            redirect("/login?error=true");
+        } else {
+            errorToast(message);
+        }
     }
 }
 
@@ -95,25 +113,37 @@ export async function postUpdate(_prevState: any, formData: FormData, id: number
 
         const success = res?.success;
         const message = res?.message;
+        const login = res?.login;
 
         if (success) {
             // 成功時
             successToast(message);
             redirect("/post");
         } else {
-            // 失敗時
-            errorToast(message);
+            if (!login) {
+                redirect("/login?error=true");
+            } else {
+                errorToast(message);
+            }
         }
     }
-
 }
 
-export async function postDelete(postId: number) {
+export async function postDelete(postId: number, userId: number) {
 
-    const res = await Delete(postId);
+    const res = await Delete(postId, userId);
 
     const success = res?.success;
     const message = res?.message;
+    const login = res?.login;
 
-    return {success, message};
+    if (success) {
+        return { success, message };
+    } else {
+        if (!login) {
+            redirect("/login?error=true");
+        } else {
+            errorToast(message);
+        }
+    }
 }

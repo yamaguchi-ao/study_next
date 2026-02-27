@@ -1,19 +1,28 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { GameUpdateSchema } from "@/utils/validation";
+import { z } from "zod";
+import { loginCheck } from "@/utils/loginCheck";
 
 export async function POST(req: NextRequest) {
     const { rank, gameId } = await req.json();
-    const JWT_SECRET = process.env.JWT_SECRET;
 
     try {
         // ログインしているかどうかの判定
-        const token = req.cookies.get("auth_token")?.value;
+        const isLogin = await loginCheck(req);
 
-        const data = await jwt.verify(token!, JWT_SECRET!);
+        if (!isLogin) {
+            return NextResponse.json({message: "ログインしていません。", success: false, login: false}, {status: 401});
+        }
 
-        if (!data) {
-            return NextResponse.json({ message: "ログインしていません。", success: false }, { status: 404 });
+        //API側バリデーションチェック
+        const issue = GameUpdateSchema.safeParse({ rank, gameId });
+
+        if (!issue.success) {
+            const validation = z.flattenError(issue.error);
+            const message = validation.fieldErrors;
+            console.log("エラーメッセージ：", message);
+            return NextResponse.json({ message: message, success: false }, { status: 400 });
         }
 
         // ゲームとランクの更新

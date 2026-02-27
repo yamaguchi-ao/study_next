@@ -22,11 +22,11 @@ export async function getCookies() {
             // ここでIDとusernameを持つことは可能
             return { id, name };
         } else {
-            // トークンが存在しない
-            console.log("ログインしていない");
+            return null;
         }
     } catch (error) {
         // verifyが正常に処理できなかった
         console.log("エラー内容：", error);
+        return null;
     }
 }

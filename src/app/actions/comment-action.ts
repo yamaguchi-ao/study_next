@@ -9,7 +9,10 @@ export async function addComment(_prevState: any, formData: FormData, postId: nu
         comment: formData.get("comment") as string,
         postId: postId,
         userId: userId,
-        hiddenFlg: formData.get("anonymous") as string
+        hiddenFlg: formData.get("anonymous") as string,
+        dispRankFlg: formData.get("dispRank") as string,
+        postRank: Number(formData.get("postRank")),
+        yourRank: Number(formData.get("yourRank")),
     }
 
     const issues = CommentSchema.safeParse(commentData);
@@ -26,8 +29,6 @@ export async function addComment(_prevState: any, formData: FormData, postId: nu
 
         if (success) {
             successToast(message);
-        } else {
-            errorToast(message);
         }
     }
 }
@@ -43,18 +44,16 @@ export async function getCommentList(postId: number, game: string) {
     if (success) {
         // 成功時
         return data;
-    } else {
-        // 失敗時
-        errorToast(message);
     }
 }
 
-export async function commentDelete(commentId: number) {
+export async function commentDelete(commentId: number, userId: number) {
     // コメント削除処理
-    const res = await deleteComment(commentId);
+    const res = await deleteComment(commentId, userId);
 
     const success = res?.success;
     const message = res?.message;
+    const login = res?.login;
 
-    return { success, message };
+    return { success, message, login };
 }

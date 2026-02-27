@@ -8,15 +8,21 @@ import Loading from "../loading";
 import { postDelete, postListSearch } from "../actions/post-action";
 import { getCookies } from "../actions/action";
 import { CancelIcon, CommentIcon } from "@/components/ui/icons";
-import Link from "next/link";
 import Modal, { ConfirmModalContent } from "@/components/ui/modal";
 import { errorToast, successToast } from "@/utils/toast";
+import type { PostsWithUsers } from "@/types";
+
+interface PostProps {
+  userId: number,
+  data: PostsWithUsers[],
+  search: () => Promise<void>
+}
 
 export default function List() {
   const router = useRouter();
-  const [game, setGame] = useState(String);
-  const [userId, setUserId] = useState(Number);
-  const [search, setSearch] = useState(Array);
+  const [game, setGame] = useState("");
+  const [userId, setUserId] = useState(0);
+  const [search, setSearch] = useState<PostsWithUsers[]>([]);
   const [state, searchAction, isPending] = useActionState(GetSearch, null);
 
   useEffect(() => {
@@ -73,7 +79,7 @@ export default function List() {
   )
 }
 
-function PostTable({ userId, data, search }: any) {
+function PostTable({ userId, data, search }: PostProps) {
 
   const router = useRouter();
   const modalRef = useRef(null);
@@ -81,14 +87,14 @@ function PostTable({ userId, data, search }: any) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   // 削除処理
-  async function onDelete(id: number) {
+  async function onDelete(id: number, userId: number) {
     setIsOpen(false);
-    const res = await postDelete(id);
-    if (res.success) {
+    const res = await postDelete(id, userId);
+    if (res?.success) {
       search();
-      successToast(res.message);
+      successToast(res?.message);
     } else {
-      errorToast(res.message);
+      errorToast(res?.message);
     }
   }
 
@@ -106,10 +112,10 @@ function PostTable({ userId, data, search }: any) {
       <div className="grid grid-cols-3 justify-items-center gap-y-10">
         {selectedId && (
           <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} ref={modalRef} >
-            <ConfirmModalContent handleClick={() => onDelete(selectedId)} ref={modalRef} />
+            <ConfirmModalContent handleClickAction={() => onDelete(selectedId, userId)} ref={modalRef} />
           </Modal>
         )}
-        {data !== undefined ? data.map((value: any, idx: any) => {
+        {data !== undefined ? data.map((value: any) => {
           return (
             <div key={value.id}>
               <div key={value.id} className="flex flex-col flex-wrap transition delay-70 duration-300 hover:scale-110 hover:cursor-pointer"
@@ -134,7 +140,7 @@ function PostTable({ userId, data, search }: any) {
 
                     <div className="flex justify-end">
                       <CommentIcon className="size-5 mt-[3px]" />
-                      <p className="pl-2">{value.comments.length}</p>
+                      <p className="pl-2">{value.comments.length >= 99 ? "99+" : value.comments.length}</p>
                     </div>
                   </div>
                 </div>

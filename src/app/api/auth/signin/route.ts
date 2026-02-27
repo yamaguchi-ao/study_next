@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from 'bcrypt'
 import jwt from "jsonwebtoken";
+import { LoginSchema } from "@/utils/validation";
+import z from "zod";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -12,6 +14,16 @@ export async function POST(req: NextRequest) {
     const { email, password } = await req.json();
 
     try {
+
+        // リクエストで取得した値をAPI側でも検証
+        const issue = LoginSchema.safeParse({ email, password });
+
+        if (!issue.success) {
+            const validation = z.flattenError(issue.error);
+            const message = validation.fieldErrors ?? null;
+            return NextResponse.json({ message: message }, { status: 400 });
+        }
+
         // DBから特定のユーザを検索 
         const user = await prisma.users.findUnique({
             where: { email: email },

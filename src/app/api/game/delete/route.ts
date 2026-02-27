@@ -1,26 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import jwt from "jsonwebtoken";
+import { DeleteSchema } from "@/utils/validation";
+import { z } from "zod";
+import { loginCheck } from "@/utils/loginCheck";
 
 // ゲームとランクの検索
 export async function POST(req: NextRequest) {
-    const { id } = await req.json();
-
-    const JWT_SECRET = process.env.JWT_SECRET;
-
+    const { userId, id } = await req.json();
+    
     try {
         // ログインしているかどうかの判定
-        const token = req.cookies.get("auth_token")?.value;
+        const isLogin = await loginCheck(req);
 
-        const data = await jwt.verify(token!, JWT_SECRET!);
-
-        if (!data) {
-            return NextResponse.json({ message: "ログインしていない。", success: false }, { status: 500 });
+        if (!isLogin) {
+            return NextResponse.json({message: "ログインしていません。", success: false, login: false}, {status: 401});
         }
 
-        if (id) {
+        //API側バリデーションチェック
+        const issue = DeleteSchema.safeParse({ userId, id });
+
+        if (!issue.success) {
+            const validation = z.flattenError(issue.error);
+            const message = validation.fieldErrors;
+            return NextResponse.json({ message: message, success: false }, { status: 400 });
+        }
+
+        if (id && userId) {
             await prisma.games.delete({
-                where: { id: id }
+                where: { id: id, userId: userId }
             });
             return NextResponse.json({ message: "登録したゲームは正常に削除されました。", success: true }, { status: 200 });
         } else {

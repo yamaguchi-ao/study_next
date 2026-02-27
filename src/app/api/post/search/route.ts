@@ -1,23 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
-import jwt from "jsonwebtoken";
+import { loginCheck } from "@/utils/loginCheck";
 
 // ゲームとランクの検索
 export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const gameParams = searchParams.get('game');
     const postIdParams = searchParams.get('id');
-    const JWT_SECRET = process.env.JWT_SECRET;
 
     try {
         // ログインしているかどうかの判定
-        const token = req.cookies.get("auth_token")?.value;
-        const data = await jwt.verify(token!, JWT_SECRET!);
-        if (!data) {
-            return NextResponse.json({ message: "ログインしていません。", success: false }, { status: 404 });
+        const isLogin = await loginCheck(req);
+
+        if (!isLogin) {
+            return NextResponse.json({message: "ログインしていません。", success: false, login: false}, {status: 401});
         }
-        
+
         if (searchParams.toString().includes("id")) {
             const detailData = await getDetail(postIdParams!);
             return NextResponse.json({ message: "取得成功", success: true, data: detailData }, { status: 200 });
@@ -73,6 +72,9 @@ async function getDetail(postId: string) {
             content: true,
             gameTag: true,
             userId: true,
+            createdAt: true,
+            updatedAt: true,
+            rankFlg: true,
             user: {
                 select: {
                     name: true,

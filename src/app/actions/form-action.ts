@@ -76,7 +76,7 @@ export async function Logout() {
     const success = res?.success;
     const message = res?.message;
 
-    // 作成したトークンがある場合
+    // ログアウト
     if (success) {
         successToast(message);
         redirect("/login");

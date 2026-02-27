@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
-import jwt from "jsonwebtoken";
+import { loginCheck } from "@/utils/loginCheck";
 
 // ゲームとランクの検索
 export async function GET(req: NextRequest) {
@@ -10,14 +10,13 @@ export async function GET(req: NextRequest) {
     const rankParams = searchParams.get('rank');
     const gameIdParams = searchParams.get('id');
     const userIdParams = searchParams.get('userId') as unknown as number;
-    const JWT_SECRET = process.env.JWT_SECRET;
 
     try {
         // ログインしているかどうかの判定
-        const token = req.cookies.get("auth_token")?.value;
-        const data = await jwt.verify(token!, JWT_SECRET!);
-        if (!data) {
-            return NextResponse.json({ message: "ログインしていません。", success: false }, { status: 404 });
+        const isLogin = await loginCheck(req);
+
+        if (!isLogin) {
+            return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
         }
 
         if (searchParams.toString().includes("id")) {
@@ -36,7 +35,7 @@ export async function GET(req: NextRequest) {
 async function getList(gameParams: string, rankParams: string, userId: number) {
     const whereConditions: Prisma.GamesWhereInput = {};
     whereConditions.userId = { equals: Number(userId) };
-    
+
     if (gameParams) {
         whereConditions.name = { contains: gameParams };
     }

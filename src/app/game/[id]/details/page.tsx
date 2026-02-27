@@ -16,11 +16,11 @@ export default async function Detail({ params }: { params: Promise<{ id: Number 
                 <div className="flex-1 flex flex-col">
                     <div className="flex flex-col h-full justify-center items-center">
                         <div className="">
-                            <div className="flex pb-10">
+                            <div className="flex pb-10 items-center">
                                 <div className="w-35">ゲームタイトル</div>
                                 <h1 className="text-2xl pl20">{games?.name}</h1>
                             </div>
-                            <div className="flex pb-10">
+                            <div className="flex pb-10 items-center">
                                 <div className="w-35">ランク</div>
                                 <h1 className="text-2xl pl20">{games?.rank}</h1>
                             </div>

@@ -10,12 +10,13 @@ export default async function RootLayout({
 
   const user = await getCookies();
   const username = user?.name;
+  const userId = user?.id; 
 
   return (
     <html lang="ja">
       <body className="h-screen">
         <ToastProvider>
-            {username ? <Header username={username} /> : <></>}
+          {username ? <Header username={username} userId={userId!} /> : <></>}
           {children}
         </ToastProvider>
       </body>

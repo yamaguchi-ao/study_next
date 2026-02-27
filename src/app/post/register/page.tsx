@@ -6,9 +6,14 @@ import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import { postRegister } from "@/app/actions/post-action";
 import { GameListSearch } from "@/app/actions/game-action";
+import type { GamesWithUsers } from "@/types";
+
+interface GamesProps {
+  data: GamesWithUsers[]
+}
 
 export default function List() {
-  const [gameData, setGameData] = useState(Array);
+  const [gameData, setGameData] = useState<GamesWithUsers[]>([]);
   const [state, postAction, isPending] = useActionState(postRegister, null);
 
   useEffect(() => {
@@ -67,7 +72,7 @@ export default function List() {
   )
 }
 
-function SelectGameTag({ data }: any) {
+function SelectGameTag({ data }: GamesProps) {
   return (
     data.map((games: { name: string; id: number }) => {
       return (
