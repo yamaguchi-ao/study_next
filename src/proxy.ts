@@ -15,7 +15,8 @@ export default async function proxy(req: NextRequest) {
     const authToken = req.cookies.get("auth_token")?.value;
     const loginUrl = new URL('/login?error=true', req.url);
 
-    if (authToken !== undefined) {
+    if (authToken === undefined) {
+    } else {
         try {
             // jwtの署名の検証
             const encode = new TextEncoder().encode(JWT_SECRET);
@@ -25,7 +26,7 @@ export default async function proxy(req: NextRequest) {
             return NextResponse.redirect(loginUrl);
         }
     }
-    
+
     return NextResponse.next();
 }
 
@@ -34,6 +35,7 @@ export const config = {
     matcher: [
         '/post/:path*',
         '/game/:path*',
+        '/user/:path*',
         '/((?!api|_next/static|_next/image|.*\\.png$).*)',
     ]
 }

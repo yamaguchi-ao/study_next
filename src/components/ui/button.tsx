@@ -17,6 +17,7 @@ interface ModalButtonProps {
 
 // 複数ボタン用
 interface ManyButtonProps {
+    className?: string,
     type?: string,
     id?: Number,
     userId?: number,
@@ -58,9 +59,9 @@ export function SearchButton({ type, disabled }: ManyButtonProps) {
 }
 
 /** 更新用ボタン */
-export function UpdateButton({ type, id }: ManyButtonProps) {
+export function UpdateButton({ className, type, id }: ManyButtonProps) {
     const router = useRouter();
-    return <Button onClick={() => router.push(`/${type}/${id}/update`)}>更新</Button>
+    return <Button className={className} onClick={() => router.push(`/${type}/${id}/update`)}>更新</Button>
 }
 
 /** 戻る用ボタン */
@@ -79,7 +80,7 @@ export function ReturnButton({ type }: ManyButtonProps) {
 }
 
 /** 削除用ボタン */
-export function DeleteButton({ type, id, userId }: ManyButtonProps) {
+export function DeleteButton({ className, type, id, userId }: ManyButtonProps) {
     const router = useRouter();
 
     async function onDelete(id: number, userId: number) {
@@ -101,10 +102,12 @@ export function DeleteButton({ type, id, userId }: ManyButtonProps) {
                     errorToast(message);
                 }
             }
+        } else if (type === "user") {
+            // ログインしている自身を削除？
         }
     }
 
-    return <Button onClick={() => onDelete(id! as number, userId!)}>削除</Button>
+    return <Button className={className} onClick={() => onDelete(id! as number, userId!)}>削除</Button>
 }
 
 /** モーダル用ボタン */

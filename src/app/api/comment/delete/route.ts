@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import { DeleteSchema } from "@/utils/validation";
 import z from "zod";
 import { loginCheck } from "@/utils/loginCheck";
