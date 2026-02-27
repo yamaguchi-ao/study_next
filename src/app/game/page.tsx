@@ -101,11 +101,11 @@ function SearchTable({ data, search }: GameProps) {
         setIsOpen(false);
         const res = await gameDelete(id, userId);
 
-        if (res.success) {
+        if (res?.success) {
             search();
-            successToast(res.message);
+            successToast(res?.message);
         } else {
-            errorToast(res.message);
+            errorToast(res?.message);
         }
     }
 

@@ -16,6 +16,7 @@ export type GamesWithUsers = Games & {
 export type UserNameType = {
     title?: string;
     username: string;
+    userId: number;
 }
 
 export type CommentsType = {

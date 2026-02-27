@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import { PostSchema } from "@/utils/validation";
 import z from "zod";
 import { loginCheck } from "@/utils/loginCheck";
@@ -21,7 +20,7 @@ export async function POST(req: NextRequest) {
 
         if (!issue.success) {
             const validation = z.flattenError(issue.error);
-            const message = validation.fieldErrors ?? null ;
+            const message = validation.fieldErrors ?? null;
             return NextResponse.json({ message: message, success: false }, { status: 400 });
         }
 

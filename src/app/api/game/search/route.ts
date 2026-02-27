@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
         const isLogin = await loginCheck(req);
 
         if (!isLogin) {
-            return NextResponse.json({message: "ログインしていません。", success: false, login: false}, {status: 401});
+            return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
         }
 
         if (searchParams.toString().includes("id")) {
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
 async function getList(gameParams: string, rankParams: string, userId: number) {
     const whereConditions: Prisma.GamesWhereInput = {};
     whereConditions.userId = { equals: Number(userId) };
-    
+
     if (gameParams) {
         whereConditions.name = { contains: gameParams };
     }

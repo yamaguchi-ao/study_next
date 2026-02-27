@@ -13,9 +13,9 @@ import { errorToast, successToast } from "@/utils/toast";
 import type { PostsWithUsers } from "@/types";
 
 interface PostProps {
-  userId : number,
-  data : PostsWithUsers[],
-  search : () => Promise<void>
+  userId: number,
+  data: PostsWithUsers[],
+  search: () => Promise<void>
 }
 
 export default function List() {
@@ -90,11 +90,11 @@ function PostTable({ userId, data, search }: PostProps) {
   async function onDelete(id: number, userId: number) {
     setIsOpen(false);
     const res = await postDelete(id, userId);
-    if (res.success) {
+    if (res?.success) {
       search();
-      successToast(res.message);
+      successToast(res?.message);
     } else {
-      errorToast(res.message);
+      errorToast(res?.message);
     }
   }
 

@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
 import { CommentSchema } from "@/utils/validation";
 import z from "zod";
 import { loginCheck } from "@/utils/loginCheck";
@@ -11,6 +10,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 export async function POST(req: NextRequest) {
 
     const { comment, postId, userId, hiddenFlg, dispRankFlg, postRank, yourRank } = await req.json();
+
+    const token = req.cookies.get("auth_token")?.value;
 
     try {
         // ログインしているかどうかの判定
