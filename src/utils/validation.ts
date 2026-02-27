@@ -49,12 +49,14 @@ export const UserUpdateSchema = z.object({
         });
     }
 
-    if ((newPassword && !confirm) || (!newPassword && confirm)) {
-        ctx.addIssue({
-            code: "custom",
-            path: ["confirm"],
-            message: "新しいパスワードと確認用パスワードを両方入力してください。"
-        });
+    if (password) {
+        if ((newPassword && !confirm) || (!newPassword && confirm) || (!newPassword && !confirm)) {
+            ctx.addIssue({
+                code: "custom",
+                path: ["confirm"],
+                message: "新しいパスワードと確認用パスワードを両方入力してください。"
+            });
+        }
     }
 
     if (password && newPassword && confirm) {
