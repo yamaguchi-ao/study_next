@@ -8,17 +8,18 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const gameParams = searchParams.get('game');
     const postIdParams = searchParams.get('id');
+    const gameTagParams = searchParams.get('gameTag');
 
     try {
         // ログインしているかどうかの判定
         const isLogin = await loginCheck(req);
 
         if (!isLogin) {
-            return NextResponse.json({message: "ログインしていません。", success: false, login: false}, {status: 401});
+            return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
         }
 
-        if (searchParams.toString().includes("id")) {
-            const detailData = await getDetail(postIdParams!);
+        if (searchParams.toString().includes("id") && searchParams.toString().includes("gameTag")) {
+            const detailData = await getDetail(postIdParams!, gameTagParams!);
             return NextResponse.json({ message: "取得成功", success: true, data: detailData }, { status: 200 });
         } else {
             const listData = await getList(gameParams!);
@@ -57,12 +58,7 @@ async function getList(gameParams: string) {
 }
 
 //　詳細用検索
-async function getDetail(postId: string) {
-
-    const gameTag = await prisma.posts.findUnique({
-        where: { id: Number(postId) },
-        select: { gameTag: true }
-    });
+async function getDetail(postId: string, gameTag: string) {
 
     const data = await prisma.posts.findUnique({
         where: { id: Number(postId) },
@@ -79,8 +75,9 @@ async function getDetail(postId: string) {
                 select: {
                     name: true,
                     games: {
-                        where: {
-                            name: gameTag?.gameTag || ""
+                        where: { name: gameTag },
+                        select: {
+                            rank: true
                         },
                     }
                 }

@@ -4,10 +4,18 @@ import { UserUpdateSchema } from "@/utils/validation";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
 import bcrypt from 'bcrypt';
+import { getCookies } from "@/app/actions/action";
 
 // ユーザー更新
 export async function POST(req: NextRequest) {
-    const { userId, username, email, password, newPassword, confirm } = await req.json();
+    const { username, email, password, newPassword, confirm } = await req.json();
+
+    // ログインIDを取得
+    const cookies = await getCookies();
+    if (cookies === null) {
+        return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
+    }
+    const userId = cookies?.id;
 
     try {
         // ログイン判定

@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 export async function postRegister(_prevState: any, formData: FormData) {
 
     const cookie = await getCookies();
-    
+
     if (cookie === null || cookie === undefined) {
         redirect("/login?error=true");
     }
@@ -71,10 +71,10 @@ export async function postListSearch(game: string) {
     }
 }
 
-export async function getPost(postId: Number) {
+export async function getPost(postId: Number, gameTag?: string) {
 
     // やっているゲームとランクを取得
-    const res = await detailSearch(postId);
+    const res = await detailSearch(postId, gameTag);
 
     const success = res?.success;
     const message = res?.message;
@@ -129,9 +129,9 @@ export async function postUpdate(_prevState: any, formData: FormData, id: number
     }
 }
 
-export async function postDelete(postId: number, userId: number) {
+export async function postDelete(postId: number) {
 
-    const res = await Delete(postId, userId);
+    const res = await Delete(postId);
 
     const success = res?.success;
     const message = res?.message;

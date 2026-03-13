@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import { loginCheck } from "@/utils/loginCheck";
+import { getCookies } from "@/app/actions/action";
 
 // ゲームとランクの検索
 export async function GET(req: NextRequest) {
@@ -9,7 +10,13 @@ export async function GET(req: NextRequest) {
     const gameParams = searchParams.get('game');
     const rankParams = searchParams.get('rank');
     const gameIdParams = searchParams.get('id');
-    const userIdParams = searchParams.get('userId') as unknown as number;
+
+    const cookies = await getCookies();
+
+    if (cookies === null) {
+        return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
+    }
+    const userId = cookies.id;
 
     try {
         // ログインしているかどうかの判定
@@ -23,7 +30,7 @@ export async function GET(req: NextRequest) {
             const detailData = await getDetail(gameIdParams!);
             return NextResponse.json({ message: "取得成功", success: true, data: detailData }, { status: 200 });
         } else {
-            const listData = await getList(gameParams!, rankParams!, userIdParams!);
+            const listData = await getList(gameParams!, rankParams!, userId);
             return NextResponse.json({ message: "検索成功", success: true, data: listData }, { status: 200 });
         }
     } catch (e) {

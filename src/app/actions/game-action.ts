@@ -51,17 +51,8 @@ export async function GameRegister(_prevState: any, formData: FormData) {
 
 export async function GameListSearch(game: string, rank: string) {
 
-    // ログインしているユーザ取得
-    const cookie = await getCookies();
-    
-    if (cookie === null || cookie === undefined) {
-        redirect("/login?error=true");
-    }
-
-    const userId = cookie?.id;
-
     // やっているゲームとランクを検索
-    const res = await listSearch(game, rank, userId!);
+    const res = await listSearch(game, rank);
 
     const success = res?.success;
     const message = res?.message;
@@ -141,9 +132,9 @@ export async function GameUpdate(_prevState: any, formData: FormData, id: Number
 }
 
 // 削除
-export async function gameDelete(gameId: number, userId: number) {
+export async function gameDelete(gameId: number) {
 
-    const res = await Delete(gameId, userId);
+    const res = await Delete(gameId);
 
     const success = res?.success;
     const message = res?.message;

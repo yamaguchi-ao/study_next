@@ -3,6 +3,7 @@ import { errorToast, successToast } from "@/utils/toast";
 import { UserUpdateSchema } from "@/utils/validation";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { getCookies } from "./action";
 
 //　ユーザー詳細
 export async function getUserData(userId: Number) {
@@ -28,10 +29,17 @@ export async function getUserData(userId: Number) {
 }
 
 // ユーザー更新
-export async function userDataUpdate(_prevState: any, formData: FormData, userId: Number) {
+export async function userDataUpdate(_prevState: any, formData: FormData) {
+
+    const cookies = await getCookies();
+    
+    if (cookies === null) {
+       return redirect("/login?error=true");
+    }
+
+    const userId = cookies.id;
 
     const userData = {
-        userId: userId as number,
         username: formData.get("username") as string,
         email: formData.get("email") as string,
         password: formData.get("password") as string,

@@ -3,10 +3,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { DeleteSchema } from "@/utils/validation";
 import z from "zod";
 import { loginCheck } from "@/utils/loginCheck";
+import { getCookies } from "@/app/actions/action";
 
 export async function POST(req: NextRequest) {
 
-    const { userId, id } = await req.json();
+    const { id } = await req.json();
+    const cookies = await getCookies();
+
+    if (cookies === null) {
+        return NextResponse.json({message: "ログインしていません。", success: false, login: false}, {status: 401});
+    }
+    
+    const userId = cookies?.id;
 
     try {
         // ログインしているかどうかの判定

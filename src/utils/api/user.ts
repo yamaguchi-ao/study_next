@@ -18,7 +18,7 @@ export const UserInfo = async (userId: Number) => {
     return data.json();
 }
 
-export const UserUpdate = async (info: { userId: number, username: string, email: string, password: string, newPassword: string, confirm: string }) => {
+export const UserUpdate = async (info: { username: string, email: string, password: string, newPassword: string, confirm: string }) => {
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/user/update`;
 

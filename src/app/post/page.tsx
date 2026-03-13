@@ -87,9 +87,9 @@ function PostTable({ userId, data, search }: PostProps) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   // 削除処理
-  async function onDelete(id: number, userId: number) {
+  async function onDelete(id: number) {
     setIsOpen(false);
-    const res = await postDelete(id, userId);
+    const res = await postDelete(id);
     if (res?.success) {
       search();
       successToast(res?.message);
@@ -112,14 +112,14 @@ function PostTable({ userId, data, search }: PostProps) {
       <div className="grid grid-cols-3 justify-items-center gap-y-10">
         {selectedId && (
           <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} ref={modalRef} >
-            <ConfirmModalContent handleClickAction={() => onDelete(selectedId, userId)} ref={modalRef} />
+            <ConfirmModalContent handleClickAction={() => onDelete(selectedId)} ref={modalRef} />
           </Modal>
         )}
         {data !== undefined ? data.map((value: any) => {
           return (
             <div key={value.id}>
               <div key={value.id} className="flex flex-col flex-wrap transition delay-70 duration-300 hover:scale-110 hover:cursor-pointer"
-                onClick={() => router.push(`/post/${value.id}/details`)}>
+                onClick={() => router.push(`/post/${value.id}/details?gameTag=${value.gameTag}`)}>
                 <div className="w-[20em] h-[8em] rounded-t-lg bg-blue-900">
                   { // 自身のみ削除可能
                     userId === value.userId && (

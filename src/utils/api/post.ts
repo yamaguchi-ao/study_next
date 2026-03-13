@@ -34,10 +34,10 @@ export const listSearch = async (game: string) => {
     return data.json();
 }
 
-export const detailSearch = async (postId: Number) => {
+export const detailSearch = async (postId: Number, gameTag?: string) => {
 
     const baseurl = await getUrl();
-    const url = `${baseurl}/api/post/search` + "?id=" + postId;
+    const url = `${baseurl}/api/post/search` + "?id=" + postId + "&gameTag=" + gameTag;
     const cookie = await cookies();
 
     const data = await fetch(url, {
@@ -66,14 +66,14 @@ export async function Update(postData: { title: string, post: string, id: number
     return data.json();
 }
 
-export async function Delete(postId: number, userId: number) {
+export async function Delete(postId: number) {
 
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/post/delete`;
     const cookie = await cookies();
     const data = await fetch(url, {
         method: "POST",
-        body: JSON.stringify({ id: postId, userId: userId }),
+        body: JSON.stringify({ id: postId }),
         headers: {
             Cookie: cookie.toString(),
         },

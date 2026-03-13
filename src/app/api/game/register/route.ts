@@ -4,9 +4,19 @@ import { gameNameFixed } from "@/constants/context";
 import { GameSchema } from "@/utils/validation";
 import z from "zod";
 import { loginCheck } from "@/utils/loginCheck";
+import { getCookies } from "@/app/actions/action";
 
 export async function POST(req: NextRequest) {
-    const { name, rank, id } = await req.json();
+    const { name, rank } = await req.json();
+
+    const cookies = await getCookies();
+
+    if (cookies === null) {
+        return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
+    }
+
+    const userId = cookies.id;
+
     let game: string | undefined = undefined;
 
     try {
@@ -14,10 +24,10 @@ export async function POST(req: NextRequest) {
         const isLogin = await loginCheck(req);
 
         if (!isLogin) {
-            return NextResponse.json({message: "ログインしていません。", success: false, login: false}, {status: 401});
+            return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
         }
 
-        const issue = GameSchema.safeParse({ name, rank, id });
+        const issue = GameSchema.safeParse({ name, rank, userId });
 
         if (!issue.success) {
             const validation = z.flattenError(issue.error);
@@ -30,7 +40,7 @@ export async function POST(req: NextRequest) {
 
         // ゲームタイトルの既存確認
         const existingGame = await prisma.games.findMany({
-            where: { userId: id, AND: { name: game } }
+            where: { userId: userId, AND: { name: game } }
         });
 
         if (existingGame.length > 0) {
@@ -40,7 +50,7 @@ export async function POST(req: NextRequest) {
         // ゲームとランクの登録
         await prisma.games.create({
             data: {
-                userId: id,
+                userId: userId,
                 name: game as string,
                 rank: rank
             }
