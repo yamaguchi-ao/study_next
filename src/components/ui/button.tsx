@@ -80,13 +80,13 @@ export function ReturnButton({ type }: ManyButtonProps) {
 }
 
 /** 削除用ボタン */
-export function DeleteButton({ className, type, id, userId }: ManyButtonProps) {
+export function DeleteButton({ className, type, id }: ManyButtonProps) {
     const router = useRouter();
 
-    async function onDelete(id: number, userId: number) {
+    async function onDelete(id: number) {
         // 取得したタイプの条件で削除する
         if (type == "comment") {
-            const req = await commentDelete(id, userId);
+            const req = await commentDelete(id);
 
             const success = req.success ? req.success : "";
             const message = req.message ? req.message : "";
@@ -107,7 +107,7 @@ export function DeleteButton({ className, type, id, userId }: ManyButtonProps) {
         }
     }
 
-    return <Button className={className} onClick={() => onDelete(id! as number, userId!)}>削除</Button>
+    return <Button className={className} onClick={() => onDelete(id! as number)}>削除</Button>
 }
 
 /** モーダル用ボタン */

@@ -108,7 +108,7 @@ function Comment({ data, userId }: CommentProps) {
                         </div>
                         <div className="pl-7">{value.comment}</div>
                         <div className="flex justify-end mb-3">
-                            {userId == value.user.id ? <DeleteButton type={"comment"} id={value.id} userId={userId} /> : ""}
+                            {userId == value.user.id ? <DeleteButton type={"comment"} id={value.id} /> : ""}
                         </div>
                     </div>
                 )

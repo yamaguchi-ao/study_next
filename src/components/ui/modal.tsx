@@ -92,7 +92,7 @@ export function CommentModalContent({ data, setIsOpenAction, ref }: CommentProps
     // コメント追加APIアクション
     const [state, commentAction, isPending] = useActionState(
         async (_prevState: any, formData: FormData) => {
-            const comment = await addComment(_prevState, formData, data!.id, data!.userId);
+            const comment = await addComment(_prevState, formData, data!.id);
             if (comment?.comment || comment?.yourRank) {
                 return comment;
             }
