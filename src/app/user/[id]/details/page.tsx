@@ -1,12 +1,29 @@
+import { getCookies } from "@/app/actions/action";
 import { getUserData } from "@/app/actions/user-action";
 import { Sidebar } from "@/components/layout/sidebar"
 import { ReturnButton, UpdateButton } from "@/components/ui/button";
+import { redirect } from "next/navigation";
 
 // ユーザー詳細
 export default async function UserDetails({ params }: { params: Promise<{ id: Number }> }) {
 
     const userId = (await params).id;
     const data = await getUserData(userId);
+
+    const cookies = await getCookies();
+
+    if (cookies === null) {
+        return redirect("/login?error=true");
+    }
+
+    // cookieからログインしているIDを取得
+    const loginId = cookies?.id;
+
+    // ログインしているユーザーとURLのIDを比較
+    if (Number(userId) !== loginId) {
+        // 違ったら投稿画面に戻す
+        return redirect("/post");
+    }
 
     return (
         <>

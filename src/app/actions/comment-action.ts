@@ -3,12 +3,11 @@ import { errorToast, successToast } from "@/utils/toast";
 import { CommentSchema } from "@/utils/validation";
 import z from "zod";
 
-export async function addComment(_prevState: any, formData: FormData, postId: number, userId: number) {
+export async function addComment(_prevState: any, formData: FormData, postId: number) {
 
     const commentData = {
         comment: formData.get("comment") as string,
         postId: postId,
-        userId: userId,
         hiddenFlg: formData.get("anonymous") as string,
         dispRankFlg: formData.get("dispRank") as string,
         postRank: Number(formData.get("postRank")),
@@ -47,9 +46,9 @@ export async function getCommentList(postId: number, game: string) {
     }
 }
 
-export async function commentDelete(commentId: number, userId: number) {
+export async function commentDelete(commentId: number) {
     // コメント削除処理
-    const res = await deleteComment(commentId, userId);
+    const res = await deleteComment(commentId);
 
     const success = res?.success;
     const message = res?.message;

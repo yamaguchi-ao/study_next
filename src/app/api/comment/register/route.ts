@@ -3,15 +3,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { CommentSchema } from "@/utils/validation";
 import z from "zod";
 import { loginCheck } from "@/utils/loginCheck";
-
-const JWT_SECRET = process.env.JWT_SECRET;
+import { getCookies } from "@/app/actions/action";
 
 // コメント追加API
 export async function POST(req: NextRequest) {
 
-    const { comment, postId, userId, hiddenFlg, dispRankFlg, postRank, yourRank } = await req.json();
+    const { comment, postId, hiddenFlg, dispRankFlg, postRank, yourRank } = await req.json();
 
-    const token = req.cookies.get("auth_token")?.value;
+    const cookies = await getCookies();
+    if (cookies === null) {
+        return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
+    }
+
+    const userId = cookies.id;
 
     try {
         // ログインしているかどうかの判定

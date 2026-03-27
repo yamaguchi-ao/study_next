@@ -4,6 +4,8 @@ import { GameUpdate, getGame } from "@/app/actions/game-action";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button, ReturnButton } from "@/components/ui/button";
 import { gameNameFixed, supportedGames, supportedGamesMap } from "@/constants/context";
+import { errorToast } from "@/utils/toast";
+import { redirect } from "next/navigation";
 import { use, useActionState, useEffect, useState } from "react";
 
 export default function UpdatePage({ params }: { params: Promise<{ id: number }> }) {
@@ -21,6 +23,10 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
     useEffect(() => {
         async function getGames() {
             const games = await getGame(gameId);
+            if (!games) {
+                errorToast("不正な遷移です。");
+                redirect("/game");
+            }
             setName(games?.name);
             setRank(games?.rank);
         }

@@ -1,12 +1,20 @@
+import { getCookies } from "@/app/actions/action";
 import prisma from "@/lib/prisma";
 import { loginCheck } from "@/utils/loginCheck";
-import { DeleteSchema, UserSchema } from "@/utils/validation";
+import { DeleteSchema } from "@/utils/validation";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
 
 // ユーザー削除
 export async function POST(req: NextRequest) {
-    const { userId } = await req.json();
+
+    const cookies = await getCookies();
+
+    if (cookies === null) {
+        return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
+    }
+    const userId = cookies.id;
+    const id = 0;
 
     try {
         // ログイン判定
@@ -17,7 +25,7 @@ export async function POST(req: NextRequest) {
         }
 
         //　API側のバリデーションチェック
-        const issue = DeleteSchema.safeParse({ userId });
+        const issue = DeleteSchema.safeParse({ userId, id });
 
         if (!issue.success) {
             const validation = z.flattenError(issue.error);

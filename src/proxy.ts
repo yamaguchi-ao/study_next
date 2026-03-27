@@ -4,18 +4,14 @@ import { jwtVerify } from "jose";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-export const menus = {
-    menubar: [
-        '/post',
-        '/game',
-    ]
-}
-
 export default async function proxy(req: NextRequest) {
     const authToken = req.cookies.get("auth_token")?.value;
     const loginUrl = new URL('/login?error=true', req.url);
 
     if (authToken === undefined) {
+        if (!req.nextUrl.pathname.includes("/login")) {
+            return NextResponse.redirect(loginUrl);
+        }
     } else {
         try {
             // jwtの署名の検証

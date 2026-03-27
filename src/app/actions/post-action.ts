@@ -1,14 +1,19 @@
 import { PostSchema } from "@/utils/validation";
 import { getCookies } from "./action";
 import { z } from "zod";
-import { Delete, detailSearch, listSearch, post, Update } from "@/utils/api/post";
+import { Delete, detailSearch, listSearch, post, Update, updateSearch } from "@/utils/api/post";
 import { errorToast, successToast } from "@/utils/toast";
 import { redirect } from "next/navigation";
+interface PostProps {
+    postId?: number;
+    gameTag?: string;
+    game?: string;
+}
 
 export async function postRegister(_prevState: any, formData: FormData) {
 
     const cookie = await getCookies();
-    
+
     if (cookie === null || cookie === undefined) {
         redirect("/login?error=true");
     }
@@ -49,32 +54,23 @@ export async function postRegister(_prevState: any, formData: FormData) {
     }
 }
 
-export async function postListSearch(game: string) {
-
-    // やっているゲームとランクを検索
-    const res = await listSearch(game);
-
-    const success = res?.success;
-    const message = res?.message;
-    const login = res?.login;
-    const data = res?.data;
-
-    if (success) {
-        // 成功時
-        return data;
+export async function getPost({ postId, gameTag, game }: PostProps, type?: string) {
+    let res = null;
+        
+    if (game !== null && game !== undefined) {
+        // 一覧用
+        res = await listSearch(game);
     } else {
-        if (!login) {
-            redirect("/login?error=true");
-        } else {
-            errorToast(message);
+        if (postId) {
+            if (type === "details") {
+                // 詳細
+                res = await detailSearch(postId, gameTag);
+            } else {
+                // 更新
+                res = await updateSearch(postId);
+            }
         }
     }
-}
-
-export async function getPost(postId: Number) {
-
-    // やっているゲームとランクを取得
-    const res = await detailSearch(postId);
 
     const success = res?.success;
     const message = res?.message;
@@ -129,9 +125,9 @@ export async function postUpdate(_prevState: any, formData: FormData, id: number
     }
 }
 
-export async function postDelete(postId: number, userId: number) {
+export async function postDelete(postId: number) {
 
-    const res = await Delete(postId, userId);
+    const res = await Delete(postId);
 
     const success = res?.success;
     const message = res?.message;

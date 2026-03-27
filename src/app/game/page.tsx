@@ -41,7 +41,7 @@ const Game: NextPage = () => {
             <title>ゲーム一覧</title>
             <div className="flex h-main overflow-hidden">
                 <Sidebar />
-                <form className="flex-1 flex flex-col" action={searchAction}>
+                <form className="flex-1 flex flex-col overflow-y-scroll" action={searchAction}>
                     <div className="flex p-5 justify-center">
                         <div className="flex items-center pr-5">
                             <div className="pr-5">ゲーム</div>
@@ -97,9 +97,9 @@ function SearchTable({ data, search }: GameProps) {
     }
 
     // 削除処理
-    async function onDelete(id: number, userId: number) {
+    async function onDelete(id: number) {
         setIsOpen(false);
-        const res = await gameDelete(id, userId);
+        const res = await gameDelete(id);
 
         if (res?.success) {
             search();
@@ -122,7 +122,7 @@ function SearchTable({ data, search }: GameProps) {
             <div className="grid grid-cols-5 justify-items-center gap-y-10">
                 {selectedId && (
                     <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} ref={modalRef} >
-                        <ConfirmModalContent handleClickAction={() => onDelete(selectedId, userId)} ref={modalRef} />
+                        <ConfirmModalContent handleClickAction={() => onDelete(selectedId)} ref={modalRef} />
                     </Modal>
                 )}
                 {data !== undefined ? data.map((value: any) => {

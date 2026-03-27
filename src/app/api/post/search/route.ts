@@ -2,25 +2,40 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import { loginCheck } from "@/utils/loginCheck";
+import { getCookies } from "@/app/actions/action";
 
 // ゲームとランクの検索
 export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const gameParams = searchParams.get('game');
     const postIdParams = searchParams.get('id');
+    const gameTagParams = searchParams.get('gameTag');
+
+    const cookies = await getCookies();
+
+    if (cookies === null) {
+        return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
+    }
+    const userId = cookies.id;
 
     try {
         // ログインしているかどうかの判定
         const isLogin = await loginCheck(req);
 
         if (!isLogin) {
-            return NextResponse.json({message: "ログインしていません。", success: false, login: false}, {status: 401});
+            return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
         }
 
-        if (searchParams.toString().includes("id")) {
-            const detailData = await getDetail(postIdParams!);
+        if (searchParams.toString().includes("id") && searchParams.toString().includes("gameTag")) {
+            // 詳細用
+            const detailData = await getDetail(postIdParams!, gameTagParams!);
             return NextResponse.json({ message: "取得成功", success: true, data: detailData }, { status: 200 });
+        } else if (searchParams.toString().includes("id") && !searchParams.toString().includes("gameTag")) {
+            // 更新用
+            const updateData = await getUpdate(postIdParams!, userId);
+            return NextResponse.json({ message: "取得成功", success: true, data: updateData }, { status: 200 });
         } else {
+            // 一覧用
             const listData = await getList(gameParams!);
             return NextResponse.json({ message: "検索成功", success: true, data: listData }, { status: 200 });
         }
@@ -57,12 +72,7 @@ async function getList(gameParams: string) {
 }
 
 //　詳細用検索
-async function getDetail(postId: string) {
-
-    const gameTag = await prisma.posts.findUnique({
-        where: { id: Number(postId) },
-        select: { gameTag: true }
-    });
+async function getDetail(postId: string, gameTag: string) {
 
     const data = await prisma.posts.findUnique({
         where: { id: Number(postId) },
@@ -79,12 +89,29 @@ async function getDetail(postId: string) {
                 select: {
                     name: true,
                     games: {
-                        where: {
-                            name: gameTag?.gameTag || ""
+                        where: { name: gameTag },
+                        select: {
+                            rank: true
                         },
                     }
                 }
             }
+        }
+    });
+
+    return data;
+}
+
+//　詳細用検索
+async function getUpdate(postId: string, userId: number) {
+
+    const data = await prisma.posts.findUnique({
+        where: { id: Number(postId), userId: Number(userId) },
+        select: {
+            id: true,
+            title: true,
+            content: true,
+            gameTag: true,
         }
     });
 

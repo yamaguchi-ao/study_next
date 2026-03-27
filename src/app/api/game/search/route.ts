@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 import { loginCheck } from "@/utils/loginCheck";
+import { getCookies } from "@/app/actions/action";
 
 // ゲームとランクの検索
 export async function GET(req: NextRequest) {
@@ -9,7 +10,13 @@ export async function GET(req: NextRequest) {
     const gameParams = searchParams.get('game');
     const rankParams = searchParams.get('rank');
     const gameIdParams = searchParams.get('id');
-    const userIdParams = searchParams.get('userId') as unknown as number;
+
+    const cookies = await getCookies();
+
+    if (cookies === null) {
+        return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
+    }
+    const userId = cookies.id;
 
     try {
         // ログインしているかどうかの判定
@@ -20,10 +27,10 @@ export async function GET(req: NextRequest) {
         }
 
         if (searchParams.toString().includes("id")) {
-            const detailData = await getDetail(gameIdParams!);
+            const detailData = await getDetail(gameIdParams!, userId);
             return NextResponse.json({ message: "取得成功", success: true, data: detailData }, { status: 200 });
         } else {
-            const listData = await getList(gameParams!, rankParams!, userIdParams!);
+            const listData = await getList(gameParams!, rankParams!, userId);
             return NextResponse.json({ message: "検索成功", success: true, data: listData }, { status: 200 });
         }
     } catch (e) {
@@ -57,10 +64,10 @@ async function getList(gameParams: string, rankParams: string, userId: number) {
 }
 
 //　詳細用検索
-async function getDetail(gameId: string) {
+async function getDetail(gameId: string, userId: number) {
 
     const data = await prisma.games.findUnique({
-        where: { id: Number(gameId) },
+        where: { id: Number(gameId), userId: Number(userId)},
         select: {
             id: true,
             name: true,
