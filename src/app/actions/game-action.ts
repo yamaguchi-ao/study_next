@@ -80,11 +80,10 @@ export async function getGame(gameId: Number) {
     const message = res?.message;
     const login = res?.login;
     const data = res?.data;
-    const { name, rank } = data;
-
+    
     if (success) {
         // 成功時
-        return { name, rank };
+        return data;
     } else {
         if (!login) {
             redirect("/login?error=true");

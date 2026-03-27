@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
         }
 
         if (searchParams.toString().includes("id")) {
-            const detailData = await getDetail(gameIdParams!);
+            const detailData = await getDetail(gameIdParams!, userId);
             return NextResponse.json({ message: "取得成功", success: true, data: detailData }, { status: 200 });
         } else {
             const listData = await getList(gameParams!, rankParams!, userId);
@@ -64,10 +64,10 @@ async function getList(gameParams: string, rankParams: string, userId: number) {
 }
 
 //　詳細用検索
-async function getDetail(gameId: string) {
+async function getDetail(gameId: string, userId: number) {
 
     const data = await prisma.games.findUnique({
-        where: { id: Number(gameId) },
+        where: { id: Number(gameId), userId: Number(userId)},
         select: {
             id: true,
             name: true,

@@ -2,11 +2,16 @@
 import { getGame } from "@/app/actions/game-action";
 import { Sidebar } from "@/components/layout/sidebar";
 import { ReturnButton, UpdateButton } from "@/components/ui/button";
+import { redirect } from "next/navigation";
 
 export default async function Detail({ params }: { params: Promise<{ id: Number }> }) {
 
     const gameId = (await params).id;
     const games = await getGame(gameId);
+
+    if (!games) {
+        redirect("/game");
+    }
 
     return (
         <>

@@ -5,7 +5,7 @@ import { Suspense, useActionState, useEffect, useRef, useState } from "react";
 import { Button, SearchButton } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Loading from "../loading";
-import { postDelete, postListSearch } from "../actions/post-action";
+import { postDelete, getPost } from "../actions/post-action";
 import { getCookies } from "../actions/action";
 import { CancelIcon, CommentIcon } from "@/components/ui/icons";
 import Modal, { ConfirmModalContent } from "@/components/ui/modal";
@@ -33,7 +33,7 @@ export default function List() {
 
   // 検索
   async function GetSearch() {
-    const getData = await postListSearch(game);
+    const getData = await getPost({ game: game });    
     setSearch(getData);
   }
 

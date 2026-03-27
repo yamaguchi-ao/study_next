@@ -23,7 +23,7 @@ export default async function details({ params, searchParams }: detailsProp) {
     const gameTag = (await searchParams).gameTag;
 
     // 投稿の詳細取得
-    const posts = await getPost(postId, gameTag);
+    const posts = await getPost({ postId: postId, gameTag: gameTag }, "details");
 
     if (posts === null) {
         return redirect("/post");
@@ -104,7 +104,7 @@ function Comment({ data, userId }: CommentProps) {
                         <div className="flex text-xs p-3" >
                             <div className="row">ユーザ名：{value.hiddenFlg ? "匿名ユーザー" : value.user.name}</div>
                             <div className="row pl-3">コメント日：{date}</div>
-                            <div className="row pl-3">ランク：{value.dispRankFlg ? "非表示" : commentGames.length != 0 ? commentGames[0].rank : "表示なし" }</div>
+                            <div className="row pl-3">ランク：{value.dispRankFlg ? "非表示" : commentGames.length != 0 ? commentGames[0].rank : "表示なし"}</div>
                         </div>
                         <div className="pl-7">{value.comment}</div>
                         <div className="flex justify-end mb-3">

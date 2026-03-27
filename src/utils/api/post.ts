@@ -50,6 +50,22 @@ export const detailSearch = async (postId: Number, gameTag?: string) => {
     return data.json();
 }
 
+export const updateSearch = async (postId: Number) => {
+
+    const baseurl = await getUrl();
+    const url = `${baseurl}/api/post/search` + "?id=" + postId;
+    const cookie = await cookies();
+
+    const data = await fetch(url, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+            Cookie: cookie.toString(),
+        },
+    });
+    return data.json();
+}
+
 export async function Update(postData: { title: string, post: string, id: number }) {
 
     const baseUrl = await getUrl();
