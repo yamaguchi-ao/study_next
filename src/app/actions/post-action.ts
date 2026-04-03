@@ -8,6 +8,7 @@ interface PostProps {
     postId?: number;
     gameTag?: string;
     game?: string;
+    page?: number;
 }
 
 export async function postRegister(_prevState: any, formData: FormData) {
@@ -54,12 +55,23 @@ export async function postRegister(_prevState: any, formData: FormData) {
     }
 }
 
-export async function getPost({ postId, gameTag, game }: PostProps, type?: string) {
+export async function getPost({ postId, gameTag, game, page }: PostProps, type?: string) {
+
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
+
     let res = null;
-        
+
     if (game !== null && game !== undefined) {
         // 一覧用
-        res = await listSearch(game);
+        if (page) {
+            res = await listSearch(game, page);
+        } else {
+            res = await listSearch(game);
+        }
     } else {
         if (postId) {
             if (type === "details") {
@@ -72,10 +84,10 @@ export async function getPost({ postId, gameTag, game }: PostProps, type?: strin
         }
     }
 
-    const success = res?.success;
+    const success: boolean | undefined = res?.success;
     const message = res?.message;
     const login = res?.login;
-    const data = res?.data;
+    const data = { data: res?.data, currentPage: res?.currentPage, totalPage: res?.totalPage };
 
     if (success) {
         // 成功時
@@ -90,6 +102,12 @@ export async function getPost({ postId, gameTag, game }: PostProps, type?: strin
 }
 
 export async function postUpdate(_prevState: any, formData: FormData, id: number) {
+
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
 
     const postId = id;
 
@@ -126,6 +144,12 @@ export async function postUpdate(_prevState: any, formData: FormData, id: number
 }
 
 export async function postDelete(postId: number) {
+
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
 
     const res = await Delete(postId);
 

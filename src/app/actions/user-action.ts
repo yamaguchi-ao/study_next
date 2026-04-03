@@ -8,6 +8,12 @@ import { getCookies } from "./action";
 //　ユーザー詳細
 export async function getUserData(userId: Number) {
 
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
+
     // やっているゲームとランクを取得
     const res = await UserInfo(userId);
 
@@ -32,9 +38,9 @@ export async function getUserData(userId: Number) {
 export async function userDataUpdate(_prevState: any, formData: FormData) {
 
     const cookies = await getCookies();
-    
-    if (cookies === null) {
-       return redirect("/login?error=true");
+
+    if (cookies === null || cookies === undefined) {
+        return redirect("/login?error=true");
     }
 
     const userId = cookies.id;
@@ -75,6 +81,12 @@ export async function userDataUpdate(_prevState: any, formData: FormData) {
 
 // ユーザー削除
 export async function UserDelete(userId: number) {
+
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
 
     const res = await deleteUser(userId);
 

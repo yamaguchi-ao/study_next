@@ -21,6 +21,8 @@ interface PostProps {
 export default function List() {
   const router = useRouter();
   const [game, setGame] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
   const [userId, setUserId] = useState(0);
   const [search, setSearch] = useState<PostsWithUsers[]>([]);
   const [state, searchAction, isPending] = useActionState(GetSearch, null);
@@ -33,8 +35,29 @@ export default function List() {
 
   // 検索
   async function GetSearch() {
-    const getData = await getPost({ game: game });    
-    setSearch(getData);
+    const getData = await getPost({ game: game, page: 1 });
+    if (getData) {
+      setCurrentPage(getData?.currentPage);
+      setTotalPage(getData?.totalPage);
+      setSearch(getData?.data);
+    } else {
+      errorToast("検索に失敗しました。");
+      setSearch([]);
+    }
+  }
+
+  // ページ遷移
+  async function changePage(page: number) {
+    const getData = await getPost({ game: game, page: page });
+
+    if (getData) {
+      setCurrentPage(getData?.currentPage);
+      setTotalPage(getData?.totalPage);
+      setSearch(getData?.data);
+    } else {
+      errorToast("ページの遷移に失敗しました。");
+      setSearch([]);
+    }
   }
 
   // ログインユーザー取得用
@@ -43,6 +66,17 @@ export default function List() {
     const userId = cookies?.id;
     setUserId(userId!);
   }
+  const generatePagination = () => {
+    const pages = [];
+    for (let i = 1; i <= totalPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  const handlePageChange = (page: number) => {
+    changePage(page);
+  };
 
   return (
     <>
@@ -65,6 +99,22 @@ export default function List() {
                 <Button onClick={(() => router.push("/post/register"))}>新規登録</Button>
               </div>
             </div>
+          </div>
+
+          <div className="flex justify-center mt-5">
+            {currentPage > 1 && (<Button onClick={() => handlePageChange(currentPage - 1)}>前</Button>)}
+            {generatePagination().map((page, index) => (
+              <button
+                key={index}
+                onClick={() => handlePageChange(page)}
+                type="button"
+                className={`w-10 h-10 sm:w-12 sm:h-12 mx-1 rounded text-sm sm:text-base ${currentPage === page ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black hover:bg-gray-400'}`}
+                disabled={typeof page !== 'number'}
+              >
+                {page}
+              </button>
+            ))}
+            {currentPage < totalPage && (<Button onClick={() => handlePageChange(currentPage + 1)}>次</Button>)}
           </div>
 
           <div className="w-full p-5">

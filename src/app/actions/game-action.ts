@@ -49,15 +49,26 @@ export async function GameRegister(_prevState: any, formData: FormData) {
     }
 }
 
-export async function GameListSearch(game: string, rank: string) {
+export async function GameListSearch(game: string, rank: string, page?: number) {
 
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
+
+    let res = null;
     // やっているゲームとランクを検索
-    const res = await listSearch(game, rank);
+    if (page) {
+        res = await listSearch(game, rank, page);
+    } else {
+        res = await listSearch(game, rank);
+    }
 
     const success = res?.success;
     const message = res?.message;
     const login = res?.login;
-    const data = res?.data;
+    const data = { data: res?.data, currentPage: res?.currentPage, totalPage: res?.totalPage };
 
     if (success) {
         // 成功時
@@ -73,6 +84,12 @@ export async function GameListSearch(game: string, rank: string) {
 
 export async function getGame(gameId: Number) {
 
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
+
     // やっているゲームとランクを取得
     const res = await gameSearch(gameId);
 
@@ -80,7 +97,7 @@ export async function getGame(gameId: Number) {
     const message = res?.message;
     const login = res?.login;
     const data = res?.data;
-    
+
     if (success) {
         // 成功時
         return data;
@@ -94,6 +111,12 @@ export async function getGame(gameId: Number) {
 }
 
 export async function GameUpdate(_prevState: any, formData: FormData, id: Number) {
+
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
 
     // ゲームとランクを更新
     const gameId = id;
@@ -132,6 +155,12 @@ export async function GameUpdate(_prevState: any, formData: FormData, id: Number
 
 // 削除
 export async function gameDelete(gameId: number) {
+
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
 
     const res = await Delete(gameId);
 

@@ -12,6 +12,8 @@ import Modal, { ConfirmModalContent } from "@/components/ui/modal";
 import { errorToast, successToast } from "@/utils/toast";
 import { getCookies } from "../actions/action";
 import type { GamesWithUsers } from "@/types";
+import { get } from "http";
+import { set } from "zod";
 
 interface GameProps {
     data: GamesWithUsers[],
@@ -23,6 +25,8 @@ const Game: NextPage = () => {
 
     const [game, setGame] = useState('');
     const [rank, setRank] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(1);
     const [search, setSearch] = useState<GamesWithUsers[]>([]);
     const [state, searchAction, isPending] = useActionState(GetSearch, null);
 
@@ -32,9 +36,41 @@ const Game: NextPage = () => {
 
     // 検索
     async function GetSearch() {
-        const getData = await GameListSearch(game, rank);
-        setSearch(getData!);
+        const getData = await GameListSearch(game, rank, 1);
+        if (getData) {
+            setCurrentPage(getData?.currentPage);
+            setTotalPage(getData?.totalPage);
+            setSearch(getData?.data);
+        } else {
+            errorToast("検索に失敗しました。");
+            setSearch([]);
+        }
     }
+
+    // ページ遷移
+    async function changePage(page: number) {
+        const getData = await GameListSearch(game, rank, page);
+        if (getData) {
+            setCurrentPage(getData?.currentPage);
+            setTotalPage(getData?.totalPage);
+            setSearch(getData?.data);
+        } else {
+            errorToast("ページの遷移に失敗しました。");
+            setSearch([]);
+        }
+    }
+
+    const generatePagination = () => {
+        const pages = [];
+        for (let i = 1; i <= totalPage; i++) {
+            pages.push(i);
+        }
+        return pages;
+    };
+
+    const handlePageChange = (page: number) => {
+        changePage(page);
+    };
 
     return (
         <>
@@ -63,6 +99,23 @@ const Game: NextPage = () => {
                             </div>
                         </div>
                     </div>
+
+                    <div className="flex justify-center mt-5">
+                        {currentPage > 1 && (<Button onClick={() => handlePageChange(currentPage - 1)}>前</Button>)}
+                        {generatePagination().map((page, index) => (
+                            <button
+                                key={index}
+                                onClick={() => handlePageChange(page)}
+                                type="button"
+                                className={`w-10 h-10 sm:w-12 sm:h-12 mx-1 rounded text-sm sm:text-base ${currentPage === page ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black hover:bg-gray-400'}`}
+                                disabled={typeof page !== 'number'}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                        {currentPage < totalPage && (<Button onClick={() => handlePageChange(currentPage + 1)}>次</Button>)}
+                    </div>
+                    
                     <div className="w-full p-5">
                         <div className="p-1 bg-gray-600/20 mb-5">{`検索結果：${search !== undefined ? search.length + "件" : "0件"}`}</div>
                         <Suspense fallback={<Loading />}>

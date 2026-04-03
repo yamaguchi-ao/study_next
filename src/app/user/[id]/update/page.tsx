@@ -38,8 +38,6 @@ export default function UserUpdate({ params }: { params: Promise<{ id: number }>
         getUser();
     }, [params, userId]);
 
-    console.log("確認：", [loginId, userId]);
-
     const errorText = (data: string[]) => {
         const list = [];
         for (let i = 0; i < data.length; i++) {
