@@ -7,7 +7,7 @@
 import { getUrl } from "@/constants/getUrl";
 import { cookies } from "next/headers";
 
-export const Register = async (gameData: { name: string, rank: string, id: number }) => {
+export const Register = async (gameData: { name: string, rank: string }) => {
 
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/game/register`;
@@ -23,12 +23,14 @@ export const Register = async (gameData: { name: string, rank: string, id: numbe
     return data.json();
 }
 
-export const listSearch = async (game: string, rank: string, userId: number) => {
+
+export const listSearch = async (game: string, rank: string, page?:number) => {
 
     const baseUrl = await getUrl();
-    const url = `${baseUrl}/api/game/search` + "?game=" + game + "&rank=" + rank + "&userId=" + userId;
+    const url = `${baseUrl}/api/game/search` + "?game=" + game + "&rank=" + rank;
+    const currentPage = page ? "&page=" + page : ''; 
     const cookie = await cookies();
-    const data = await fetch(url, {
+    const data = await fetch(url + currentPage, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -75,14 +77,14 @@ export const Update = async (subject: { rank: string, gameId: Number }) => {
     return data.json();
 }
 
-export const Delete = async (id: number, userId: number) => {
+export const Delete = async (id: number) => {
 
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/game/delete`;
     const cookie = await cookies();
     const data = await fetch(url, {
         method: "POST",
-        body: JSON.stringify({ id: id, userId: userId }),
+        body: JSON.stringify({ id: id }),
         headers: {
             Cookie: cookie.toString(),
         },

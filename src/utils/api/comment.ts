@@ -6,7 +6,6 @@ import { cookies } from "next/headers";
 interface Comment {
     comment: string,
     postId: number,
-    userId: number,
     hiddenFlg: string,
     postRank: number,
     yourRank: number
@@ -48,13 +47,13 @@ export async function getComments(postId: number, game: string) {
 }
 
 // コメント削除
-export async function deleteComment(id: number, userId: number) {
+export async function deleteComment(id: number) {
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/comment/delete`;
     const cookie = await cookies();
     const data = await fetch(url, {
         method: "POST",
-        body: JSON.stringify({ id: id, userId: userId }),
+        body: JSON.stringify({ id: id }),
         headers: {
             Cookie: cookie.toString(),
         },

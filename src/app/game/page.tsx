@@ -12,6 +12,8 @@ import Modal, { ConfirmModalContent } from "@/components/ui/modal";
 import { errorToast, successToast } from "@/utils/toast";
 import { getCookies } from "../actions/action";
 import type { GamesWithUsers } from "@/types";
+import { get } from "http";
+import { set } from "zod";
 
 interface GameProps {
     data: GamesWithUsers[],
@@ -23,6 +25,8 @@ const Game: NextPage = () => {
 
     const [game, setGame] = useState('');
     const [rank, setRank] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(1);
     const [search, setSearch] = useState<GamesWithUsers[]>([]);
     const [state, searchAction, isPending] = useActionState(GetSearch, null);
 
@@ -32,16 +36,48 @@ const Game: NextPage = () => {
 
     // 検索
     async function GetSearch() {
-        const getData = await GameListSearch(game, rank);
-        setSearch(getData!);
+        const getData = await GameListSearch(game, rank, 1);
+        if (getData) {
+            setCurrentPage(getData?.currentPage);
+            setTotalPage(getData?.totalPage);
+            setSearch(getData?.data);
+        } else {
+            errorToast("検索に失敗しました。");
+            setSearch([]);
+        }
     }
+
+    // ページ遷移
+    async function changePage(page: number) {
+        const getData = await GameListSearch(game, rank, page);
+        if (getData) {
+            setCurrentPage(getData?.currentPage);
+            setTotalPage(getData?.totalPage);
+            setSearch(getData?.data);
+        } else {
+            errorToast("ページの遷移に失敗しました。");
+            setSearch([]);
+        }
+    }
+
+    const generatePagination = () => {
+        const pages = [];
+        for (let i = 1; i <= totalPage; i++) {
+            pages.push(i);
+        }
+        return pages;
+    };
+
+    const handlePageChange = (page: number) => {
+        changePage(page);
+    };
 
     return (
         <>
             <title>ゲーム一覧</title>
             <div className="flex h-main overflow-hidden">
                 <Sidebar />
-                <form className="flex-1 flex flex-col" action={searchAction}>
+                <form className="flex-1 flex flex-col overflow-y-scroll" action={searchAction}>
                     <div className="flex p-5 justify-center">
                         <div className="flex items-center pr-5">
                             <div className="pr-5">ゲーム</div>
@@ -63,6 +99,23 @@ const Game: NextPage = () => {
                             </div>
                         </div>
                     </div>
+
+                    <div className="flex justify-center mt-5">
+                        {currentPage > 1 && (<Button onClick={() => handlePageChange(currentPage - 1)}>前</Button>)}
+                        {generatePagination().map((page, index) => (
+                            <button
+                                key={index}
+                                onClick={() => handlePageChange(page)}
+                                type="button"
+                                className={`w-10 h-10 sm:w-12 sm:h-12 mx-1 rounded text-sm sm:text-base ${currentPage === page ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black hover:bg-gray-400'}`}
+                                disabled={typeof page !== 'number'}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                        {currentPage < totalPage && (<Button onClick={() => handlePageChange(currentPage + 1)}>次</Button>)}
+                    </div>
+                    
                     <div className="w-full p-5">
                         <div className="p-1 bg-gray-600/20 mb-5">{`検索結果：${search !== undefined ? search.length + "件" : "0件"}`}</div>
                         <Suspense fallback={<Loading />}>
@@ -97,9 +150,9 @@ function SearchTable({ data, search }: GameProps) {
     }
 
     // 削除処理
-    async function onDelete(id: number, userId: number) {
+    async function onDelete(id: number) {
         setIsOpen(false);
-        const res = await gameDelete(id, userId);
+        const res = await gameDelete(id);
 
         if (res?.success) {
             search();
@@ -122,7 +175,7 @@ function SearchTable({ data, search }: GameProps) {
             <div className="grid grid-cols-5 justify-items-center gap-y-10">
                 {selectedId && (
                     <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} ref={modalRef} >
-                        <ConfirmModalContent handleClickAction={() => onDelete(selectedId, userId)} ref={modalRef} />
+                        <ConfirmModalContent handleClickAction={() => onDelete(selectedId)} ref={modalRef} />
                     </Modal>
                 )}
                 {data !== undefined ? data.map((value: any) => {

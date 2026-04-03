@@ -18,9 +18,9 @@ export async function GET(req: NextRequest) {
 
         if (searchParams.toString().includes("postId")) {
             const detailData = await getDetail(postIdParams!, gameParams!);
-            return NextResponse.json({ message: "取得成功", success: true, data: detailData }, { status: 200 });
+            return NextResponse.json({ message: "取得成功", success: true, data: detailData, login: isLogin }, { status: 200 });
         } else {
-            return NextResponse.json({ message: "パラメータが不正です。", success: false }, { status: 400 });
+            return NextResponse.json({ message: "パラメータが不正です。", success: false, login: isLogin }, { status: 400 });
         }
     } catch (e) {
         return NextResponse.json({ message: "ゲームデータ 取得失敗...", e }, { status: 500 });

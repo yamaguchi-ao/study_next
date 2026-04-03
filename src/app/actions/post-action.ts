@@ -1,14 +1,20 @@
 import { PostSchema } from "@/utils/validation";
 import { getCookies } from "./action";
 import { z } from "zod";
-import { Delete, detailSearch, listSearch, post, Update } from "@/utils/api/post";
+import { Delete, detailSearch, listSearch, post, Update, updateSearch } from "@/utils/api/post";
 import { errorToast, successToast } from "@/utils/toast";
 import { redirect } from "next/navigation";
+interface PostProps {
+    postId?: number;
+    gameTag?: string;
+    game?: string;
+    page?: number;
+}
 
 export async function postRegister(_prevState: any, formData: FormData) {
 
     const cookie = await getCookies();
-    
+
     if (cookie === null || cookie === undefined) {
         redirect("/login?error=true");
     }
@@ -49,37 +55,39 @@ export async function postRegister(_prevState: any, formData: FormData) {
     }
 }
 
-export async function postListSearch(game: string) {
+export async function getPost({ postId, gameTag, game, page }: PostProps, type?: string) {
 
-    // やっているゲームとランクを検索
-    const res = await listSearch(game);
+    const cookie = await getCookies();
 
-    const success = res?.success;
-    const message = res?.message;
-    const login = res?.login;
-    const data = res?.data;
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
 
-    if (success) {
-        // 成功時
-        return data;
-    } else {
-        if (!login) {
-            redirect("/login?error=true");
+    let res = null;
+
+    if (game !== null && game !== undefined) {
+        // 一覧用
+        if (page) {
+            res = await listSearch(game, page);
         } else {
-            errorToast(message);
+            res = await listSearch(game);
+        }
+    } else {
+        if (postId) {
+            if (type === "details") {
+                // 詳細
+                res = await detailSearch(postId, gameTag);
+            } else {
+                // 更新
+                res = await updateSearch(postId);
+            }
         }
     }
-}
 
-export async function getPost(postId: Number) {
-
-    // やっているゲームとランクを取得
-    const res = await detailSearch(postId);
-
-    const success = res?.success;
+    const success: boolean | undefined = res?.success;
     const message = res?.message;
     const login = res?.login;
-    const data = res?.data;
+    const data = { data: res?.data, currentPage: res?.currentPage, totalPage: res?.totalPage };
 
     if (success) {
         // 成功時
@@ -94,6 +102,12 @@ export async function getPost(postId: Number) {
 }
 
 export async function postUpdate(_prevState: any, formData: FormData, id: number) {
+
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
 
     const postId = id;
 
@@ -129,9 +143,15 @@ export async function postUpdate(_prevState: any, formData: FormData, id: number
     }
 }
 
-export async function postDelete(postId: number, userId: number) {
+export async function postDelete(postId: number) {
 
-    const res = await Delete(postId, userId);
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
+
+    const res = await Delete(postId);
 
     const success = res?.success;
     const message = res?.message;

@@ -3,6 +3,8 @@
 import { getPost, postUpdate } from "@/app/actions/post-action";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button, ReturnButton } from "@/components/ui/button";
+import { errorToast } from "@/utils/toast";
+import { redirect } from "next/navigation";
 import { use, useActionState, useEffect, useState } from "react";
 
 export default function UpdatePage({ params }: { params: Promise<{ id: number }> }) {
@@ -18,10 +20,14 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
 
     useEffect(() => {
         async function getPosts() {
-            const posts = await getPost(postId);
-            setTitle(posts.title);
-            setPost(posts.content);
-            setGameTag(posts.gameTag);
+            const posts = await getPost({ postId: postId }, "update");
+            if (!posts?.data) {
+                errorToast("不正な遷移です。");
+                redirect("/post");
+            }
+            setTitle(posts?.data?.title);
+            setPost(posts?.data?.content);
+            setGameTag(posts?.data?.gameTag);
         }
         getPosts();
     }, [params, postId]);

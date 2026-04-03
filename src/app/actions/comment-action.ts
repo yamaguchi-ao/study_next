@@ -1,14 +1,21 @@
 import { comment, deleteComment, getComments } from "@/utils/api/comment";
-import { errorToast, successToast } from "@/utils/toast";
+import { successToast } from "@/utils/toast";
 import { CommentSchema } from "@/utils/validation";
 import z from "zod";
+import { getCookies } from "./action";
+import { redirect } from "next/navigation";
 
-export async function addComment(_prevState: any, formData: FormData, postId: number, userId: number) {
+export async function addComment(_prevState: any, formData: FormData, postId: number) {
+
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
 
     const commentData = {
         comment: formData.get("comment") as string,
         postId: postId,
-        userId: userId,
         hiddenFlg: formData.get("anonymous") as string,
         dispRankFlg: formData.get("dispRank") as string,
         postRank: Number(formData.get("postRank")),
@@ -34,22 +41,30 @@ export async function addComment(_prevState: any, formData: FormData, postId: nu
 }
 
 export async function getCommentList(postId: number, game: string) {
+
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
+
     // コメント取得処理
     const res = await getComments(postId, game);
 
     const success = res?.success;
-    const message = res?.message;
     const data = res?.data;
 
     if (success) {
         // 成功時
         return data;
+    } else {
+        return null;
     }
 }
 
-export async function commentDelete(commentId: number, userId: number) {
+export async function commentDelete(commentId: number) {
     // コメント削除処理
-    const res = await deleteComment(commentId, userId);
+    const res = await deleteComment(commentId);
 
     const success = res?.success;
     const message = res?.message;

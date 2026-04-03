@@ -49,19 +49,49 @@ export async function GameRegister(_prevState: any, formData: FormData) {
     }
 }
 
-export async function GameListSearch(game: string, rank: string) {
+export async function GameListSearch(game: string, rank: string, page?: number) {
 
-    // ログインしているユーザ取得
     const cookie = await getCookies();
-    
+
     if (cookie === null || cookie === undefined) {
         redirect("/login?error=true");
     }
 
-    const userId = cookie?.id;
-
+    let res = null;
     // やっているゲームとランクを検索
-    const res = await listSearch(game, rank, userId!);
+    if (page) {
+        res = await listSearch(game, rank, page);
+    } else {
+        res = await listSearch(game, rank);
+    }
+
+    const success = res?.success;
+    const message = res?.message;
+    const login = res?.login;
+    const data = { data: res?.data, currentPage: res?.currentPage, totalPage: res?.totalPage };
+
+    if (success) {
+        // 成功時
+        return data;
+    } else {
+        if (!login) {
+            redirect("/login?error=true");
+        } else {
+            errorToast(message);
+        }
+    }
+}
+
+export async function getGame(gameId: Number) {
+
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
+
+    // やっているゲームとランクを取得
+    const res = await gameSearch(gameId);
 
     const success = res?.success;
     const message = res?.message;
@@ -80,30 +110,13 @@ export async function GameListSearch(game: string, rank: string) {
     }
 }
 
-export async function getGame(gameId: Number) {
-
-    // やっているゲームとランクを取得
-    const res = await gameSearch(gameId);
-
-    const success = res?.success;
-    const message = res?.message;
-    const login = res?.login;
-    const data = res?.data;
-    const { name, rank } = data;
-
-    if (success) {
-        // 成功時
-        return { name, rank };
-    } else {
-        if (!login) {
-            redirect("/login?error=true");
-        } else {
-            errorToast(message);
-        }
-    }
-}
-
 export async function GameUpdate(_prevState: any, formData: FormData, id: Number) {
+
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
 
     // ゲームとランクを更新
     const gameId = id;
@@ -141,9 +154,15 @@ export async function GameUpdate(_prevState: any, formData: FormData, id: Number
 }
 
 // 削除
-export async function gameDelete(gameId: number, userId: number) {
+export async function gameDelete(gameId: number) {
 
-    const res = await Delete(gameId, userId);
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
+
+    const res = await Delete(gameId);
 
     const success = res?.success;
     const message = res?.message;

@@ -1,24 +1,37 @@
 "use client"
 
+import { getCookies } from "@/app/actions/action";
 import { getUserData, userDataUpdate } from "@/app/actions/user-action";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button, ReturnButton } from "@/components/ui/button";
+import { errorToast } from "@/utils/toast";
+import { redirect } from "next/navigation";
 import { use, useActionState, useEffect, useState } from "react";
 
 // ユーザー更新
 export default function UserUpdate({ params }: { params: Promise<{ id: number }> }) {
     const [userName, setUserName] = useState(String);
     const [email, setEmail] = useState(String);
+    const [loginId, setLoginId] = useState<Number | null>();
     const userId = use(params).id;
 
     const [state, userUpdateAction, isPending] = useActionState(
         async (_prevState: any, formData: FormData) => {
-            return userDataUpdate(_prevState, formData, userId);
+            return userDataUpdate(_prevState, formData);
         }, null);
 
     useEffect(() => {
         async function getUser() {
             const data = await getUserData(userId);
+            const cookies = await getCookies();
+            const loginId = cookies?.id;
+
+            if (loginId !== Number(userId)) {
+                errorToast("不正な遷移です。");
+                return redirect("/post");
+            }
+
+            setLoginId(loginId);
             setUserName(data.name);
             setEmail(data.email);
         }

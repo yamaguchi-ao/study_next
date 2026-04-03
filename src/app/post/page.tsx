@@ -5,7 +5,7 @@ import { Suspense, useActionState, useEffect, useRef, useState } from "react";
 import { Button, SearchButton } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Loading from "../loading";
-import { postDelete, postListSearch } from "../actions/post-action";
+import { postDelete, getPost } from "../actions/post-action";
 import { getCookies } from "../actions/action";
 import { CancelIcon, CommentIcon } from "@/components/ui/icons";
 import Modal, { ConfirmModalContent } from "@/components/ui/modal";
@@ -21,6 +21,8 @@ interface PostProps {
 export default function List() {
   const router = useRouter();
   const [game, setGame] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
   const [userId, setUserId] = useState(0);
   const [search, setSearch] = useState<PostsWithUsers[]>([]);
   const [state, searchAction, isPending] = useActionState(GetSearch, null);
@@ -33,8 +35,29 @@ export default function List() {
 
   // 検索
   async function GetSearch() {
-    const getData = await postListSearch(game);
-    setSearch(getData);
+    const getData = await getPost({ game: game, page: 1 });
+    if (getData) {
+      setCurrentPage(getData?.currentPage);
+      setTotalPage(getData?.totalPage);
+      setSearch(getData?.data);
+    } else {
+      errorToast("検索に失敗しました。");
+      setSearch([]);
+    }
+  }
+
+  // ページ遷移
+  async function changePage(page: number) {
+    const getData = await getPost({ game: game, page: page });
+
+    if (getData) {
+      setCurrentPage(getData?.currentPage);
+      setTotalPage(getData?.totalPage);
+      setSearch(getData?.data);
+    } else {
+      errorToast("ページの遷移に失敗しました。");
+      setSearch([]);
+    }
   }
 
   // ログインユーザー取得用
@@ -43,6 +66,17 @@ export default function List() {
     const userId = cookies?.id;
     setUserId(userId!);
   }
+  const generatePagination = () => {
+    const pages = [];
+    for (let i = 1; i <= totalPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  };
+
+  const handlePageChange = (page: number) => {
+    changePage(page);
+  };
 
   return (
     <>
@@ -67,6 +101,22 @@ export default function List() {
             </div>
           </div>
 
+          <div className="flex justify-center mt-5">
+            {currentPage > 1 && (<Button onClick={() => handlePageChange(currentPage - 1)}>前</Button>)}
+            {generatePagination().map((page, index) => (
+              <button
+                key={index}
+                onClick={() => handlePageChange(page)}
+                type="button"
+                className={`w-10 h-10 sm:w-12 sm:h-12 mx-1 rounded text-sm sm:text-base ${currentPage === page ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black hover:bg-gray-400'}`}
+                disabled={typeof page !== 'number'}
+              >
+                {page}
+              </button>
+            ))}
+            {currentPage < totalPage && (<Button onClick={() => handlePageChange(currentPage + 1)}>次</Button>)}
+          </div>
+
           <div className="w-full p-5">
             <div className="p-1 bg-gray-600/20 mb-5">{`検索結果：${search !== undefined ? search.length + "件" : "0件"}`}</div>
             <Suspense fallback={<Loading />}>
@@ -87,9 +137,9 @@ function PostTable({ userId, data, search }: PostProps) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
   // 削除処理
-  async function onDelete(id: number, userId: number) {
+  async function onDelete(id: number) {
     setIsOpen(false);
-    const res = await postDelete(id, userId);
+    const res = await postDelete(id);
     if (res?.success) {
       search();
       successToast(res?.message);
@@ -112,14 +162,14 @@ function PostTable({ userId, data, search }: PostProps) {
       <div className="grid grid-cols-3 justify-items-center gap-y-10">
         {selectedId && (
           <Modal isOpen={isOpen} setIsOpenAction={setIsOpen} ref={modalRef} >
-            <ConfirmModalContent handleClickAction={() => onDelete(selectedId, userId)} ref={modalRef} />
+            <ConfirmModalContent handleClickAction={() => onDelete(selectedId)} ref={modalRef} />
           </Modal>
         )}
         {data !== undefined ? data.map((value: any) => {
           return (
             <div key={value.id}>
               <div key={value.id} className="flex flex-col flex-wrap transition delay-70 duration-300 hover:scale-110 hover:cursor-pointer"
-                onClick={() => router.push(`/post/${value.id}/details`)}>
+                onClick={() => router.push(`/post/${value.id}/details?gameTag=${value.gameTag}`)}>
                 <div className="w-[20em] h-[8em] rounded-t-lg bg-blue-900">
                   { // 自身のみ削除可能
                     userId === value.userId && (

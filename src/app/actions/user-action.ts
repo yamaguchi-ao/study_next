@@ -3,9 +3,16 @@ import { errorToast, successToast } from "@/utils/toast";
 import { UserUpdateSchema } from "@/utils/validation";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { getCookies } from "./action";
 
 //　ユーザー詳細
 export async function getUserData(userId: Number) {
+
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
 
     // やっているゲームとランクを取得
     const res = await UserInfo(userId);
@@ -28,10 +35,17 @@ export async function getUserData(userId: Number) {
 }
 
 // ユーザー更新
-export async function userDataUpdate(_prevState: any, formData: FormData, userId: Number) {
+export async function userDataUpdate(_prevState: any, formData: FormData) {
+
+    const cookies = await getCookies();
+
+    if (cookies === null || cookies === undefined) {
+        return redirect("/login?error=true");
+    }
+
+    const userId = cookies.id;
 
     const userData = {
-        userId: userId as number,
         username: formData.get("username") as string,
         email: formData.get("email") as string,
         password: formData.get("password") as string,
@@ -67,6 +81,12 @@ export async function userDataUpdate(_prevState: any, formData: FormData, userId
 
 // ユーザー削除
 export async function UserDelete(userId: number) {
+
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
 
     const res = await deleteUser(userId);
 
