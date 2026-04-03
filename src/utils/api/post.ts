@@ -19,12 +19,13 @@ export async function post(postData: { title: string, post: string, game: string
     return data.json();
 }
 
-export const listSearch = async (game: string) => {
+export const listSearch = async (game: string, page?:number) => {
 
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/post/search` + "?game=" + game;
+    const currentPage = page ? "&page=" + page : ''; 
     const cookie = await cookies();
-    const data = await fetch(url, {
+    const data = await fetch(url + currentPage , {
         method: "GET",
         credentials: "include",
         headers: {

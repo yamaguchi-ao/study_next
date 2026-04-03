@@ -24,12 +24,13 @@ export const Register = async (gameData: { name: string, rank: string }) => {
 }
 
 
-export const listSearch = async (game: string, rank: string) => {
+export const listSearch = async (game: string, rank: string, page?:number) => {
 
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/game/search` + "?game=" + game + "&rank=" + rank;
+    const currentPage = page ? "&page=" + page : ''; 
     const cookie = await cookies();
-    const data = await fetch(url, {
+    const data = await fetch(url + currentPage, {
         method: "GET",
         credentials: "include",
         headers: {

@@ -19,7 +19,7 @@ export default function List() {
   useEffect(() => {
     async function getGames() {
       const games = await GameListSearch("", "");
-      setGameData(games);
+      setGameData(games?.data || []);
     }
     getGames();
   }, []);

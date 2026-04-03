@@ -21,13 +21,13 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
     useEffect(() => {
         async function getPosts() {
             const posts = await getPost({ postId: postId }, "update");
-            if (!posts) {
+            if (!posts?.data) {
                 errorToast("不正な遷移です。");
                 redirect("/post");
             }
-            setTitle(posts.title);
-            setPost(posts.content);
-            setGameTag(posts.gameTag);
+            setTitle(posts?.data?.title);
+            setPost(posts?.data?.content);
+            setGameTag(posts?.data?.gameTag);
         }
         getPosts();
     }, [params, postId]);
