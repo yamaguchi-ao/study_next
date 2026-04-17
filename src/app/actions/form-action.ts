@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { signUp, signIn, logout } from "@/utils/api/auth";
+import { signUp, signIn } from "@/utils/api/auth";
 import { LoginSchema, UserSchema } from "@/utils/validation";
 import { z } from "zod";
 import { errorToast, successToast } from "@/utils/toast";
@@ -68,17 +68,5 @@ export async function RegisterAction(_prevState: any, formData: FormData) {
             // ない場合
             errorToast(message);
         }
-    }
-}
-
-export async function Logout() {
-    const res = await logout();
-    const success = res?.success;
-    const message = res?.message;
-
-    // ログアウト
-    if (success) {
-        successToast(message);
-        redirect("/login");
     }
 }

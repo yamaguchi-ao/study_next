@@ -30,8 +30,11 @@ export default function List() {
   useEffect(() => {
     getUserId();
     GetSearch();
+  }, []);
+
+  useEffect(() => {
     router.refresh();
-  }, [router]);
+  }, []);
 
   // 検索
   async function GetSearch() {
@@ -49,7 +52,6 @@ export default function List() {
   // ページ遷移
   async function changePage(page: number) {
     const getData = await getPost({ game: game, page: page });
-
     if (getData) {
       setCurrentPage(getData?.currentPage);
       setTotalPage(getData?.totalPage);
@@ -66,6 +68,7 @@ export default function List() {
     const userId = cookies?.id;
     setUserId(userId!);
   }
+  
   const generatePagination = () => {
     const pages = [];
     for (let i = 1; i <= totalPage; i++) {

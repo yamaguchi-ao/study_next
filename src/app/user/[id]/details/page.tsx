@@ -1,7 +1,7 @@
 import { getCookies } from "@/app/actions/action";
 import { getUserData } from "@/app/actions/user-action";
 import { Sidebar } from "@/components/layout/sidebar"
-import { ReturnButton, UpdateButton } from "@/components/ui/button";
+import { DeleteButton, DeleteModalButton, ReturnButton, UpdateButton } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import DataList from "./dataList";
 
@@ -52,6 +52,7 @@ export default async function UserDetails({ params }: { params: Promise<{ id: Nu
                                 <div className="pl-2.5">メールアドレス：</div>
                                 <h1 className="text-2xl pl20">{data.email}</h1>
                             </div>
+                            <DeleteModalButton id={Number(userId)} className={""} />
                         </div>
 
                         {/* 自身の投稿と自身がコメントしたリスト */}

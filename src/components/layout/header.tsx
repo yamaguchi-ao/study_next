@@ -6,8 +6,9 @@ import icon from "@/public/test_icon.png"
 import { Username } from "../ui/username";
 import { LogOutIcon } from "../ui/icons";
 import { UserNameType } from "@/types";
-import { Logout } from "@/app/actions/form-action";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
+import { logout } from "@/utils/api/auth";
+import { successToast } from "@/utils/toast";
 
 // ヘッダー
 export function Header({ username, userId }: UserNameType) {
@@ -34,6 +35,18 @@ export function Header({ username, userId }: UserNameType) {
         pagename = title + " 登録";
     } else {
         pagename = title + " 一覧";
+    }
+
+    async function Logout() {
+        const res = await logout();
+        const success = res?.success;
+        const message = res?.message;
+
+        // ログアウト
+        if (success) {
+            successToast(message);
+            redirect("/login");
+        }
     }
 
     return (

@@ -1,5 +1,5 @@
-import { comment, deleteComment, getComments } from "@/utils/api/comment";
-import { successToast } from "@/utils/toast";
+import { comment, deleteComment, getComments, Update } from "@/utils/api/comment";
+import { errorToast, successToast } from "@/utils/toast";
 import { CommentSchema } from "@/utils/validation";
 import z from "zod";
 import { getCookies } from "./action";
@@ -59,6 +59,28 @@ export async function getCommentList(postId: number, game: string) {
         return data;
     } else {
         return null;
+    }
+}
+
+// コメント評価の更新
+export async function commentUpdate(postId: number, commentId: number, count: number, type: string) {
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
+
+    const res = await Update({ postId, commentId, count, type });
+    const success = res?.success;
+    const message = res?.message;
+    const login = res?.login;
+
+    if (!success) {
+        if (!login) {
+            redirect("/login?error=true");
+        } else {
+            errorToast(message);
+        }
     }
 }
 

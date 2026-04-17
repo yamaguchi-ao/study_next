@@ -84,7 +84,7 @@ function GameRankSelect(game: string) {
                     return true;
                 }
                 return (
-                    <option key={item.key} value={item.key}>{item.value}</option>
+                    <option key={item.key} value={item.value}>{item.value}</option>
                 );
             })}
         </select>

@@ -12,8 +12,6 @@ import Modal, { ConfirmModalContent } from "@/components/ui/modal";
 import { errorToast, successToast } from "@/utils/toast";
 import { getCookies } from "../actions/action";
 import type { GamesWithUsers } from "@/types";
-import { get } from "http";
-import { set } from "zod";
 
 interface GameProps {
     data: GamesWithUsers[],
@@ -140,7 +138,7 @@ function SearchTable({ data, search }: GameProps) {
 
     useEffect(() => {
         getUserId();
-    });
+    },[]);
 
     // ログインユーザー取得用
     async function getUserId() {
