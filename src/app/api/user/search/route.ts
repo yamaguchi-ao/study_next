@@ -20,6 +20,10 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ message: "ユーザーIDが指定されていません。", success: false }, { status: 400 });
         } else {
             const data = await getUserInfo(userIdParams);
+            
+            if (!data) {
+                return NextResponse.json({ message: "ユーザーが見つかりません。", success: false }, { status: 404 });
+            }
             return NextResponse.json({ data, success: true }, { status: 200 })
         }
 
@@ -34,7 +38,26 @@ async function getUserInfo(userId: number) {
         select: {
             name: true,
             email: true,
-            password: true,
+            posts: {
+                select: {
+                    id: true,
+                    title: true,
+                    createdAt: true,
+                    updatedAt: true,
+                }
+            },
+            comments: {
+                select: {
+                    id: true,
+                    comment: true,
+                    createdAt: true,
+                    post: {
+                        select: {
+                            title: true,
+                        }
+                    }
+                }
+            }
         }
     });
     return data;

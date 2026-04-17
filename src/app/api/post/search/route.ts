@@ -30,7 +30,8 @@ export async function GET(req: NextRequest) {
 
         if (searchParams.toString().includes("id") && searchParams.toString().includes("gameTag")) {
             // 詳細用
-            const detailData = await getDetail(postIdParams!, gameTagParams!);
+            let detailData = await getDetail(Number(userId), postIdParams!, gameTagParams!);
+
             return NextResponse.json({ message: "取得成功", success: true, data: detailData }, { status: 200 });
         } else if (searchParams.toString().includes("id") && !searchParams.toString().includes("gameTag")) {
             // 更新用
@@ -72,7 +73,8 @@ async function getList(gameParams: string, offset?: number, take?: number) {
                     name: true,
                 }
             },
-            comments: true
+            comments: true,
+            like: true,
         },
     });
 
@@ -80,7 +82,7 @@ async function getList(gameParams: string, offset?: number, take?: number) {
 }
 
 //　詳細用検索
-async function getDetail(postId: string, gameTag: string) {
+async function getDetail(userId: number, postId: string, gameTag: string) {
 
     const data = await prisma.posts.findUnique({
         where: { id: Number(postId) },
@@ -93,6 +95,11 @@ async function getDetail(postId: string, gameTag: string) {
             createdAt: true,
             updatedAt: true,
             rankFlg: true,
+            like: true,
+            pressedPosts: {
+                where: { postId: Number(postId), userId: Number(userId) },
+                select: { pressFlg: true }
+            },
             user: {
                 select: {
                     name: true,

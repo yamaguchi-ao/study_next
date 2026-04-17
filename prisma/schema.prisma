@@ -20,6 +20,8 @@ model Users {
   posts     Posts[]
   games     Games[]
   comments  Comments[]
+  pressedPosts PressedPosts[]
+  pressedComments PressedComments[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -29,9 +31,12 @@ model Posts {
   title    String
   content  String?
   gameTag  String?
+  like     Int    @default(0)
   user     Users  @relation(fields: [userId], references:[id], onDelete:Cascade)
   userId   Int
   comments Comments[]
+  pressedPosts PressedPosts[]
+  pressedComments PressedComments[]
   rankFlg  Boolean   @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -50,12 +55,40 @@ model Games {
 model Comments {
   id          Int      @id@default(autoincrement())
   comment     String
+  like        Int      @default(0)
+  bad         Int      @default(0)
   post        Posts    @relation(fields:[postId], references:[id], onDelete:Cascade)
   postId      Int
   user        Users    @relation(fields:[userId], references:[id], onDelete:Cascade)
   userId      Int
+  pressedComments PressedComments[]
   hiddenFlg   Boolean  @default(false)
   dispRankFlg Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PressedPosts {
+  id         Int      @id@default(autoincrement())
+  post       Posts    @relation(fields:[postId], references:[id], onDelete:Cascade)
+  postId     Int
+  user       Users    @relation(fields:[userId], references:[id], onDelete:Cascade)
+  userId     Int
+  pressFlg   Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model PressedComments {
+  id          Int      @id@default(autoincrement())
+  comment     Comments @relation(fields:[commentId], references:[id], onDelete:Cascade)
+  commentId   Int
+  post        Posts    @relation(fields:[postId], references:[id], onDelete:Cascade)
+  postId      Int
+  user        Users    @relation(fields:[userId], references:[id], onDelete:Cascade)
+  userId      Int
+  pressedFlg  Boolean  @default(false)
+  pressedType String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

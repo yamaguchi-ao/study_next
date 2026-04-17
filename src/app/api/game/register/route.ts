@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
         });
 
         if (existingGame.length > 0) {
-            return NextResponse.json({ message: "そのゲームタイトルは既に登録されています。", success: false }, { status: 500 });
+            return NextResponse.json({ message: "そのゲームタイトルは既に登録されています。", success: false, login: isLogin }, { status: 500 });
         }
 
         // ゲームとランクの登録

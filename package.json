@@ -12,7 +12,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
     "@prisma/adapter-pg": "^7.1.0",
-    "@prisma/client": "^7.1.0",
+    "@prisma/client": "^7.7.0",
     "@supabase/supabase-js": "^2.52.0",
     "bcrypt": "^6.0.0",
     "client": "link:@prisma\\client",
@@ -23,7 +23,7 @@
     "next": "16.0.10",
     "pg": "^8.16.3",
     "postgres": "^3.4.7",
-    "prisma": "^7.1.0",
+    "prisma": "^7.7.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-hook-form": "^7.61.1",
