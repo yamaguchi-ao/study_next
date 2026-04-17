@@ -1,6 +1,7 @@
 // コメントのAPI
 "use server"
 import { getUrl } from "@/constants/getUrl";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 interface Comment {
@@ -9,6 +10,13 @@ interface Comment {
     hiddenFlg: string,
     postRank: number,
     yourRank: number
+}
+
+interface CommentUpdate {
+    postId: number,
+    commentId: number,
+    count: number,
+    type: string
 }
 
 // コメント追加
@@ -43,6 +51,23 @@ export async function getComments(postId: number, game: string) {
         credentials: "include"
     });
 
+    return data.json();
+}
+
+export async function Update(commentUpdate: CommentUpdate) {
+    const baseUrl = await getUrl();
+    const url = `${baseUrl}/api/comment/update`;
+    const cookie = await cookies();
+
+    const data = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(commentUpdate),
+        headers: {
+            Cookie: cookie.toString(),
+        },
+        credentials: "include"
+    });
+    revalidatePath("/post/" + commentUpdate.postId + "/details");
     return data.json();
 }
 

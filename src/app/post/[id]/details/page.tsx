@@ -3,13 +3,14 @@ import { getCommentList } from "@/app/actions/comment-action";
 import { GameListSearch } from "@/app/actions/game-action";
 import { getPost } from "@/app/actions/post-action";
 import { Sidebar } from "@/components/layout/sidebar";
-import { DeleteButton, ModalButton, ReturnButton, UpdateButton } from "@/components/ui/button";
+import { CommentEvaluationButton, DeleteButton, EvaluationButton, ModalButton, ReturnButton, UpdateButton } from "@/components/ui/button";
 import { dateformat } from "@/constants/dateFormat";
 import type { CommentsWithUsers } from "@/types";
 import { redirect } from "next/navigation";
 
 interface CommentProps {
     data: CommentsWithUsers[],
+    postId: number;
     userId: number;
 }
 
@@ -44,6 +45,9 @@ export default async function details({ params, searchParams }: detailsProp) {
     // 投稿に紐づいているコメントすべて取得
     const comments = await getCommentList(postId, gameTag);
 
+    const isCurrentPost = userId === posts?.data?.userId;
+    const pressFlg = posts?.data?.pressedPosts?.[0]?.pressFlg ?? false;
+
     return (
         <>
             <title>投稿 詳細</title>
@@ -61,12 +65,14 @@ export default async function details({ params, searchParams }: detailsProp) {
 
                     <div className="w-full mt-3 mb-5 p-3 leading-6 whitespace-pre-wrap">{posts?.data?.content}</div>
 
-                    <div className="flex text-sm text-gray-500 justify-end">
-                        <div className="row">投稿者: {posts?.data?.user.name}</div>
-                        <div className="row pl-3">ゲーム: {posts?.data?.gameTag}</div>
-                        {postRank === undefined ? <div className="row pl-3">ランク: 表示なし</div> :
-                            <div className="row pl-3">ランク: {postRank}</div>}
-
+                    <div className="flex justify-between items-end">
+                        <div className="flex text-sm text-gray-500 justify-end">
+                            <div className="row">投稿者: {posts?.data?.user.name}</div>
+                            <div className="row pl-3">ゲーム: {posts?.data?.gameTag}</div>
+                            {postRank === undefined ? <div className="row pl-3">ランク: 表示なし</div> :
+                                <div className="row pl-3">ランク: {postRank}</div>}
+                        </div>
+                        <EvaluationButton isCurrentPost={isCurrentPost} postId={Number(postId)} like={posts?.data.like} pressedFlg={pressFlg} />
                     </div>
 
                     <div className="border-t w-full mt-3 mb-5"></div>
@@ -74,7 +80,7 @@ export default async function details({ params, searchParams }: detailsProp) {
                     <h1 className="font-bold mb-5">コメント</h1>
 
                     <div className="border-1 h-[280px] p-3 overflow-y-scroll">
-                        <Comment data={comments} userId={userId!} />
+                        <Comment data={comments} postId={Number(postId)} userId={userId!} />
                     </div>
 
                     <div className="flex mt-7">
@@ -91,13 +97,14 @@ export default async function details({ params, searchParams }: detailsProp) {
     );
 }
 
-function Comment({ data, userId }: CommentProps) {
+function Comment({ data, postId, userId }: CommentProps) {
     return (
         <>
             {data.length > 0 ? data.map((value: any, idx: number) => {
 
                 const date = dateformat(value.createdAt);
                 const commentGames = value.user.games;
+                const isCurrentComment = userId === value.user.id;                
 
                 return (
                     <div key={idx}>
@@ -106,9 +113,11 @@ function Comment({ data, userId }: CommentProps) {
                             <div className="row pl-3">コメント日：{date}</div>
                             <div className="row pl-3">ランク：{value.dispRankFlg ? "非表示" : commentGames.length != 0 ? commentGames[0].rank : "表示なし"}</div>
                         </div>
-                        <div className="pl-7">{value.comment}</div>
-                        <div className="flex justify-end mb-3">
-                            {userId == value.user.id ? <DeleteButton type={"comment"} id={value.id} /> : ""}
+
+                        <div className="flex justify-between items-center mb-3">
+                            <div className="pl-7">{value.comment}</div>
+                            {!isCurrentComment ? <CommentEvaluationButton postId={postId} commentId={value.id} like={value.like} bad={value.bad} pressedFlg={value.pressedFlg} pressedType={value.pressedType} /> : ""}
+                            {isCurrentComment ? <DeleteButton type={"comment"} id={value.id} /> : ""}
                         </div>
                     </div>
                 )

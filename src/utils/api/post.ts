@@ -1,6 +1,7 @@
 "use server"
 
 import { getUrl } from "@/constants/getUrl";
+import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
 export async function post(postData: { title: string, post: string, game: string }) {
@@ -16,16 +17,17 @@ export async function post(postData: { title: string, post: string, game: string
         },
         credentials: "include"
     });
+    revalidatePath("/post");
     return data.json();
 }
 
-export const listSearch = async (game: string, page?:number) => {
+export const listSearch = async (game: string, page?: number) => {
 
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/post/search` + "?game=" + game;
-    const currentPage = page ? "&page=" + page : ''; 
+    const currentPage = page ? "&page=" + page : '';
     const cookie = await cookies();
-    const data = await fetch(url + currentPage , {
+    const data = await fetch(url + currentPage, {
         method: "GET",
         credentials: "include",
         headers: {
@@ -67,7 +69,7 @@ export const updateSearch = async (postId: Number) => {
     return data.json();
 }
 
-export async function Update(postData: { title: string, post: string, id: number }) {
+export async function Update(postData: { title?: string, post?: string, id: number, likeCount?: number }) {
 
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/post/update`;
@@ -80,6 +82,7 @@ export async function Update(postData: { title: string, post: string, id: number
         },
         credentials: "include"
     });
+    revalidatePath("/post/" + postData.id + "/details");
     return data.json();
 }
 

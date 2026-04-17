@@ -19,13 +19,10 @@ export async function postRegister(_prevState: any, formData: FormData) {
         redirect("/login?error=true");
     }
 
-    const userId = cookie?.id;
-
     const postData = {
         title: formData.get("title") as string,
         post: formData.get("post") as string,
         game: formData.get("game") as string,
-        id: userId as number
     }
 
     // バリデーションチェック
@@ -139,6 +136,28 @@ export async function postUpdate(_prevState: any, formData: FormData, id: number
             } else {
                 errorToast(message);
             }
+        }
+    }
+}
+
+export async function likeUpdate(id: number, likeCount: number) {
+    
+    const cookie = await getCookies();
+
+    if (cookie === null || cookie === undefined) {
+        redirect("/login?error=true");
+    }
+
+    const res = await Update({ id, likeCount });
+    const success = res?.success;
+    const message = res?.message;
+    const login = res?.login;
+    
+    if (!success) {
+        if (!login) {
+            redirect("/login?error=true");
+        } else {
+            errorToast(message);
         }
     }
 }

@@ -36,13 +36,13 @@ export const UserUpdate = async (info: { username: string, email: string, passwo
     return data.json();
 }
 
-export const deleteUser = async (userId: number) => {
+export const deleteUser = async (id: number) => {
     const baseUrl = await getUrl();
     const url = `${baseUrl}/api/user/delete`;
     const cookie = await cookies();
     const data = await fetch(url, {
         method: "POST",
-        body: JSON.stringify({ userId: userId }),
+        body: JSON.stringify({ id: id }),
         headers: {
             Cookie: cookie.toString(),
         },

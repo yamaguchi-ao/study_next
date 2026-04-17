@@ -1,4 +1,4 @@
-import { deleteUser, UserInfo, UserUpdate } from "@/utils/api/user";
+import { UserInfo, UserUpdate } from "@/utils/api/user";
 import { errorToast, successToast } from "@/utils/toast";
 import { UserUpdateSchema } from "@/utils/validation";
 import { redirect } from "next/navigation";
@@ -75,32 +75,6 @@ export async function userDataUpdate(_prevState: any, formData: FormData) {
             } else {
                 errorToast(message);
             }
-        }
-    }
-}
-
-// ユーザー削除
-export async function UserDelete(userId: number) {
-
-    const cookie = await getCookies();
-
-    if (cookie === null || cookie === undefined) {
-        redirect("/login?error=true");
-    }
-
-    const res = await deleteUser(userId);
-
-    const success = res?.success;
-    const message = res?.message;
-    const login = res?.login;
-
-    if (success) {
-        return { success, message };
-    } else {
-        if (!login) {
-            redirect("/login?error=true");
-        } else {
-            errorToast(message);
         }
     }
 }
