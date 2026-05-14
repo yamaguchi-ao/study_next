@@ -2,7 +2,6 @@ import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { CommentSchema } from "@/utils/validation";
 import z from "zod";
-import { loginCheck } from "@/utils/loginCheck";
 import { getCookies } from "@/app/actions/action";
 
 // コメント追加API
@@ -18,12 +17,6 @@ export async function POST(req: NextRequest) {
     const userId = cookies.id;
 
     try {
-        // ログインしているかどうかの判定
-        const isLogin = await loginCheck(req);
-
-        if (!isLogin) {
-            return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
-        }
 
         //API側バリデーションチェック
         const issue = CommentSchema.safeParse({ comment, postId, userId, hiddenFlg, dispRankFlg, postRank, yourRank });

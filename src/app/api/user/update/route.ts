@@ -1,5 +1,4 @@
 import prisma from "@/lib/prisma";
-import { loginCheck } from "@/utils/loginCheck";
 import { UserUpdateSchema } from "@/utils/validation";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
@@ -18,20 +17,13 @@ export async function POST(req: NextRequest) {
     const userId = cookies?.id;
 
     try {
-        // ログイン判定
-        const isLogin = await loginCheck(req);
-
-        if (!isLogin) {
-            return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
-        }
-
         //　API側のバリデーションチェック
         const issue = UserUpdateSchema.safeParse({ userId, username, email, password, newPassword, confirm });
 
         if (!issue.success) {
             const validation = z.flattenError(issue.error);
             const message = validation.fieldErrors ?? null;
-            return NextResponse.json({ message: message, success: false, login: isLogin }, { status: 400 });
+            return NextResponse.json({ message: message, success: false }, { status: 400 });
         }
 
         // 更新を行うユーザー情報の取得
@@ -40,7 +32,7 @@ export async function POST(req: NextRequest) {
         });
 
         if (!user) {
-            return NextResponse.json({ message: "ユーザーが見つかりません。", success: false, login: isLogin }, { status: 404 });
+            return NextResponse.json({ message: "ユーザーが見つかりません。", success: false }, { status: 404 });
         }
 
         if (user.email !== email) {
@@ -49,7 +41,7 @@ export async function POST(req: NextRequest) {
             });
 
             if (existingEmail) {
-                return NextResponse.json({ message: "このメールアドレスは既に使用されています。", success: false, login: isLogin }, { status: 400 });
+                return NextResponse.json({ message: "このメールアドレスは既に使用されています。", success: false }, { status: 400 });
             }
         }
 
@@ -63,14 +55,14 @@ export async function POST(req: NextRequest) {
                 }
             });
 
-            return NextResponse.json({ message: "ユーザー情報を更新しました。", success: true, login: isLogin }, { status: 200 });
+            return NextResponse.json({ message: "ユーザー情報を更新しました。", success: true }, { status: 200 });
         }
 
         // パスワードの照合
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            return NextResponse.json({ message: "現在のパスワードが違います。", success: false, login: isLogin }, { status: 400 });
+            return NextResponse.json({ message: "現在のパスワードが違います。", success: false}, { status: 400 });
         }
 
         // パスワードのハッシュ化
@@ -85,7 +77,7 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        return NextResponse.json({ message: "ユーザー情報を更新しました。", success: true, login: isLogin }, { status: 200 });
+        return NextResponse.json({ message: "ユーザー情報を更新しました。", success: true }, { status: 200 });
 
     } catch (e) {
         console.log("エラー確認：", e);

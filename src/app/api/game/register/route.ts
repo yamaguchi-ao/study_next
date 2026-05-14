@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { gameNameFixed } from "@/constants/context";
 import { GameSchema } from "@/utils/validation";
 import z from "zod";
-import { loginCheck } from "@/utils/loginCheck";
 import { getCookies } from "@/app/actions/action";
 
 export async function POST(req: NextRequest) {
@@ -20,12 +19,6 @@ export async function POST(req: NextRequest) {
     let game: string | undefined = undefined;
 
     try {
-        // ログインしているかどうかの判定
-        const isLogin = await loginCheck(req);
-
-        if (!isLogin) {
-            return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
-        }
 
         const issue = GameSchema.safeParse({ name, rank, userId });
 
@@ -44,7 +37,7 @@ export async function POST(req: NextRequest) {
         });
 
         if (existingGame.length > 0) {
-            return NextResponse.json({ message: "そのゲームタイトルは既に登録されています。", success: false, login: isLogin }, { status: 500 });
+            return NextResponse.json({ message: "そのゲームタイトルは既に登録されています。", success: false }, { status: 500 });
         }
 
         // ゲームとランクの登録

@@ -1,6 +1,5 @@
 import { getCookies } from "@/app/actions/action";
 import prisma from "@/lib/prisma";
-import { loginCheck } from "@/utils/loginCheck";
 import { DeleteSchema } from "@/utils/validation";
 import { NextRequest, NextResponse } from "next/server";
 import z from "zod";
@@ -18,13 +17,6 @@ export async function POST(req: NextRequest) {
     const { id } = await req.json();
 
     try {
-        // ログイン判定
-        const isLogin = await loginCheck(req);
-
-        if (!isLogin) {
-            return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
-        }
-
         //　API側のバリデーションチェック
         const issue = DeleteSchema.safeParse({ userId, id });
 

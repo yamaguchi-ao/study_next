@@ -9,6 +9,7 @@ import { errorToast } from "@/utils/toast";
 import Image from "next/image";
 import icon from "@/public/test_icon.png"
 import Link from "next/link";
+import { commonErrorMessage } from "@/utils/validation";
 
 const Login: NextPage = () => {
     const router = useRouter();
@@ -28,7 +29,8 @@ const Login: NextPage = () => {
 
     useEffect(() => {
         if (errorCode) {
-            errorToast("ログインしていません。");
+            // ログイン等を行っていなかった場合
+            errorToast(commonErrorMessage.login);
         }
 
         const newSearchParams = new URLSearchParams(window.location.search);
@@ -85,9 +87,7 @@ const Login: NextPage = () => {
                     {/* 右側のレイアウト */}
                     <div className="flex-3 bg-black/20 blur-[5px]">
                         <Image src={icon} alt="" width={192} height={0} className="absolute w-[200px] h-[200px] bottom-0 right-0" />
-                        <div className="flex justify-center items-center">
-                            
-                        </div>
+                        <div className="flex justify-center items-center"></div>
                     </div>
                 </form>
             </div>

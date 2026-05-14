@@ -2,19 +2,11 @@ import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { GameUpdateSchema } from "@/utils/validation";
 import { z } from "zod";
-import { loginCheck } from "@/utils/loginCheck";
 
 export async function POST(req: NextRequest) {
     const { rank, gameId } = await req.json();
 
     try {
-        // ログインしているかどうかの判定
-        const isLogin = await loginCheck(req);
-
-        if (!isLogin) {
-            return NextResponse.json({message: "ログインしていません。", success: false, login: false}, {status: 401});
-        }
-
         //API側バリデーションチェック
         const issue = GameUpdateSchema.safeParse({ rank, gameId });
 

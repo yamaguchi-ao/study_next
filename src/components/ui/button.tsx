@@ -10,7 +10,7 @@ import { CommentBadIcon, CommentLikeIcon, LikeIcon, ReplyIcon, SearchIcon } from
 import { CommentsType } from '@/types';
 import { likeUpdate } from '@/app/actions/post-action';
 import { deleteUser } from '@/utils/api/user';
-import { logout } from '@/utils/api/auth';
+import { Logout } from '@/utils/api/auth';
 
 // モーダルボタン用
 interface ModalButtonProps {
@@ -98,31 +98,26 @@ export function ReturnButton({ type }: ManyButtonProps) {
 }
 
 /** 削除用ボタン */
-export function DeleteButton({ className, type, id }: ManyButtonProps) {
+export function DeleteButton({ className, id }: ManyButtonProps) {
     const router = useRouter();
 
     async function onDelete(id: number) {
         // 取得したタイプの条件で削除する
-        if (type === "comment") {
-            const req = await commentDelete(id);
+        const req = await commentDelete(id);
 
-            const success = req.success ? req.success : "";
-            const message = req.message ? req.message : "";
-            const login = req.login ? req.login : false;
+        const success = req.success ? req.success : "";
+        const message = req.message ? req.message : "";
+        const login = req.login ? req.login : false;
 
-            router.refresh();
+        router.refresh();
 
-            if (success) {
-                successToast(message);
-            } else {
-                // ログインしているときのみエラー表示
-                if (login) {
-                    errorToast(message);
-                }
+        if (success) {
+            successToast(message);
+        } else {
+            // ログインしているときのみエラー表示
+            if (login) {
+                errorToast(message);
             }
-        } else if (type === "user") {
-            // ログインしている自身を削除？
-
         }
     }
 
@@ -155,12 +150,12 @@ export function DeleteModalButton({ className, id }: ModalButtonProps) {
         const res = await deleteUser(id);
         setIsOpen(false);
         if (res?.success) {
-            successToast(res?.message);
+            successToast(res?.message!);
             // ログイン時につけていたセッションを削除
-            await logout();
+            await Logout();
             router.push("/login");
         } else {
-            errorToast(res?.message);
+            errorToast(res?.message!);
         }
     }
 

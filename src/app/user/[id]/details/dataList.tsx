@@ -59,12 +59,13 @@ function PostList({ posts }: { posts: string[] }) {
         const res = await postDelete(id);
         if (res?.success) {
             router.refresh();
-            successToast(res?.message);
+            successToast(res?.message!);
         } else {
-            errorToast(res?.message);
+            errorToast(res?.message!);
         }
     }
 
+    // モーダルを開く処理
     const openModal = (id: number) => {
         setSelectedId(id);
         setIsOpen(true);
@@ -156,7 +157,7 @@ function CommentList({ comments }: { comments: string[] }) {
                                 </tr>
                                 <tr className="w-1/10 place-items-center">
                                     <td>
-                                        <DeleteButton id={comment.id} type={"comment"} />
+                                        <DeleteButton id={comment.id} />
                                     </td>
                                 </tr>
                             </tbody>

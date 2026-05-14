@@ -7,7 +7,7 @@ import { Username } from "../ui/username";
 import { LogOutIcon } from "../ui/icons";
 import { UserNameType } from "@/types";
 import { redirect, usePathname } from "next/navigation";
-import { logout } from "@/utils/api/auth";
+import { Logout } from "@/utils/api/auth";
 import { successToast } from "@/utils/toast";
 
 // ヘッダー
@@ -37,8 +37,8 @@ export function Header({ username, userId }: UserNameType) {
         pagename = title + " 一覧";
     }
 
-    async function Logout() {
-        const res = await logout();
+    async function logoutButton() {
+        const res = await Logout();
         const success = res?.success;
         const message = res?.message;
 
@@ -58,7 +58,7 @@ export function Header({ username, userId }: UserNameType) {
                 </div>
                 <div className="flex pr-5 items-center">
                     <Username username={username} userId={userId} />
-                    <Button onClick={() => Logout()}>ログアウト
+                    <Button onClick={() => logoutButton()}>ログアウト
                         <LogOutIcon className="ml-[5px] size-4" />
                     </Button>
                 </div>

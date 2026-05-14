@@ -1,7 +1,7 @@
 import { getCookies } from "@/app/actions/action";
 import { getUserData } from "@/app/actions/user-action";
 import { Sidebar } from "@/components/layout/sidebar"
-import { DeleteButton, DeleteModalButton, ReturnButton, UpdateButton } from "@/components/ui/button";
+import { DeleteModalButton, ReturnButton, UpdateButton } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import DataList from "./dataList";
 
@@ -26,15 +26,14 @@ export default async function UserDetails({ params }: { params: Promise<{ id: Nu
     }
 
     // IDからユーザーデータを取得
-    const data = await getUserData(userId);
+    const data = await getUserData();
 
     if (!data) {
-        // 
         return redirect("/post");
     }
 
-    const posts = data.posts;
-    const comments = data.comments;
+    const posts = data.posts as unknown as string[];
+    const comments = data.comments as unknown as string[];
 
     return (
         <>
