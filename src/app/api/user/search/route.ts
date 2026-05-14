@@ -1,5 +1,4 @@
 import prisma from "@/lib/prisma";
-import { loginCheck } from "@/utils/loginCheck";
 import { NextRequest, NextResponse } from "next/server";
 
 // ユーザー詳細
@@ -8,14 +7,6 @@ export async function GET(req: NextRequest) {
     const userIdParams = searchParams.get('id') as number | null;
 
     try {
-        // ログイン判定
-        const isLogin = await loginCheck(req);
-        
-
-        if (!isLogin) {
-            return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
-        }
-
         if (!userIdParams) {
             return NextResponse.json({ message: "ユーザーIDが指定されていません。", success: false }, { status: 400 });
         } else {

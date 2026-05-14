@@ -1,6 +1,5 @@
 import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import { loginCheck } from "@/utils/loginCheck";
 import { getCookies } from "@/app/actions/action";
 
 export async function POST(req: NextRequest) {
@@ -10,12 +9,6 @@ export async function POST(req: NextRequest) {
     const userId = cookie!.id;
 
     try {
-        // ログインできているかの確認
-        const isLogin = await loginCheck(req);
-
-        if (!isLogin) {
-            return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
-        }
 
         await prisma.posts.create({
             data: {

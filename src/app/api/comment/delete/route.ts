@@ -2,7 +2,6 @@ import prisma from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import { DeleteSchema } from "@/utils/validation";
 import z from "zod";
-import { loginCheck } from "@/utils/loginCheck";
 import { getCookies } from "@/app/actions/action";
 
 export async function POST(req: NextRequest) {
@@ -18,11 +17,6 @@ export async function POST(req: NextRequest) {
 
     try {
         // ログインしているかどうかの判定
-        const isLogin = await loginCheck(req);
-
-        if (!isLogin) {
-            return NextResponse.json({message: "ログインしていません。", success: false, login: false}, {status: 401});
-        }
         
         // 削除時バリデーションチェック
         const issue = DeleteSchema.safeParse({ userId, id });

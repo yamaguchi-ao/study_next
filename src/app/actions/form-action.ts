@@ -7,9 +7,10 @@ import { errorToast, successToast } from "@/utils/toast";
 // ログイン情報取得
 export async function LoginAction(_prevState: any, formData: FormData) {
 
+    // 入力内容の取得
     const loginData = {
         email: formData.get("email") as string,
-        password: formData.get("password") as string
+        password: formData.get("password") as string,
     }
 
     // バリデーションチェック
@@ -17,28 +18,30 @@ export async function LoginAction(_prevState: any, formData: FormData) {
 
     // バリデーションエラー時
     if (!issues.success) {
+        // チェックに引っかかった場合
         const validation = z.flattenError(issues.error);
         return validation.fieldErrors;
     } else {
-        // ログイン実行
+        // ログイン処理
         const res = await signIn(loginData);
         const success = res?.success;
         const message = res?.message;
 
         if (success) {
-            // ログイン成功時
-            successToast(message);
+            // 成功時
+            successToast(message!);
             redirect("/post");
         } else {
-            // ログイン失敗時
-            errorToast(message);
+            // 失敗時
+            errorToast(message!);
         }
     }
 }
 
-// 登録情報取得
+// ユーザー新規登録
 export async function RegisterAction(_prevState: any, formData: FormData) {
-    // ユーザ登録の入力値取得
+
+    // 入力内容取得
     const userData = {
         username: formData.get("username") as string,
         email: formData.get("email") as string,
@@ -49,24 +52,23 @@ export async function RegisterAction(_prevState: any, formData: FormData) {
     // バリデーションチェック
     const issues = UserSchema.safeParse(userData);
 
-    // バリデーションエラー時
     if (!issues.success) {
+        // チェックに引っかかった場合
         const validation = z.flattenError(issues.error);
         return validation.fieldErrors;
-
     } else {
-        //　ユーザー登録実施
+        //　ユーザー登録処理
         const res = await signUp(userData);
         const success = res?.success;
         const message = res?.message;
 
         // 作成したトークンがある場合
         if (success) {
-            successToast(message);
+            successToast(message!);
             redirect("/post");
         } else {
             // ない場合
-            errorToast(message);
+            errorToast(message!);
         }
     }
 }

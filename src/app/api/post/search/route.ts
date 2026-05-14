@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
-import { loginCheck } from "@/utils/loginCheck";
 import { getCookies } from "@/app/actions/action";
 
 // ゲームとランクの検索
@@ -21,12 +20,6 @@ export async function GET(req: NextRequest) {
     const userId = cookies.id;
 
     try {
-        // ログインしているかどうかの判定
-        const isLogin = await loginCheck(req);
-
-        if (!isLogin) {
-            return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
-        }
 
         if (searchParams.toString().includes("id") && searchParams.toString().includes("gameTag")) {
             // 詳細用

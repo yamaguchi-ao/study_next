@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { loginCheck } from "@/utils/loginCheck";
 import { getCookies } from "@/app/actions/action";
 
 // ゲームとランクの検索
@@ -18,12 +17,6 @@ export async function GET(req: NextRequest) {
     const userId = cookies.id;
 
     try {
-        // ログインしているかどうかの判定
-        const isLogin = await loginCheck(req);
-
-        if (!isLogin) {
-            return NextResponse.json({ message: "ログインしていません。", success: false, login: false }, { status: 401 });
-        }
 
         if (searchParams.toString().includes("postId")) {
             let detailData = await getDetail(postIdParams!, gameParams!);
@@ -40,9 +33,9 @@ export async function GET(req: NextRequest) {
                 };
             }
             );
-            return NextResponse.json({ message: "取得成功", success: true, data: detailData, login: isLogin }, { status: 200 });
+            return NextResponse.json({ message: "取得成功", success: true, data: detailData }, { status: 200 });
         } else {
-            return NextResponse.json({ message: "パラメータが不正です。", success: false, login: isLogin }, { status: 400 });
+            return NextResponse.json({ message: "パラメータが不正です。", success: false }, { status: 400 });
         }
     } catch (e) {
         return NextResponse.json({ message: "ゲームデータ 取得失敗...", e }, { status: 500 });

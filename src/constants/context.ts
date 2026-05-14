@@ -99,6 +99,10 @@ enum streetFighterRanks {
     Legend = 35
 }
 
+enum OWRanks {
+    Top500 = 0 
+}
+
 enum ApexRanks {
     Rookie = 0,
     Iron1 = 1,
@@ -144,6 +148,7 @@ export function gameNameFixed(name: string) {
         case "LOL":
         case "リーグオブレジェンド":
         case "リーグ・オブ・レジェンド":
+        case "リグレジェ":
             return "League of Legends";
         case "Apex":
         case "APEX":
@@ -157,11 +162,10 @@ export function gameNameFixed(name: string) {
             return "Apex Legends"
         case "OW":
         case "ow":
-        case "OW2":
-        case "ow2":
-        case "オーバーウォッチ2":
+        case "OVER WATCH":
         case "オーバーウォッチ":
-            return "OverWatch 2";
+        case "オバウォ":
+            return "OverWatch";
         case "SF6":
         case "sf6":
         case "SF":

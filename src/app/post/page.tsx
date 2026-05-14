@@ -5,7 +5,7 @@ import { Suspense, useActionState, useEffect, useRef, useState } from "react";
 import { Button, SearchButton } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import Loading from "../loading";
-import { postDelete, getPost } from "../actions/post-action";
+import { postDelete, getPostList } from "../actions/post-action";
 import { getCookies } from "../actions/action";
 import { CancelIcon, CommentIcon } from "@/components/ui/icons";
 import Modal, { ConfirmModalContent } from "@/components/ui/modal";
@@ -38,7 +38,7 @@ export default function List() {
 
   // 検索
   async function GetSearch() {
-    const getData = await getPost({ game: game, page: 1 });
+    const getData = await getPostList({ game: game, page: 1 });
     if (getData) {
       setCurrentPage(getData?.currentPage);
       setTotalPage(getData?.totalPage);
@@ -51,7 +51,7 @@ export default function List() {
 
   // ページ遷移
   async function changePage(page: number) {
-    const getData = await getPost({ game: game, page: page });
+    const getData = await getPostList({ game: game, page: page });
     if (getData) {
       setCurrentPage(getData?.currentPage);
       setTotalPage(getData?.totalPage);
@@ -69,6 +69,7 @@ export default function List() {
     setUserId(userId!);
   }
   
+  // ページ数
   const generatePagination = () => {
     const pages = [];
     for (let i = 1; i <= totalPage; i++) {
@@ -77,6 +78,7 @@ export default function List() {
     return pages;
   };
 
+  // ページング用
   const handlePageChange = (page: number) => {
     changePage(page);
   };
@@ -132,6 +134,7 @@ export default function List() {
   )
 }
 
+// 投稿の表示
 function PostTable({ userId, data, search }: PostProps) {
 
   const router = useRouter();
@@ -145,9 +148,9 @@ function PostTable({ userId, data, search }: PostProps) {
     const res = await postDelete(id);
     if (res?.success) {
       search();
-      successToast(res?.message);
+      successToast(res?.message ?? "");
     } else {
-      errorToast(res?.message);
+      errorToast(res?.message ?? "");
     }
   }
 

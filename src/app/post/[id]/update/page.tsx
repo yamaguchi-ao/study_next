@@ -1,6 +1,6 @@
 "use client"
 
-import { getPost, postUpdate } from "@/app/actions/post-action";
+import { getUpdatePost, postUpdate } from "@/app/actions/post-action";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button, ReturnButton } from "@/components/ui/button";
 import { errorToast } from "@/utils/toast";
@@ -19,19 +19,21 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
         }, null);
 
     useEffect(() => {
+        // 更新する投稿内容の取得
         async function getPosts() {
-            const posts = await getPost({ postId: postId }, "update");
-            if (!posts?.data) {
+            const posts = await getUpdatePost({ postId: postId });
+            if (!posts) {
                 errorToast("不正な遷移です。");
                 redirect("/post");
             }
-            setTitle(posts?.data?.title);
-            setPost(posts?.data?.content);
-            setGameTag(posts?.data?.gameTag);
+            setTitle(posts?.title);
+            setPost(posts?.content!);
+            setGameTag(posts?.gameTag!);
         }
         getPosts();
     }, [params, postId]);
 
+    // バリデーションエラーメッセージ
     const errorText = (data: string[]) => {
         const list = [];
         for (let i = 0; i < data.length; i++) {

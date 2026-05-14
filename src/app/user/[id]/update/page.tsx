@@ -22,7 +22,7 @@ export default function UserUpdate({ params }: { params: Promise<{ id: number }>
 
     useEffect(() => {
         async function getUser() {
-            const data = await getUserData(userId);
+            const data = await getUserData();
             const cookies = await getCookies();
             const loginId = cookies?.id;
 
@@ -32,8 +32,8 @@ export default function UserUpdate({ params }: { params: Promise<{ id: number }>
             }
 
             setLoginId(loginId);
-            setUserName(data.name);
-            setEmail(data.email);
+            setUserName(data?.name!);
+            setEmail(data?.email!);
         }
         getUser();
     }, [params, userId]);

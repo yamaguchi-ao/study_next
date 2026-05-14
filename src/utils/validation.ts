@@ -130,3 +130,13 @@ export const DeleteSchema = z.object({
 });
 
 export type DeleteSchema = z.infer<typeof DeleteSchema>;
+
+// 共通で使用されるエラーメッセージ
+export enum commonErrorMessage {
+    W001 = "",
+    W002 = "",
+    W003 = "",
+    login = "ログインしていません。",
+    valid = "入力内容に問題があります。",
+
+}
