@@ -17,6 +17,7 @@ export default function List() {
   const [state, postAction, isPending] = useActionState(postRegister, null);
 
   useEffect(() => {
+    // 登録するゲームの取得
     async function getGames() {
       const games = await GameListSearch("", "");
       setGameData(games?.data || []);
@@ -24,6 +25,7 @@ export default function List() {
     getGames();
   }, []);
 
+  // バリデーションエラーメッセージ
   const errorText = (data: string[]) => {
     const list = [];
     for (let i = 0; i < data.length; i++) {
@@ -72,6 +74,7 @@ export default function List() {
   )
 }
 
+// 現在ログインしている人が持つゲームのリスト
 function SelectGameTag({ data }: GamesProps) {
   return (
     data.map((games: { name: string; id: number }) => {

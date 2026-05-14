@@ -58,6 +58,7 @@ const Game: NextPage = () => {
         }
     }
 
+    // ページ数
     const generatePagination = () => {
         const pages = [];
         for (let i = 1; i <= totalPage; i++) {
@@ -66,6 +67,7 @@ const Game: NextPage = () => {
         return pages;
     };
 
+    // ページング用
     const handlePageChange = (page: number) => {
         changePage(page);
     };
@@ -113,7 +115,7 @@ const Game: NextPage = () => {
                         ))}
                         {currentPage < totalPage && (<Button onClick={() => handlePageChange(currentPage + 1)}>次</Button>)}
                     </div>
-                    
+
                     <div className="w-full p-5">
                         <div className="p-1 bg-gray-600/20 mb-5">{`検索結果：${search !== undefined ? search.length + "件" : "0件"}`}</div>
                         <Suspense fallback={<Loading />}>
@@ -128,6 +130,7 @@ const Game: NextPage = () => {
 
 export default Game
 
+// 検索結果
 function SearchTable({ data, search }: GameProps) {
 
     const router = useRouter();
@@ -138,7 +141,7 @@ function SearchTable({ data, search }: GameProps) {
 
     useEffect(() => {
         getUserId();
-    },[]);
+    }, []);
 
     // ログインユーザー取得用
     async function getUserId() {
@@ -154,9 +157,9 @@ function SearchTable({ data, search }: GameProps) {
 
         if (res?.success) {
             search();
-            successToast(res?.message);
+            successToast(res?.message ?? "");
         } else {
-            errorToast(res?.message);
+            errorToast(res?.message ?? "");
         }
     }
 

@@ -17,6 +17,7 @@ const GameRegist: NextPage = () => {
     useEffect(() => {
     }, []);
 
+    // バリデーションエラーメッセージ
     const errorText = (data: string[]) => {
         const list = [];
         for (let i = 0; i < data.length; i++) {
@@ -26,6 +27,7 @@ const GameRegist: NextPage = () => {
         return list;
     }
 
+    // 選択したゲームを対象とする関数
     function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
         setInputGame(event.target.value);
     }
@@ -72,6 +74,7 @@ const GameRegist: NextPage = () => {
 
 export default GameRegist
 
+// 現在登録しているゲームのリストを表示する関数
 function GameRankSelect(game: string) {
 
     // 特定のランクマップを取得

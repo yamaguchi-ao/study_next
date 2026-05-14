@@ -1,34 +1,40 @@
-import { Register, listSearch, Update, gameSearch, Delete } from "@/utils/api/game"
+import { Register, listSearch, Update, Delete, detail } from "@/utils/api/game"
 import { errorToast, successToast } from "@/utils/toast";
 import { GameSchema, GameUpdateSchema } from "@/utils/validation";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getCookies } from "./action";
+import { GamesWithUsers } from "@/types";
 
 // ゲームとランク登録
 export async function GameRegister(_prevState: any, formData: FormData) {
 
+    // jwt認証
     const cookie = await getCookies();
 
+    // ログインしているか
     if (cookie === null || cookie === undefined) {
         redirect("/login?error=true");
     }
 
     const userId = cookie?.id;
 
+    // 入力内容の取得
     const gameData = {
         name: formData.get("name") as string,
         rank: formData.get("rank") as string,
         id: userId as number
     }
 
+    // バリデーションチェック
     const issues = GameSchema.safeParse(gameData);
 
     if (!issues.success) {
+        // チェックに引っかかった場合
         const validation = z.flattenError(issues.error);
         return validation.fieldErrors;
     } else {
-        // やっているゲームとランクを登録
+        // ゲームとランクを登録
         const res = await Register(gameData);
 
         const success = res?.success;
@@ -37,61 +43,69 @@ export async function GameRegister(_prevState: any, formData: FormData) {
 
         if (success) {
             // 成功時
-            successToast(message);
+            successToast(message!);
             redirect("/game");
         } else {
+            errorToast(message!);
             if (!login) {
                 redirect("/login?error=true");
-            } else {
-                errorToast(message);
             }
         }
     }
 }
 
+// ゲーム一覧の取得
 export async function GameListSearch(game: string, rank: string, page?: number) {
 
+    // jwt認証
     const cookie = await getCookies();
 
+    // ログインしているか
     if (cookie === null || cookie === undefined) {
         redirect("/login?error=true");
     }
 
     let res = null;
-    // やっているゲームとランクを検索
+
     if (page) {
-        res = await listSearch(game, rank, page);
+        // ページング用
+        res = await listSearch({ game, rank, page });
     } else {
-        res = await listSearch(game, rank);
-    }
+        // 検索用
+        res = await listSearch({ game, rank });
+    };
 
     const success = res?.success;
     const message = res?.message;
     const login = res?.login;
-    const data = { data: res?.data, currentPage: res?.currentPage, totalPage: res?.totalPage };
+    const data = res?.data as GamesWithUsers[];
+    const totalPage = res?.totalPage!;
+    const currentPage = res?.currentPage!;
 
     if (success) {
         // 成功時
-        return data;
+        return { data: data, totalPage: totalPage, currentPage: currentPage };
     } else {
+        errorToast(message!);
         if (!login) {
             redirect("/login?error=true");
-        } else {
-            errorToast(message);
         }
     }
-}
+};
 
-export async function getGame(gameId: Number) {
+// 詳細用
+export async function getGame(id: number) {
 
+    // jwt認証
     const cookie = await getCookies();
 
+    // ログインしているか
     if (cookie === null || cookie === undefined) {
         redirect("/login?error=true");
     }
 
     // やっているゲームとランクを取得
-    const res = await gameSearch(gameId);
+    const res = await detail({ id });
 
     const success = res?.success;
     const message = res?.message;
@@ -102,33 +116,36 @@ export async function getGame(gameId: Number) {
         // 成功時
         return data;
     } else {
+        // 失敗時
+        errorToast(message);
         if (!login) {
             redirect("/login?error=true");
-        } else {
-            errorToast(message);
         }
     }
 }
 
-export async function GameUpdate(_prevState: any, formData: FormData, id: Number) {
+// ゲームとランクの更新
+export async function GameUpdate(_prevState: any, formData: FormData, id: number) {
 
+    // jwt認証
     const cookie = await getCookies();
 
+    // ログインしているか
     if (cookie === null || cookie === undefined) {
         redirect("/login?error=true");
     }
 
-    // ゲームとランクを更新
-    const gameId = id;
-
+    // 入力内容の取得
     const gameData = {
         rank: formData.get("rank") as string,
-        gameId: gameId as unknown as Number
-    }
+        id: id
+    };
 
+    // バリデーションチェック
     const issues = GameUpdateSchema.safeParse(gameData);
 
     if (!issues.success) {
+        // チェックに引っかかった場合
         const validation = z.flattenError(issues.error);
         return validation.fieldErrors;
     } else {
@@ -141,13 +158,12 @@ export async function GameUpdate(_prevState: any, formData: FormData, id: Number
 
         if (success) {
             // 成功時
-            successToast(message);
+            successToast(message!);
             redirect("/game");
         } else {
+            errorToast(message!);
             if (!login) {
                 redirect("/login?error=true");
-            } else {
-                errorToast(message);
             }
         }
     }
@@ -156,12 +172,15 @@ export async function GameUpdate(_prevState: any, formData: FormData, id: Number
 // 削除
 export async function gameDelete(gameId: number) {
 
+    // jwt認証
     const cookie = await getCookies();
 
+    // ログインしているか
     if (cookie === null || cookie === undefined) {
         redirect("/login?error=true");
     }
 
+    // ゲーム削除処理
     const res = await Delete(gameId);
 
     const success = res?.success;
@@ -169,12 +188,12 @@ export async function gameDelete(gameId: number) {
     const login = res?.login;
 
     if (success) {
+        // 成功時
         return { success, message };
     } else {
+        errorToast(message!);
         if (!login) {
             redirect("/login?error=true");
-        } else {
-            errorToast(message);
         }
     }
 }

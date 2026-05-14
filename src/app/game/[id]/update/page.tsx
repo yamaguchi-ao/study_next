@@ -13,6 +13,7 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
     const [rank, setRank] = useState(String);
     const gameId = use(params).id;
 
+    // サポートしているゲームの値を取得
     const supportedGameNames = Object.values(supportedGames);
 
     const [state, gameAction, isPending] = useActionState(
@@ -28,11 +29,12 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
                 redirect("/game");
             }
             setName(games?.name);
-            setRank(games?.rank);
+            setRank(games?.rank ?? "");
         }
         getGames();
     }, [params, gameId]);
 
+    // バリデーションエラーメッセージ
     const errorText = (data: string[]) => {
         const list = [];
         for (let i = 0; i < data.length; i++) {
@@ -76,6 +78,7 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
     )
 }
 
+// 取得したゲームのランクをセレクトボックスする関数
 function GameRankSelect(game: string, rank: string) {
 
     // 特定のランクマップを取得
