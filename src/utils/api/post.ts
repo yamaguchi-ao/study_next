@@ -30,6 +30,7 @@ export async function post({ title, post, game }: PostProps) {
     const issue = PostSchema.safeParse({ title, post, game });
 
     if (!issue.success) {
+        // チェックに引っかかった場合
         const validation = z.flattenError(issue.error);
         const message = validation.fieldErrors;
         console.log("エラーメッセージ：", [message.title, message.post, message.game]);
@@ -37,6 +38,7 @@ export async function post({ title, post, game }: PostProps) {
     }
 
     try {
+        // 投稿の新規作成
         await prisma.posts.create({
             data: {
                 title: title!,
@@ -202,23 +204,25 @@ export async function Update({ ...postData }: PostProps) {
     }
 
     try {
-        // バリデーションチェック
-        const issue = PostSchema.safeParse(postData);
-
-        if (!issue.success) {
-            // チェックに引っかかった場合
-            const validation = z.flattenError(issue.error);
-            const message = validation.fieldErrors;
-            console.log("エラーメッセージ", [message.title, message.post, message.game]);
-            return { success: false, message: commonErrorMessage.valid, login: userId ? true : false };
-        }
-
         if (postData.likeCount === null || postData.likeCount === undefined) {
+            // 投稿の更新をした場合
+
+            // バリデーションチェック
+            const issue = PostSchema.safeParse(postData);
+
+            if (!issue.success) {
+                // チェックに引っかかった場合
+                const validation = z.flattenError(issue.error);
+                const message = validation.fieldErrors;
+                console.log("エラーメッセージ", [message.title, message.post, message.game]);
+                return { success: false, message: commonErrorMessage.valid, login: userId ? true : false };
+            }
+
             // 投稿自体の更新
             await PostUpdate(postData.title!, postData.post!, postData.postId!);
 
         } else {
-            // 押下されているかの確認
+            // 評価した場合
             const pressedPost = await prisma.pressedPosts.findFirst({
                 where: { postId: Number(postData.postId), userId: Number(userId) },
             });
@@ -258,6 +262,7 @@ export async function Delete(postId: number) {
             return { message: message ? commonErrorMessage.valid : null, success: false, login: true };
         }
 
+        // 投稿の削除
         if (postId && userId) {
             await prisma.posts.delete({
                 where: { id: postId, userId: userId }
@@ -310,7 +315,6 @@ async function PostUpdate(title: string, post: string, postId: number) {
 async function likeUpdate(postId: number, userId: number, likeCount: number, pressedPostId?: number) {
 
     try {
-
         // 評価の更新
         await prisma.posts.update({
             where: { id: Number(postId) },
