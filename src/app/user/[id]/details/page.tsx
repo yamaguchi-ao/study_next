@@ -9,15 +9,15 @@ import DataList from "./dataList";
 export default async function UserDetails({ params }: { params: Promise<{ id: Number }> }) {
 
     const userId = (await params).id;
-    const cookies = await getCookies();
+    const cookie = await getCookies();
 
     // cookieがない場合はログイン画面にリダイレクト
-    if (cookies === null) {
+    if (!cookie) {
         return redirect("/login?error=true");
     }
 
     // cookieからログインしているIDを取得
-    const loginId = cookies?.id;
+    const loginId = cookie?.id;
 
     // ログインしているユーザーとURLのIDを比較
     if (Number(userId) !== loginId) {

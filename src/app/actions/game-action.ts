@@ -13,7 +13,7 @@ export async function GameRegister(_prevState: any, formData: FormData) {
     const cookie = await getCookies();
 
     // ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 
@@ -61,7 +61,7 @@ export async function GameListSearch(game: string, rank: string, page?: number) 
     const cookie = await getCookies();
 
     // ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 
@@ -100,7 +100,7 @@ export async function getGame(id: number) {
     const cookie = await getCookies();
 
     // ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 
@@ -131,7 +131,7 @@ export async function GameUpdate(_prevState: any, formData: FormData, id: number
     const cookie = await getCookies();
 
     // ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 
@@ -176,7 +176,7 @@ export async function gameDelete(gameId: number) {
     const cookie = await getCookies();
 
     // ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 

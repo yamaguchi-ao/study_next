@@ -42,7 +42,7 @@ export async function post({ title, post, game }: PostProps) {
         await prisma.posts.create({
             data: {
                 title: title!,
-                content: post?.replace(/r?\n/g, "\n"),
+                content: post?.replace(/\r?\n/g, "\n"),
                 gameTag: game,
                 userId: userId,
                 rankFlg: false,

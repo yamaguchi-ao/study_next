@@ -3,7 +3,7 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { Button, SearchButton } from "@/components/ui/button";
 import type { NextPage } from "next";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Suspense, useActionState, useEffect, useRef, useState } from "react";
 import { gameDelete, GameListSearch } from "../actions/game-action";
 import Loading from "../loading";
@@ -145,8 +145,11 @@ function SearchTable({ data, search }: GameProps) {
 
     // ログインユーザー取得用
     async function getUserId() {
-        const cookies = await getCookies();
-        const userId = cookies?.id;
+        const cookie = await getCookies();
+        if (!cookie) {
+            redirect("/login?error=true");
+        }
+        const userId = cookie?.id;
         setUserId(userId!);
     }
 

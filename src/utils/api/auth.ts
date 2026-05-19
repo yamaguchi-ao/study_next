@@ -145,7 +145,7 @@ export async function signIn({ email, password }: userData) {
 export async function Logout() {
     const cookieStore = await cookies();
 
-    if (cookieStore === null || cookieStore === undefined) {
+    if (!cookieStore) {
         return { message: "cookieが取得できませんでした。", success: false };
     }
 
