@@ -22,12 +22,22 @@ export default function UserUpdate({ params }: { params: Promise<{ id: number }>
 
     useEffect(() => {
         async function getUser() {
-            const data = await getUserData();
-            const cookies = await getCookies();
-            const loginId = cookies?.id;
+            
+            const cookie = await getCookies();
+            if(!cookie) {
+                return redirect("/login?error=true");
+            }
+
+            const loginId = cookie?.id;
 
             if (loginId !== Number(userId)) {
                 errorToast("不正な遷移です。");
+                return redirect("/post");
+            }
+
+            const data = await getUserData();
+            if (!data) {
+                errorToast("ユーザー情報の取得に失敗しました。");
                 return redirect("/post");
             }
 

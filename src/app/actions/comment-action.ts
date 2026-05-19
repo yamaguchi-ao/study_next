@@ -12,7 +12,7 @@ export async function addComment(_prevState: any, formData: FormData, postId: nu
     const cookie = await getCookies();
 
     //　ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 
@@ -57,7 +57,7 @@ export async function getCommentList(postId: number, game: string) {
     const cookie = await getCookies();
 
     // ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 
@@ -83,7 +83,7 @@ export async function commentUpdate(postId: number, commentId: number, count: nu
     const cookie = await getCookies();
 
     // ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 

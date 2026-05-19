@@ -19,7 +19,7 @@ export async function postRegister(_prevState: any, formData: FormData) {
     const cookie = await getCookies();
 
     // jwt認証でログインしているかを確認
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 
@@ -67,7 +67,7 @@ export async function getPostList({ game, page }: PostProps) {
     const cookie = await getCookies();
 
     // ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 
@@ -108,7 +108,7 @@ export async function getUpdatePost({ postId }: PostProps) {
     const cookie = await getCookies();
 
     // ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 
@@ -139,7 +139,7 @@ export async function getPostDetails({ postId, gameTag, }: PostProps) {
     const cookie = await getCookies();
 
     // ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 
@@ -170,7 +170,7 @@ export async function postUpdate(_prevState: any, formData: FormData, postId: nu
     const cookie = await getCookies();
 
     // ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 
@@ -217,7 +217,7 @@ export async function likeUpdate(postId: number, likeCount: number) {
     const cookie = await getCookies();
 
     // ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 
@@ -244,7 +244,7 @@ export async function postDelete(postId: number) {
     const cookie = await getCookies();
 
     // ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 
