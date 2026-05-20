@@ -9,7 +9,7 @@ export default async function proxy(req: NextRequest) {
     const loginUrl = new URL('/login?error=true', req.url);
     const postUrl = new URL('/post', req.url);
 
-    if (authToken === undefined) {
+    if (!authToken) {
         if (!req.nextUrl.pathname.includes("/login")) {
             return NextResponse.redirect(loginUrl);
         }

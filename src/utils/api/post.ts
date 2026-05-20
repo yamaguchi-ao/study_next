@@ -204,7 +204,7 @@ export async function Update({ ...postData }: PostProps) {
     }
 
     try {
-        if (postData.likeCount === null || postData.likeCount === undefined) {
+        if (!postData.likeCount) {
             // 投稿の更新をした場合
 
             // バリデーションチェック
@@ -324,7 +324,7 @@ async function likeUpdate(postId: number, userId: number, likeCount: number, pre
         });
 
         // 対象の投稿の評価ボタンを押下しているか
-        if (pressedPostId === null || pressedPostId === undefined) {
+        if (!pressedPostId) {
             // 評価の作成
             await prisma.pressedPosts.create({
                 data: {

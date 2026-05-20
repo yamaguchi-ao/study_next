@@ -20,7 +20,7 @@ export async function UserInfo() {
     // jwt認証でユーザーIdを取得
     const userId = await commonCheck();
 
-    if (userId === null) {
+    if (!userId) {
         return { success: false, message: commonErrorMessage.login, login: false };
     }
 
@@ -71,7 +71,7 @@ export async function UserUpdate({ ...info }: updateProp) {
     // jwt認証でユーザーIdを取得
     const userId = await commonCheck();
 
-    if (userId === null) {
+    if (!userId) {
         return { success: false, message: commonErrorMessage.login, login: false };
     }
 
@@ -151,7 +151,7 @@ export async function deleteUser(id: number) {
     // jwt認証でユーザーIdを取得
     const userId = await commonCheck();
 
-    if (userId === null) {
+    if (!userId) {
         return { success: false, message: commonErrorMessage.login, login: false };
     }
 

@@ -82,7 +82,7 @@ export default async function details({ params, searchParams }: detailsProp) {
                         <div className="flex text-sm text-gray-500 justify-end">
                             <div className="row">投稿者: {posts?.user.name}</div>
                             <div className="row pl-3">ゲーム: {posts?.gameTag}</div>
-                            {postRank === undefined ? <div className="row pl-3">ランク: 表示なし</div> :
+                            {!postRank ? <div className="row pl-3">ランク: 表示なし</div> :
                                 <div className="row pl-3">ランク: {postRank}</div>}
                         </div>
                         <EvaluationButton isCurrentPost={isCurrentPost} postId={Number(postId)} like={like} pressedFlg={pressFlg} />
