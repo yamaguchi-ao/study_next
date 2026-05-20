@@ -28,7 +28,7 @@ export async function Comment({ ...CommentProp }: CommentProp) {
     const userId = await commonCheck();
 
     // jwi認証でユーザーIDを取得する
-    if (userId === null) {
+    if (!userId) {
         return { success: false, message: commonErrorMessage.login, login: false };
     }
 
@@ -65,7 +65,7 @@ export async function getComments({ postId, game }: CommentProp) {
     const userId = await commonCheck();
 
     // jwi認証でユーザーIDを取得する
-    if (userId === null) {
+    if (!userId) {
         return { success: false, message: commonErrorMessage.login, login: false };
     }
 
@@ -103,7 +103,7 @@ export async function Update({ ...comment }: CommentUpdateProp) {
     const userId = await commonCheck();
 
     // jwi認証でユーザーIDを取得する
-    if (userId === null) {
+    if (!userId) {
         return { success: false, message: commonErrorMessage.login, login: false };
     }
 
@@ -159,7 +159,7 @@ export async function Update({ ...comment }: CommentUpdateProp) {
 export async function deleteComment(id: number) {
     const userId = await commonCheck();
 
-    if (userId === null) {
+    if (!userId) {
         return { success: false, message: commonErrorMessage.login, login: false };
     }
 

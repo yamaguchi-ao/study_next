@@ -16,6 +16,8 @@ interface DataListProps {
 // ユーザーデータのリスト
 export default function DataList({ posts, comments }: DataListProps) {
     const [tab, setTab] = useState(1);
+    const postTab = 1;
+    const commentTab = 2;
 
     const handleTabChange = (selectedTab: number) => {
         setTab(selectedTab);
@@ -27,19 +29,19 @@ export default function DataList({ posts, comments }: DataListProps) {
                 <ul className="flex flex-wrap text-center text-sm font-semibold">
                     <li>
                         <button className={`px-4 py-2 w-[150px] text-[20px] rounded-tl-2xl rounded-tr-2xl
-                            ${tab === 1 ? "bg-cyan-600 text-white" : "bg-gray-200 text-gray-700"}`} onClick={() => handleTabChange(1)}>
+                            ${tab === postTab ? "bg-cyan-600 text-white" : "bg-gray-200 text-gray-700"}`} onClick={() => handleTabChange(postTab)}>
                             投稿
                         </button>
                     </li>
                     <li>
                         <button className={`px-4 py-2 w-[150px] text-[20px] rounded-tl-2xl rounded-tr-2xl
-                            ${tab === 2 ? "bg-cyan-600 text-white" : "bg-gray-200 text-gray-700"}`} onClick={() => handleTabChange(2)}>
+                            ${tab === commentTab ? "bg-cyan-600 text-white" : "bg-gray-200 text-gray-700"}`} onClick={() => handleTabChange(commentTab)}>
                             コメント
                         </button>
                     </li>
                 </ul>
-                {tab === 1 && <PostList posts={posts} />}
-                {tab === 2 && <CommentList comments={comments} />}
+                {tab === postTab && <PostList posts={posts} />}
+                {tab === commentTab && <CommentList comments={comments} />}
             </div>
         </>
     );
