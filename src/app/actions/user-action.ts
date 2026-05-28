@@ -12,7 +12,7 @@ export async function getUserData() {
     const cookie = await getCookies();
 
     // ログインしているか
-    if (cookie === null || cookie === undefined) {
+    if (!cookie) {
         redirect("/login?error=true");
     }
 
@@ -39,14 +39,14 @@ export async function getUserData() {
 export async function userDataUpdate(_prevState: any, formData: FormData) {
 
     // jwt認証
-    const cookies = await getCookies();
+    const cookie = await getCookies();
 
     // ログインしているか
-    if (cookies === null || cookies === undefined) {
+    if (!cookie) {
         return redirect("/login?error=true");
     }
 
-    const userId = cookies.id;
+    const userId = cookie.id;
 
     // 入力内容の取得
     const userData = {

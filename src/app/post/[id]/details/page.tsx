@@ -26,7 +26,7 @@ export default async function details({ params, searchParams }: detailsProp) {
     // 投稿の詳細取得
     const posts = await getPostDetails({ postId: postId, gameTag: gameTag });
 
-    if (posts === null) {
+    if (!posts) {
         // 詳細取得した際に無ければ一覧に戻す
         return redirect("/post");
     }
@@ -35,8 +35,11 @@ export default async function details({ params, searchParams }: detailsProp) {
     const postRank = posts?.user.games ? posts.user.games[0]?.rank : "";
 
     // ログインユーザー取得
-    const cookies = await getCookies();
-    const userId = cookies?.id;
+    const cookie = await getCookies();
+    if (!cookie) {
+        return redirect("/login?error=true");
+    }
+    const userId = cookie?.id;
 
     // 投稿のゲームで自身のランクを取得
     const myGames = await GameListSearch(gameTag, "");
@@ -79,7 +82,7 @@ export default async function details({ params, searchParams }: detailsProp) {
                         <div className="flex text-sm text-gray-500 justify-end">
                             <div className="row">投稿者: {posts?.user.name}</div>
                             <div className="row pl-3">ゲーム: {posts?.gameTag}</div>
-                            {postRank === undefined ? <div className="row pl-3">ランク: 表示なし</div> :
+                            {!postRank ? <div className="row pl-3">ランク: 表示なし</div> :
                                 <div className="row pl-3">ランク: {postRank}</div>}
                         </div>
                         <EvaluationButton isCurrentPost={isCurrentPost} postId={Number(postId)} like={like} pressedFlg={pressFlg} />

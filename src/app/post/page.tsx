@@ -3,7 +3,7 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { Suspense, useActionState, useEffect, useRef, useState } from "react";
 import { Button, SearchButton } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import Loading from "../loading";
 import { postDelete, getPostList } from "../actions/post-action";
 import { getCookies } from "../actions/action";
@@ -64,8 +64,11 @@ export default function List() {
 
   // ログインユーザー取得用
   async function getUserId() {
-    const cookies = await getCookies();
-    const userId = cookies?.id;
+    const cookie = await getCookies();
+    if (!cookie) {
+      return redirect("/login?error=true");
+    }
+    const userId = cookie?.id;
     setUserId(userId!);
   }
   

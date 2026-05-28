@@ -42,7 +42,7 @@ export async function post({ title, post, game }: PostProps) {
         await prisma.posts.create({
             data: {
                 title: title!,
-                content: post?.replace(/r?\n/g, "\n"),
+                content: post?.replace(/\r?\n/g, "\n"),
                 gameTag: game,
                 userId: userId,
                 rankFlg: false,
@@ -324,7 +324,7 @@ async function likeUpdate(postId: number, userId: number, likeCount: number, pre
         });
 
         // 対象の投稿の評価ボタンを押下しているか
-        if (pressedPostId === null || pressedPostId === undefined) {
+        if (!pressedPostId) {
             // 評価の作成
             await prisma.pressedPosts.create({
                 data: {

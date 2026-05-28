@@ -23,7 +23,7 @@ export async function Register({ name, rank }: gamesProp) {
 
     const userId = await commonCheck();
 
-    if (userId === null) {
+    if (!userId) {
         return { message: commonErrorMessage.login, success: false, login: false };
     }
 
@@ -72,7 +72,7 @@ export async function Register({ name, rank }: gamesProp) {
 export async function listSearch({ game, rank, page }: gamesProp) {
     const userId = await commonCheck();
 
-    if (userId === null) {
+    if (!userId) {
         return { message: commonErrorMessage.login, success: false, login: false };
     }
 
@@ -126,7 +126,7 @@ export async function detail({ id }: gamesProp) {
     const userId = await commonCheck();
 
     // ログインしているか
-    if (userId === null) {
+    if (!userId) {
         return { message: commonErrorMessage.login, success: false, login: false };
     }
 
@@ -155,7 +155,7 @@ export async function Update({ rank, id }: gamesProp) {
     const userId = await commonCheck();
 
     // ログインしているか
-    if (userId === null) {
+    if (!userId) {
         return { message: commonErrorMessage.login, success: false, login: false };
     }
 
@@ -192,7 +192,7 @@ export async function Delete(id: number) {
     const userId = await commonCheck();
 
     // ログインしているか
-    if (userId === null) {
+    if (!userId) {
         return { message: commonErrorMessage.login, success: false, login: false };
     }
 
