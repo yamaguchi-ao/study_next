@@ -1,5 +1,20 @@
 // 定数などの宣言用ファイル
 
+// 遷移先
+export const navigation = [
+    { id: 1, name: "投稿", href: "/post" },
+    { id: 2, name: "ゲーム", href: "/game" },
+    { id: 3, name: "ユーザー", href: "/user" },
+    { id: 4, name: "分布", href: "/distribution" },
+]
+
+// ページ名
+export const pageName = [
+    { logical: "登録", physics: "register" },
+    { logical: "詳細", physics: "details" },
+    { logical: "更新", physics: "update" },
+];
+
 // valorantのランク一覧
 enum valorantRanks {
     UnRanked = 0,
@@ -100,7 +115,7 @@ enum streetFighterRanks {
 }
 
 enum OWRanks {
-    Top500 = 0 
+    Top500 = 0
 }
 
 enum ApexRanks {
@@ -146,9 +161,11 @@ export function gameNameFixed(name: string) {
         case "LoL":
         case "lol":
         case "LOL":
+        case "ロル":
         case "リーグオブレジェンド":
         case "リーグ・オブ・レジェンド":
         case "リグレジェ":
+        case "League of Legends":
             return "League of Legends";
         case "Apex":
         case "APEX":
@@ -191,7 +208,10 @@ export const supportedGames = {
 // サポートしているゲームの型指定
 export const supportedGamesMap = (game: string) => {
 
-    switch (gameNameFixed(game)) {
+    // 取得したゲームの空白をデコード
+    const gameName = decodeURIComponent(game);
+
+    switch (gameNameFixed(gameName)) {
         case supportedGames.valo:
             return Object.entries(valorantRanks).map(([key, value]) => ({ key, value }));
         case supportedGames.LoL:
