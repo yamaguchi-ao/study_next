@@ -204,7 +204,7 @@ export async function Update({ ...postData }: PostProps) {
     }
 
     try {
-        if (!postData.likeCount) {
+        if (postData.likeCount === null || postData.likeCount === undefined) {
             // 投稿の更新をした場合
 
             // バリデーションチェック
