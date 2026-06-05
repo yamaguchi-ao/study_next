@@ -4,8 +4,10 @@ import { getCookies } from "@/app/actions/action";
 import { revalidatePath } from "next/cache";
 import prisma from "@/lib/prisma";
 import { commonErrorMessage, DeleteSchema, PostSchema } from "../validation";
-import z from "zod";
+import z, { file } from "zod";
 import { Prisma } from "@prisma/client";
+import path from "path";
+import { writeFile } from "fs/promises";
 
 interface PostProps {
     userId?: number;
@@ -15,10 +17,11 @@ interface PostProps {
     page?: number;
     title?: string;
     post?: string;
+    file?: File
 }
 
 // 投稿新規登録
-export async function post({ title, post, game }: PostProps) {
+export async function post({ title, post, game, file }: PostProps) {
 
     const userId = await commonCheck();
 
@@ -26,18 +29,32 @@ export async function post({ title, post, game }: PostProps) {
         return { message: commonErrorMessage.W001, success: false, login: false };
     }
 
+    // ファイルが存在しない場合
+    if (!(file instanceof File)) {
+        return { message: "", success: false, login: true };
+    }
+
     // バリデーションチェック
-    const issue = PostSchema.safeParse({ title, post, game });
+    const issue = PostSchema.safeParse({ title, post, game, file });
 
     if (!issue.success) {
         // チェックに引っかかった場合
         const validation = z.flattenError(issue.error);
         const message = validation.fieldErrors;
-        console.log("エラーメッセージ：", [message.title, message.post, message.game]);
+        console.log("エラーメッセージ：", [message.title, message.post, message.game, message.file]);
         return { success: false, message: commonErrorMessage.valid, login: userId ? true : false };
     }
 
     try {
+        // ファイル命名＋保存先指定
+        const ext = path.extname(file.name);
+        const fileName = `${crypto.randomUUID()}${ext}`;
+        const filePath = path.join("public/uploads", fileName);
+
+        // 画像アップロード処理
+        const buffer = Buffer.from(await file.arrayBuffer());
+        await writeFile(filePath, buffer);
+
         // 投稿の新規作成
         await prisma.posts.create({
             data: {
@@ -214,12 +231,12 @@ export async function Update({ ...postData }: PostProps) {
                 // チェックに引っかかった場合
                 const validation = z.flattenError(issue.error);
                 const message = validation.fieldErrors;
-                console.log("エラーメッセージ", [message.title, message.post, message.game]);
+                console.log("エラーメッセージ", [message.title, message.post, message.game, message.file]);
                 return { success: false, message: commonErrorMessage.valid, login: userId ? true : false };
             }
 
             // 投稿自体の更新
-            await PostUpdate(postData.title!, postData.post!, postData.postId!);
+            await PostUpdate(postData.title!, postData.post!, postData.postId!, postData?.file ? postData?.file : undefined);
 
         } else {
             // 評価した場合
@@ -279,20 +296,24 @@ export async function Delete(postId: number) {
 }
 
 // 投稿の更新
-async function PostUpdate(title: string, post: string, postId: number) {
+async function PostUpdate(title: string, post: string, postId: number, file?: File) {
     try {
         // バリデーションチェック
-        const issue = PostSchema.safeParse({ title: title, post: post, id: postId });
+        const issue = PostSchema.safeParse({ title: title, post: post, id: postId, file: file });
 
         if (!issue.success) {
             // チェックに引っかかった場合
             const validation = z.flattenError(issue.error);
             const message = validation.fieldErrors;
-            console.log("エラーメッセージ：", [message.title, message.game, message.post]);
+            console.log("エラーメッセージ：", [message.title, message.game, message.post, message.file]);
             return { message: message ? commonErrorMessage.valid : null, success: false, login: true };
         }
 
         try {
+            if (file) {
+                // 登録していた画像ファイルを消してから再登録
+            }
+
             // 更新処理
             await prisma.posts.update({
                 where: { id: Number(postId) },

@@ -1,11 +1,19 @@
 // フロント用バリデーション
 import { z } from "zod";
 
-// 新規登録用バリデーション
+// 新規登録用定数
+const MIN_DIGIT = 8;
+
+// ファイル用定数
+const IMAGE_TYPE = ["image/png", "image/jpeg", "image/webp"]
+const MAX_MB = 5;
+const MAX_SIZE = 1024 * 1024 * MAX_MB;
+
+// ユーザ登録バリデーション
 export const UserSchema = z.object({
     username: z.string().min(1, { message: "ユーザーネームを入力してください" }),
     email: z.email("有効なメールアドレスで入力してください。").min(1, "メールアドレスを入力してください"),
-    password: z.string().min(8, { message: "8桁以上入力して下さい。" }),
+    password: z.string().min(MIN_DIGIT, { message: "8桁以上入力して下さい。" }),
     confirm: z.string().min(1, "パスワード再確認を入力してください。"),
     mainGame: z.string().min(1, "ゲームタグを選択してください。").nullish(),
 }).refine((data) => data.password === data.confirm, {
@@ -25,7 +33,7 @@ export const UserUpdateSchema = z.object({
 }).superRefine((data, ctx) => {
     const { password, newPassword, confirm } = data;
 
-    if (password && password.length < 8) {
+    if (password && password.length < MIN_DIGIT) {
         ctx.addIssue({
             code: "custom",
             path: ["password"],
@@ -41,7 +49,7 @@ export const UserUpdateSchema = z.object({
         });
     }
 
-    if (newPassword && newPassword.length < 8) {
+    if (newPassword && newPassword.length < MIN_DIGIT) {
         ctx.addIssue({
             code: "custom",
             path: ["newPassword"],
@@ -83,7 +91,7 @@ export type UserUpdateSchema = z.infer<typeof UserUpdateSchema>;
 // ログイン用バリデーション
 export const LoginSchema = z.object({
     email: z.email("有効なメールアドレスで入力してください。").min(1, "メールアドレスを入力してください"),
-    password: z.string().min(8, { message: "8桁以上入力して下さい。" }),
+    password: z.string().min(MIN_DIGIT, { message: "8桁以上入力して下さい。" }),
 });
 
 export type LoginSchema = z.infer<typeof LoginSchema>;
@@ -107,6 +115,11 @@ export const PostSchema = z.object({
     title: z.string().min(1, "タイトルを入力してください。"),
     post: z.string().min(1, "投稿内容は必ず1文字以上入力してください。"),
     game: z.string().min(1, "ゲームタグを入力してください。").nullish(),
+    file: z.instanceof(File).refine(({ type }) => !IMAGE_TYPE.includes(type), {
+        message: "画像ファイルを選択してください。"
+    }).refine(({ size }) => size >= MAX_SIZE, {
+        message: "ファイルサイズは5MB以下にしてください。"
+    })
 });
 
 export type PostSchema = z.infer<typeof PostSchema>;

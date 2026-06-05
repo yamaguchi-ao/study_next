@@ -10,6 +10,7 @@ interface PostProps {
     gameTag?: string;
     game?: string;
     page?: number;
+    file?: File;
 }
 
 // 投稿 新規登録
@@ -23,11 +24,14 @@ export async function postRegister(_prevState: any, formData: FormData) {
         redirect("/login?error=true");
     }
 
+    const file = formData.get("file");
+
     // 入力内容の取得
     const postData = {
         title: formData.get("title") as string,
         post: formData.get("post") as string,
         game: formData.get("game") as string,
+        file: file instanceof File ? file : undefined
     }
 
     // バリデーションチェック
@@ -62,7 +66,7 @@ export async function postRegister(_prevState: any, formData: FormData) {
 
 // 投稿一覧に表示するリストの取得
 export async function getPostList({ game, page }: PostProps) {
-    
+
     // jwt認証
     const cookie = await getCookies();
 
@@ -174,11 +178,14 @@ export async function postUpdate(_prevState: any, formData: FormData, postId: nu
         redirect("/login?error=true");
     }
 
+    const file = formData.get("file")
+
     // 入力内容の取得
     const postData = {
         title: formData.get("title") as string,
         post: formData.get("post") as string,
-        postId: postId
+        postId: postId,
+        file: file instanceof File ? file : undefined
     }
 
     //　バリデーションチェック
