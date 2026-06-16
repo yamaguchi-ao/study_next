@@ -35,7 +35,7 @@ model Posts {
   user     Users  @relation(fields: [userId], references:[id], onDelete:Cascade)
   userId   Int
   comments Comments[]
-  fileName String?
+  filePath String?
   pressedPosts PressedPosts[]
   pressedComments PressedComments[]
   rankFlg  Boolean   @default(false)

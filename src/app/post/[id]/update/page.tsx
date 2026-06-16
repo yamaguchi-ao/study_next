@@ -6,6 +6,8 @@ import { Button, ReturnButton } from "@/components/ui/button";
 import { errorToast } from "@/utils/toast";
 import { redirect } from "next/navigation";
 import { use, useActionState, useEffect, useState } from "react";
+import img from "@/public/uploads/61917552-e141-406b-a673-6074f33886b6.png"
+import Image from "next/image";
 
 export default function UpdatePage({ params }: { params: Promise<{ id: number }> }) {
     const [title, setTitle] = useState(String);
@@ -51,14 +53,19 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
                 <form className="w-full p-7" action={postAction}>
                     <div className="flex">
                         <div className="row">
-                            <div className="font-bold">タイトル 入力</div>
+                            <div className="font-bold">タイトル 編集</div>
                             <input className="mt-3 mb-3 w-[400px] h-[50px] p-3 border-1" name="title" defaultValue={title}
                                 onChange={(e) => setTitle(e.target.value)}></input>
                             {state?.title ? errorText(state?.title) : null}
                         </div>
+                        <div className="row pl-20">
+                            <div className="font-bold">画像 再添付</div>
+                            <input className="cursor-pointer file:px-4 file:mr-4 file:pr-4 file:py-1 file:border-r-1 file:bg-cyan-500/30 rounded-md border-1 mt-3 w-140" name="file" type="file"></input>
+                            {state?.file ? errorText(state?.file) : null}
+                        </div>
                     </div>
 
-                    <div className="font-bold">投稿内容</div>
+                    <div className="font-bold pt-3">投稿内容 編集</div>
                     <textarea name="post" placeholder="投稿の内容を入力..." className="border-1 w-full h-[290px] mt-3 mb-3 p-3 resize-none leading-4"
                         defaultValue={post} onChange={(e) => setPost(e.target.value)}></textarea>
                     {state?.post ? errorText(state?.post) : null}
@@ -68,6 +75,8 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
                     </div>
 
                     <div className="border-t w-full mt-3 mb-5"></div>
+
+                    <Image alt="" src={'/test_icon.png'} width={50} height={50}/>
 
                     <div className="flex justify-between">
                         <ReturnButton />

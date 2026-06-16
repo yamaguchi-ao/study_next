@@ -40,14 +40,20 @@
     "@types/pg": "^8.15.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
+    "supabase": "^2.105.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@prisma/client"
+      "@prisma/client",
+      "@prisma/engines",
+      "bcrypt",
+      "prisma",
+      "supabase"
     ]
   }
 }

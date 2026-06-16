@@ -115,11 +115,21 @@ export const PostSchema = z.object({
     title: z.string().min(1, "タイトルを入力してください。"),
     post: z.string().min(1, "投稿内容は必ず1文字以上入力してください。"),
     game: z.string().min(1, "ゲームタグを入力してください。").nullish(),
-    file: z.instanceof(File).refine(({ type }) => !IMAGE_TYPE.includes(type), {
-        message: "画像ファイルを選択してください。"
-    }).refine(({ size }) => size >= MAX_SIZE, {
-        message: "ファイルサイズは5MB以下にしてください。"
-    })
+    file: z.any().nullable().optional()
+        .refine((file) => file != null || IMAGE_TYPE.includes(file.type), {
+            message: "画像ファイルを選択してください。"
+        })
+        .refine((file) => file == null || file.size <= MAX_SIZE, {
+            message: "ファイルサイズは5MB以下にしてください。"
+        })
+}).superRefine((data, ctx) => {
+    if (data.game === null) {
+        ctx.addIssue({
+            code: "custom",
+            path: ["game"],
+            message: "ゲームタグが表示されていない場合は、登録を行ってください。"
+        });
+    }
 });
 
 export type PostSchema = z.infer<typeof PostSchema>;

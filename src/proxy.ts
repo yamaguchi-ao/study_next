@@ -37,6 +37,6 @@ export const config = {
         '/post/:path*',
         '/game/:path*',
         '/user/:path*',
-        '/((?!api|_next/static|_next/image|.*\\.png$).*)',
+        '/((?!api|_next/static|_next/image|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
     ]
 }
