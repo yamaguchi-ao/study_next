@@ -6,6 +6,8 @@ import prisma from "@/lib/prisma";
 import { commonErrorMessage, DeleteSchema, PostSchema } from "../validation";
 import z from "zod";
 import { Prisma } from "@prisma/client";
+import path from "path";
+import supabase from "@/lib/supabase";
 
 interface PostProps {
     userId?: number;
@@ -15,29 +17,42 @@ interface PostProps {
     page?: number;
     title?: string;
     post?: string;
+    file?: File
 }
 
 // 投稿新規登録
-export async function post({ title, post, game }: PostProps) {
+export async function post({ title, post, game, file }: PostProps) {
 
     const userId = await commonCheck();
+    let filePath = null;
 
     if (!userId) {
         return { message: commonErrorMessage.W001, success: false, login: false };
     }
 
     // バリデーションチェック
-    const issue = PostSchema.safeParse({ title, post, game });
+    const issue = PostSchema.safeParse({ title, post, game, file });
 
     if (!issue.success) {
         // チェックに引っかかった場合
         const validation = z.flattenError(issue.error);
         const message = validation.fieldErrors;
-        console.log("エラーメッセージ：", [message.title, message.post, message.game]);
+        console.log("エラーメッセージ：", [message.title, message.post, message.game, message.file]);
         return { success: false, message: commonErrorMessage.valid, login: userId ? true : false };
     }
 
     try {
+
+        // ファイルの存在チェック
+        if (file && file.size > 0) {
+            // 画像のアップロード
+            filePath = await imageUpload(userId, file);
+
+            if (!filePath) {
+                return { success: false, message: "アップロードに失敗しました。", login: userId ? true : false }
+            }
+        }
+
         // 投稿の新規作成
         await prisma.posts.create({
             data: {
@@ -46,6 +61,7 @@ export async function post({ title, post, game }: PostProps) {
                 gameTag: game,
                 userId: userId,
                 rankFlg: false,
+                filePath: filePath ? filePath : ""
             }
         });
 
@@ -91,6 +107,7 @@ export async function listSearch(game?: string, page?: number) {
                 title: true,
                 gameTag: true,
                 userId: true,
+                filePath: true,
                 user: {
                     select: {
                         name: true,
@@ -134,6 +151,7 @@ export async function detailSearch(postId: Number, gameTag?: string) {
                 content: true,
                 gameTag: true,
                 userId: true,
+                filePath: true,
                 createdAt: true,
                 updatedAt: true,
                 rankFlg: true,
@@ -182,6 +200,7 @@ export async function updateSearch(postId: Number) {
                 title: true,
                 content: true,
                 gameTag: true,
+                filePath: true,
             }
         });
 
@@ -214,12 +233,12 @@ export async function Update({ ...postData }: PostProps) {
                 // チェックに引っかかった場合
                 const validation = z.flattenError(issue.error);
                 const message = validation.fieldErrors;
-                console.log("エラーメッセージ", [message.title, message.post, message.game]);
+                console.log("エラーメッセージ", [message.title, message.post, message.game, message.file]);
                 return { success: false, message: commonErrorMessage.valid, login: userId ? true : false };
             }
 
             // 投稿自体の更新
-            await PostUpdate(postData.title!, postData.post!, postData.postId!);
+            await PostUpdate(userId, postData.title!, postData.post!, postData.postId!, postData?.file ? postData?.file : undefined);
 
         } else {
             // 評価した場合
@@ -279,21 +298,54 @@ export async function Delete(postId: number) {
 }
 
 // 投稿の更新
-async function PostUpdate(title: string, post: string, postId: number) {
+async function PostUpdate(userId: number, title: string, post: string, postId: number, file?: File) {
     try {
         // バリデーションチェック
-        const issue = PostSchema.safeParse({ title: title, post: post, id: postId });
+        const issue = PostSchema.safeParse({ title: title, post: post, id: postId, file: file });
+        let filePath = null;
 
         if (!issue.success) {
             // チェックに引っかかった場合
             const validation = z.flattenError(issue.error);
             const message = validation.fieldErrors;
-            console.log("エラーメッセージ：", [message.title, message.game, message.post]);
+            console.log("エラーメッセージ：", [message.title, message.game, message.post, message.file]);
             return { message: message ? commonErrorMessage.valid : null, success: false, login: true };
         }
 
-        try {
-            // 更新処理
+        // ファイルが設定されていた場合
+        if (file && file.size > 0) {
+            // 既存のファイル名を取得
+            const fileName = await prisma.posts.findUnique({
+                where: { id: Number(postId) },
+                select: {
+                    filePath: true
+                }
+            });
+
+            // 既存のファイルを削除
+            const isDelete = await imageRemove(userId, fileName?.filePath!);
+
+            // 削除後、再度画像をアップロード
+            if (isDelete) {
+                filePath = await imageUpload(userId, file);
+
+                if (!filePath) {
+                    return { success: false, message: "アップロードに失敗しました。", login: userId ? true : false }
+                }
+            }
+
+            // 更新処理　画像更新あり
+            await prisma.posts.update({
+                where: { id: Number(postId) },
+                data: {
+                    title: title,
+                    content: post,
+                    filePath: filePath ? filePath : ""
+                }
+            });
+        } else {
+
+            // 更新処理　画像更新なし
             await prisma.posts.update({
                 where: { id: Number(postId) },
                 data: {
@@ -301,10 +353,8 @@ async function PostUpdate(title: string, post: string, postId: number) {
                     content: post
                 }
             });
-        } catch (e) {
-            console.log("エラー内容：", e);
-            return { message: "投稿の更新に失敗しました。", success: false, login: true };
         }
+
     } catch (e) {
         console.log("エラー内容：", e);
         return { message: "投稿の更新に失敗しました。", success: false, login: true };
@@ -355,5 +405,41 @@ async function commonCheck() {
         return null;
     } else {
         return userId;
+    }
+}
+
+//　ストレージに画像をアップロードする
+async function imageUpload(userId: number, file: File) {
+
+    // ファイル命名＋保存先指定
+    const ext = path.extname(file.name);
+    const fileName = `${crypto.randomUUID()}${ext}`;
+
+    const { error } = await supabase.storage.from("image").upload(`${userId}/${fileName}`, file);
+
+    if (error) {
+        console.log("エラー内容：" + error);
+        return null;
+    }
+
+    // // アップロード時に作成したURLをテーブルに登録
+    const { data } = await supabase.storage.from("image").getPublicUrl(`${userId}/${fileName}`);
+    const filePath = data?.publicUrl ?? null;
+
+    return filePath;
+}
+
+// ストレージから自身のデータを削除する
+async function imageRemove(userId: number, fileUrl: string) {
+    const index = fileUrl.indexOf(`${userId}/`);
+    const folderName = fileUrl.substring(index);
+
+    const { error } = await supabase.storage.from("image").remove([folderName]);
+
+    if (error) {
+        console.log("エラー内容：" + error);
+        return false;
+    } else {
+        return true;
     }
 }
