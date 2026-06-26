@@ -30,21 +30,3 @@ export async function getCookies() {
         return null;
     }
 }
-
-export async function getSing() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("auth_token")?.value;
-    try {
-        if (token) {
-            // jwtの署名の検証
-            const data = jwt.sign(token!, JWT_SECRET!);
-            return data;
-        } else {
-            return null;
-        }
-    } catch (error) {
-        // verifyが正常に処理できなかった
-        console.log("エラー内容：", error);
-        return null;
-    }
-}

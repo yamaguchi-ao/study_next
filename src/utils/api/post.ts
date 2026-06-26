@@ -7,7 +7,6 @@ import { commonErrorMessage, DeleteSchema, PostSchema } from "../validation";
 import z from "zod";
 import { Prisma } from "@prisma/client";
 import path from "path";
-import { writeFile } from "fs/promises";
 import supabase from "@/lib/supabase";
 
 interface PostProps {
@@ -44,23 +43,14 @@ export async function post({ title, post, game, file }: PostProps) {
 
     try {
 
+        // ファイルの存在チェック
         if (file && file.size > 0) {
-            // ファイル命名＋保存先指定
-            const ext = path.extname(file.name);
-            const fileName = `${userId}/${crypto.randomUUID()}${ext}`;
+            // 画像のアップロード
+            filePath = await imageUpload(userId, file);
 
-            const data = await supabase.from("").select();
-            console.log("確認：", data);
-
-            const { error } = await supabase.storage.from("image").upload(fileName, file);
-            if (error) {
-                console.log("エラー内容：" + error);
-                return { success: false, message: "アップロードに失敗しました。", login: userId ? true : false };
+            if (!filePath) {
+                return { success: false, message: "アップロードに失敗しました。", login: userId ? true : false }
             }
-
-            // // アップロード時に作成したURLをテーブルに登録
-            // const { data } = await supabase.storage.from("image").createSignedUrl(fileName, 3600);
-            // filePath = data!!.signedUrl;
         }
 
         // 投稿の新規作成
@@ -117,6 +107,7 @@ export async function listSearch(game?: string, page?: number) {
                 title: true,
                 gameTag: true,
                 userId: true,
+                filePath: true,
                 user: {
                     select: {
                         name: true,
@@ -247,7 +238,7 @@ export async function Update({ ...postData }: PostProps) {
             }
 
             // 投稿自体の更新
-            await PostUpdate(postData.title!, postData.post!, postData.postId!, postData?.file ? postData?.file : undefined);
+            await PostUpdate(userId, postData.title!, postData.post!, postData.postId!, postData?.file ? postData?.file : undefined);
 
         } else {
             // 評価した場合
@@ -307,11 +298,11 @@ export async function Delete(postId: number) {
 }
 
 // 投稿の更新
-async function PostUpdate(title: string, post: string, postId: number, file?: File) {
+async function PostUpdate(userId: number, title: string, post: string, postId: number, file?: File) {
     try {
         // バリデーションチェック
         const issue = PostSchema.safeParse({ title: title, post: post, id: postId, file: file });
-        let fileName = null;
+        let filePath = null;
 
         if (!issue.success) {
             // チェックに引っかかった場合
@@ -321,32 +312,49 @@ async function PostUpdate(title: string, post: string, postId: number, file?: Fi
             return { message: message ? commonErrorMessage.valid : null, success: false, login: true };
         }
 
-        try {
-            // ファイルが設定されていた場合
-            if (file && file.size > 0) {
-                // ファイル命名＋保存先指定
-                const ext = path.extname(file.name);
-                fileName = `${crypto.randomUUID()}${ext}`;
-                const filePath = path.join("src/public/uploads", fileName);
+        // ファイルが設定されていた場合
+        if (file && file.size > 0) {
+            // 既存のファイル名を取得
+            const fileName = await prisma.posts.findUnique({
+                where: { id: Number(postId) },
+                select: {
+                    filePath: true
+                }
+            });
 
-                // 画像ファイルを再度登録
-                const buffer = Buffer.from(await file.arrayBuffer());
-                await writeFile(filePath, buffer);
+            // 既存のファイルを削除
+            const isDelete = await imageRemove(userId, fileName?.filePath!);
+
+            // 削除後、再度画像をアップロード
+            if (isDelete) {
+                filePath = await imageUpload(userId, file);
+
+                if (!filePath) {
+                    return { success: false, message: "アップロードに失敗しました。", login: userId ? true : false }
+                }
             }
 
-            // 更新処理
+            // 更新処理　画像更新あり
             await prisma.posts.update({
                 where: { id: Number(postId) },
                 data: {
                     title: title,
                     content: post,
-                    filePath: fileName ? fileName : ""
+                    filePath: filePath ? filePath : ""
                 }
             });
-        } catch (e) {
-            console.log("エラー内容：", e);
-            return { message: "投稿の更新に失敗しました。", success: false, login: true };
+        } else {
+
+            // 更新処理　画像更新なし
+            await prisma.posts.update({
+                where: { id: Number(postId) },
+                data: {
+                    title: title,
+                    content: post
+                }
+            });
         }
+
     } catch (e) {
         console.log("エラー内容：", e);
         return { message: "投稿の更新に失敗しました。", success: false, login: true };
@@ -397,5 +405,41 @@ async function commonCheck() {
         return null;
     } else {
         return userId;
+    }
+}
+
+//　ストレージに画像をアップロードする
+async function imageUpload(userId: number, file: File) {
+
+    // ファイル命名＋保存先指定
+    const ext = path.extname(file.name);
+    const fileName = `${crypto.randomUUID()}${ext}`;
+
+    const { error } = await supabase.storage.from("image").upload(`${userId}/${fileName}`, file);
+
+    if (error) {
+        console.log("エラー内容：" + error);
+        return null;
+    }
+
+    // // アップロード時に作成したURLをテーブルに登録
+    const { data } = await supabase.storage.from("image").getPublicUrl(`${userId}/${fileName}`);
+    const filePath = data?.publicUrl ?? null;
+
+    return filePath;
+}
+
+// ストレージから自身のデータを削除する
+async function imageRemove(userId: number, fileUrl: string) {
+    const index = fileUrl.indexOf(`${userId}/`);
+    const folderName = fileUrl.substring(index);
+
+    const { error } = await supabase.storage.from("image").remove([folderName]);
+
+    if (error) {
+        console.log("エラー内容：" + error);
+        return false;
+    } else {
+        return true;
     }
 }

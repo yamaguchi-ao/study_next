@@ -40,6 +40,9 @@ yarn-error.log*
 # vscode
 .vscode
 
+# supabase
+/supabase
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
