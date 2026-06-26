@@ -71,7 +71,7 @@ export default function List() {
     const userId = cookie?.id;
     setUserId(userId!);
   }
-  
+
   // ページ数
   const generatePagination = () => {
     const pages = [];
@@ -175,11 +175,12 @@ function PostTable({ userId, data, search }: PostProps) {
           </Modal>
         )}
         {data !== undefined ? data.map((value: any) => {
+          // 取得出来るファイル名はここしかない
           return (
             <div key={value.id}>
               <div key={value.id} className="flex flex-col flex-wrap transition delay-70 duration-300 hover:scale-110 hover:cursor-pointer"
                 onClick={() => router.push(`/post/${value.id}/details?gameTag=${value.gameTag}`)}>
-                <div className="w-[20em] h-[8em] rounded-t-lg bg-blue-900">
+                <div className={`w-[20em] h-[8em] rounded-t-lg bg-blue-900 bg-no-repeat bg-center bg-cover`} style={{ backgroundImage: `${value.filePath ? `url('${value.filePath}')` : ""}`}}>
                   { // 自身のみ削除可能
                     userId === value.userId && (
                       <div className="relative -top-[5px] left-[295px] size-8 rounded-full bg-white">

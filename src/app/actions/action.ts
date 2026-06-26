@@ -7,9 +7,9 @@ interface userData {
     id: number,
     name: string
 }
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function getCookies() {
-    const JWT_SECRET = process.env.JWT_SECRET;
     const cookieStore = await cookies();
     const token = cookieStore.get("auth_token")?.value;
 

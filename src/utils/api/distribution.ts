@@ -22,7 +22,6 @@ export async function getDistribution() {
         // 現在登録されているゲームタイトルをすべて取得
         const totalGame = await prisma.games.findMany({
             select: {
-                id: true,
                 name: true,
             },
             distinct: ["name"]
@@ -36,17 +35,15 @@ export async function getDistribution() {
         const games = await Promise.all(
             totalGame.map(async (game) => ({
                 ...game,
-                userCount: await prisma.games.count({
-                    where: {
-                        name: game.name
-                    }
-                }),
-                hasGame: await (await prisma.games.findMany({
-                    where: {
-                        name: game.name,
-                        userId: userId
-                    }
-                })).length > 0 ? true : false
+                userCount: await prisma.games.groupBy({
+                    by: ["name"],
+                    _count: true,
+                    where: { name: game.name }
+                }).then(result => result[0] ? result[0]._count : 0),
+                hasGame: await prisma.games.groupBy({
+                    by: ["userId"],
+                    where: { name: game.name, userId: userId }
+                }).then(result => result.length > 0) ? true : false
             }))
         );
 

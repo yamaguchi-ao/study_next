@@ -2,6 +2,8 @@
  * @type {import('next').NextConfig}
  */
 
+const isProduction = process.env.NODE_ENV === "production";
+
 const nextConfig = {
 
   async headers() {
@@ -19,6 +21,28 @@ const nextConfig = {
     ];
   },
   outputFileTracingRoot: __dirname,
+  images: {
+    dangerouslyAllowLocalIP: isProduction ? false : true,
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cpdlywcfampasjpqoopb.supabase.co",
+        port: "",
+        pathname: "/**"
+      },
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+        port: '54321',
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '5MB'
+    }
+  }
 }
 
 module.exports = nextConfig

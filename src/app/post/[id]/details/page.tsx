@@ -7,6 +7,7 @@ import { CommentEvaluationButton, DeleteButton, EvaluationButton, ModalButton, R
 import { dateformat } from "@/constants/dateFormat";
 import type { CommentsWithUsers } from "@/types";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 
 interface CommentProps {
     data: CommentsWithUsers[],
@@ -61,6 +62,9 @@ export default async function details({ params, searchParams }: detailsProp) {
     // 評価
     const like = posts?.like.toString() ?? "";
 
+    // 画像URL
+    const image = posts?.filePath ?? null;
+
     return (
         <>
             <title>投稿 詳細</title>
@@ -77,6 +81,8 @@ export default async function details({ params, searchParams }: detailsProp) {
                     </div>
 
                     <div className="w-full mt-3 mb-5 p-3 leading-6 whitespace-pre-wrap">{posts?.content}</div>
+
+                    {image ? <Image className="mt-3" alt="" src={image} width={300} height={1} unoptimized={true} /> : null}
 
                     <div className="flex justify-between items-end">
                         <div className="flex text-sm text-gray-500 justify-end">
