@@ -431,8 +431,9 @@ async function imageUpload(userId: number, file: File) {
 
 // ストレージから自身のデータを削除する
 async function imageRemove(userId: number, fileUrl: string) {
-    const index = fileUrl.indexOf(`${userId}/`);
-    const folderName = fileUrl.substring(index);
+    const imageFolderName = "image/";
+    const index = fileUrl.indexOf(`${imageFolderName}${userId}/`);
+    const folderName = fileUrl.substring(index + imageFolderName.length);
 
     const { error } = await supabase.storage.from("image").remove([folderName]);
 

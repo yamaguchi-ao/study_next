@@ -33,13 +33,16 @@ enum valorantRanks {
     Platinum1 = 13,
     Platinum2 = 14,
     Platinum3 = 15,
-    Ascendant1 = 16,
-    Ascendant2 = 17,
-    Ascendant3 = 18,
-    Immortal1 = 19,
-    Immortal2 = 20,
-    Immortal3 = 21,
-    Radiant = 22
+    Diamond1 = 16,
+    Diamond2 = 17,
+    Diamond3 = 18,
+    Ascendant1 = 19,
+    Ascendant2 = 20,
+    Ascendant3 = 21,
+    Immortal1 = 22,
+    Immortal2 = 23,
+    Immortal3 = 24,
+    Radiant = 25
 }
 
 // LoLのランク一覧
@@ -201,7 +204,7 @@ export const supportedGames = {
     valo: "VALORANT",
     LoL: "League of Legends",
     Apex: "Apex Legends",
-    OW: "OverWatch 2",
+    OW: "OverWatch",
     SF: "Street Fighter VI"
 };
 
