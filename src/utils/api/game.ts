@@ -10,16 +10,18 @@ import z from "zod";
 import prisma from "@/lib/prisma";
 import { gameNameFixed } from "@/constants/context";
 import { Prisma } from "@prisma/client";
+import { imageUpload, imageRemove } from "@/utils/imgUpload";
 
 interface gamesProp {
     id?: number,
     name?: string,
     game?: string,
     rank?: string,
-    page?: number
+    page?: number,
+    file?: File | null
 }
 
-export async function Register({ name, rank }: gamesProp) {
+export async function Register({ name, rank, file }: gamesProp) {
 
     const userId = await commonCheck();
 
@@ -31,12 +33,12 @@ export async function Register({ name, rank }: gamesProp) {
 
     try {
 
-        const issue = GameSchema.safeParse({ name, rank });
+        const issue = GameSchema.safeParse({ name, rank, file });
 
         if (!issue.success) {
             const validation = z.flattenError(issue.error);
             const message = validation.fieldErrors;
-            console.log("エラーメッセージ：", [message.name, message.rank]);
+            console.log("エラーメッセージ：", [message.name, message.rank, message.file]);
             return { message: message ? commonErrorMessage.valid : null, success: false };
         }
 
@@ -52,14 +54,33 @@ export async function Register({ name, rank }: gamesProp) {
             return { message: "そのゲームタイトルは既に登録されています。", success: false, login: true };
         }
 
-        // ゲームとランクの登録
-        await prisma.games.create({
-            data: {
-                userId: userId!,
-                name: game as string,
-                rank: rank
+        // 画像のアップロード
+        if (file) {
+            const filePath = await imageUpload(userId!, file, "rank");
+
+            if (!filePath) {
+                return { message: "画像のアップロードに失敗しました。", success: false, login: true };
             }
-        });
+
+            // ゲームとランクの登録
+            await prisma.games.create({
+                data: {
+                    userId: userId!,
+                    name: game as string,
+                    rank: rank,
+                    filePath: filePath
+                }
+            });
+        } else {
+            // ゲームとランクの登録
+            await prisma.games.create({
+                data: {
+                    userId: userId!,
+                    name: game as string,
+                    rank: rank,
+                }
+            });
+        }
 
         return { message: "新規登録 成功！", success: true };
 
@@ -104,7 +125,8 @@ export async function listSearch({ game, rank, page }: gamesProp) {
             select: {
                 id: true,
                 name: true,
-                rank: true
+                rank: true,
+                filePath: true,
             },
         });
 
@@ -137,7 +159,8 @@ export async function detail({ id }: gamesProp) {
             select: {
                 id: true,
                 name: true,
-                rank: true
+                rank: true,
+                filePath: true,
             }
         });
 
@@ -149,7 +172,7 @@ export async function detail({ id }: gamesProp) {
 }
 
 // ゲーム更新
-export async function Update({ rank, id }: gamesProp) {
+export async function Update({ rank, id, file }: gamesProp) {
 
     // ユーザーIDの取得
     const userId = await commonCheck();
@@ -161,23 +184,57 @@ export async function Update({ rank, id }: gamesProp) {
 
     try {
         // バリデーションチェック
-        const issue = GameUpdateSchema.safeParse({ rank, id });
+        const issue = GameUpdateSchema.safeParse({ rank, id, file });
 
         if (!issue.success) {
             // チェックに引っかかった場合
             const validation = z.flattenError(issue.error);
             const message = validation.fieldErrors;
-            console.log("エラーメッセージ：", message.rank);
+            console.log("エラーメッセージ：", message.rank, message.file);
             return { message: message ? commonErrorMessage.valid : null, success: false, login: userId ? true : false };
         }
 
-        // ゲームとランクの更新
-        await prisma.games.update({
-            where: { id: Number(id) },
-            data: {
-                rank: rank
-            },
-        });
+        // 画像のアップロード
+        if (file && file.size > 0) {
+            // 既存のファイルパスを取得
+            const existingFile = await prisma.games.findUnique({
+                where: { id: Number(id), userId: Number(userId) },
+                select: { filePath: true }
+            });
+
+            if (existingFile?.filePath) {
+                // 既存の画像を削除
+                await imageRemove(userId, existingFile.filePath, "rank");
+            } else {
+                console.log("既存の画像が存在しません。");
+            }
+
+            console.log("確認：", existingFile?.filePath);
+
+            // 新しい画像をアップロード
+            const filePath = await imageUpload(userId, file, "rank");
+
+            if (filePath) {
+
+                // ゲームとランクの更新
+                await prisma.games.update({
+                    where: { id: Number(id) },
+                    data: {
+                        rank: rank,
+                        filePath: filePath
+                    },
+                });
+            }
+        } else {
+
+            // ゲームとランクの更新
+            await prisma.games.update({
+                where: { id: Number(id) },
+                data: {
+                    rank: rank
+                },
+            });
+        }
 
         return { message: "ゲーム 更新成功", success: true, login: userId ? true : false };
     } catch (e) {

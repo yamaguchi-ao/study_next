@@ -8,6 +8,7 @@ import z from "zod";
 import { Prisma } from "@prisma/client";
 import path from "path";
 import supabase from "@/lib/supabase";
+import { imageRemove, imageUpload } from "../imgUpload";
 
 interface PostProps {
     userId?: number;
@@ -46,7 +47,7 @@ export async function post({ title, post, game, file }: PostProps) {
         // ファイルの存在チェック
         if (file && file.size > 0) {
             // 画像のアップロード
-            filePath = await imageUpload(userId, file);
+            filePath = await imageUpload(userId, file, "image");
 
             if (!filePath) {
                 return { success: false, message: "アップロードに失敗しました。", login: userId ? true : false }
@@ -323,11 +324,11 @@ async function PostUpdate(userId: number, title: string, post: string, postId: n
             });
 
             // 既存のファイルを削除
-            const isDelete = await imageRemove(userId, fileName?.filePath!);
+            const isDelete = await imageRemove(userId, fileName?.filePath!, "image");
 
             // 削除後、再度画像をアップロード
             if (isDelete) {
-                filePath = await imageUpload(userId, file);
+                filePath = await imageUpload(userId, file, "image");
 
                 if (!filePath) {
                     return { success: false, message: "アップロードに失敗しました。", login: userId ? true : false }
@@ -405,42 +406,5 @@ async function commonCheck() {
         return null;
     } else {
         return userId;
-    }
-}
-
-//　ストレージに画像をアップロードする
-async function imageUpload(userId: number, file: File) {
-
-    // ファイル命名＋保存先指定
-    const ext = path.extname(file.name);
-    const fileName = `${crypto.randomUUID()}${ext}`;
-
-    const { error } = await supabase.storage.from("image").upload(`${userId}/${fileName}`, file);
-
-    if (error) {
-        console.log("エラー内容：" + error);
-        return null;
-    }
-
-    // // アップロード時に作成したURLをテーブルに登録
-    const { data } = await supabase.storage.from("image").getPublicUrl(`${userId}/${fileName}`);
-    const filePath = data?.publicUrl ?? null;
-
-    return filePath;
-}
-
-// ストレージから自身のデータを削除する
-async function imageRemove(userId: number, fileUrl: string) {
-    const imageFolderName = "image/";
-    const index = fileUrl.indexOf(`${imageFolderName}${userId}/`);
-    const folderName = fileUrl.substring(index + imageFolderName.length);
-
-    const { error } = await supabase.storage.from("image").remove([folderName]);
-
-    if (error) {
-        console.log("エラー内容：" + error);
-        return false;
-    } else {
-        return true;
     }
 }
