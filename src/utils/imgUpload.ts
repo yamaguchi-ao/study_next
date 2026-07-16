@@ -15,9 +15,9 @@ export async function imageUpload(userId: number, file: File, storage: string) {
         return null;
     }
 
-    // // アップロード時に作成したURLをテーブルに登録
-    const { data } = await supabase.storage.from(storage).getPublicUrl(`${userId}/${fileName}`);
-    const filePath = data?.publicUrl ?? null;
+    // アップロード時に作成したURLをテーブルに登録
+    const { data } = await supabase.storage.from(storage).createSignedUrl(`${userId}/${fileName}`, 360000);
+    const filePath = data?.signedUrl ?? null;
 
     return filePath;
 }
@@ -26,9 +26,9 @@ export async function imageUpload(userId: number, file: File, storage: string) {
 export async function imageRemove(userId: number, fileUrl: string, storage: string) {
     const imageFolderName = `${storage}/`;
     const index = fileUrl.indexOf(`${imageFolderName}${userId}/`);
-    const folderName = fileUrl.substring(index + imageFolderName.length);
+    const fileName = fileUrl.substring(index + imageFolderName.length, fileUrl.indexOf("?"));
 
-    const { error } = await supabase.storage.from(storage).remove([folderName]);
+    const { error } = await supabase.storage.from(storage).remove([fileName]);
 
     if (error) {
         console.log("エラー内容：" + error);

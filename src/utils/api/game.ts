@@ -218,7 +218,7 @@ export async function Update({ rank, id, file }: gamesProp) {
 
                 // ゲームとランクの更新
                 await prisma.games.update({
-                    where: { id: Number(id) },
+                    where: { id: Number(id), userId: Number(userId) },
                     data: {
                         rank: rank,
                         filePath: filePath
@@ -229,7 +229,7 @@ export async function Update({ rank, id, file }: gamesProp) {
 
             // ゲームとランクの更新
             await prisma.games.update({
-                where: { id: Number(id) },
+                where: { id: Number(id), userId: Number(userId)},
                 data: {
                     rank: rank
                 },

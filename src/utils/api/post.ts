@@ -337,7 +337,7 @@ async function PostUpdate(userId: number, title: string, post: string, postId: n
 
             // 更新処理　画像更新あり
             await prisma.posts.update({
-                where: { id: Number(postId) },
+                where: { id: Number(postId), userId: Number(userId) },
                 data: {
                     title: title,
                     content: post,
@@ -345,10 +345,9 @@ async function PostUpdate(userId: number, title: string, post: string, postId: n
                 }
             });
         } else {
-
             // 更新処理　画像更新なし
             await prisma.posts.update({
-                where: { id: Number(postId) },
+                where: { id: Number(postId), userId: Number(userId) },
                 data: {
                     title: title,
                     content: post
