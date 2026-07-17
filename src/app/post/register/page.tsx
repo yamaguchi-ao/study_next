@@ -59,14 +59,14 @@ export default function List() {
           </div>
 
           <div className="font-bold mt-3">投稿内容</div>
-          <textarea name="post" placeholder="投稿の内容を入力..." className="border-1 w-full h-[230px] mt-2 p-3 resize-none"></textarea>
+          <textarea name="post" placeholder="投稿の内容を入力..." className="border-1 w-full h-[310px] mt-2 p-3 resize-none"></textarea>
           {state?.post ? errorText(state?.post) : null}
 
           <div className="font-bold mt-2">画像添付</div>
           <input className="cursor-pointer file:px-4 file:mr-4 file:pr-4 file:py-1 file:border-r-1 file:bg-cyan-500/30 rounded-md border-1 mt-2 w-140" name="file" type="file"></input>
           {state?.file ? errorText(state?.file) : null}
 
-          <div className="flex justify-between mt-4">
+          <div className="flex justify-between mt-7">
             <Button onClick={() => redirect('/post')}>戻る</Button>
             <Button type="submit" disabled={isPending}>
               {isPending ? "投稿中..." : "投稿"}

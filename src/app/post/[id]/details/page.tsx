@@ -82,7 +82,7 @@ export default async function details({ params, searchParams }: detailsProp) {
 
                     <div className="w-full mt-3 mb-5 p-3 leading-6 whitespace-pre-wrap">{posts?.content}</div>
 
-                    {image ? <Image className="mt-3" alt="" src={image} width={300} height={1} unoptimized={true} /> : null}
+                    {image ? <Image className="mt-3 aspect-auto" alt="" src={image} width={300} height={1} unoptimized={true} style={{ width: 'auto', height: 'auto' }} /> : null}
 
                     <div className="flex justify-between items-end">
                         <div className="flex text-sm text-gray-500 justify-end">
