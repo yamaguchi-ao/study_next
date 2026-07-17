@@ -18,12 +18,14 @@ export async function GameRegister(_prevState: any, formData: FormData) {
     }
 
     const userId = cookie?.id;
+    const file = formData.get("file");
 
     // 入力内容の取得
     const gameData = {
         name: formData.get("name") as string,
         rank: formData.get("rank") as string,
-        id: userId as number
+        id: userId as number,
+        file: file instanceof File ? file : undefined
     }
 
     // バリデーションチェック
@@ -135,10 +137,13 @@ export async function GameUpdate(_prevState: any, formData: FormData, id: number
         redirect("/login?error=true");
     }
 
+    const file = formData.get("file");
+
     // 入力内容の取得
     const gameData = {
         rank: formData.get("rank") as string,
-        id: id
+        id: id,
+        file: file instanceof File ? file: undefined
     };
 
     // バリデーションチェック

@@ -79,7 +79,7 @@ export function SearchButton({ type, disabled }: ManyButtonProps) {
 /** 更新用ボタン */
 export function UpdateButton({ className, type, id }: ManyButtonProps) {
     const router = useRouter();
-    return <Button className={className} onClick={() => router.push(`/${type}/${id}/update`)}>更新</Button>
+    return <Button className={className} onClick={() => router.push(`/${type}/${id}/update`)}>編集</Button>
 }
 
 /** 戻る用ボタン */

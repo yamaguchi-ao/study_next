@@ -5,12 +5,15 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { Button, ReturnButton } from "@/components/ui/button";
 import { gameNameFixed, supportedGames, supportedGamesMap } from "@/constants/context";
 import { errorToast } from "@/utils/toast";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { use, useActionState, useEffect, useState } from "react";
 
 export default function UpdatePage({ params }: { params: Promise<{ id: number }> }) {
     const [name, setName] = useState(String);
     const [rank, setRank] = useState(String);
+    const [image, setImage] = useState<string | null>(null);
+
     const gameId = use(params).id;
 
     // サポートしているゲームの値を取得
@@ -30,6 +33,7 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
             }
             setName(games?.name);
             setRank(games?.rank ?? "");
+            setImage(games?.filePath ?? null);
         }
         getGames();
     }, [params, gameId]);
@@ -49,9 +53,9 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
             <title>ゲーム 更新</title>
             <div className="flex h-main overflow-hidden">
                 <Sidebar />
-                <form className="flex-1 flex flex-col" action={gameAction}>
-                    <div className="flex flex-col h-full justify-center items-center">
-                        <div className="">
+                <form className="flex-1" action={gameAction}>
+                    <div className="flex p-5 justify-around items-center">
+                        <div className="flex flex-col pt-23">
                             <div className="flex pb-10 items-center">
                                 <div className="w-35">ゲームタイトル</div>
                                 <h1 className="text-2xl pl20">{name}</h1>
@@ -64,13 +68,23 @@ export default function UpdatePage({ params }: { params: Promise<{ id: number }>
                                     {state?.rank ? errorText(state?.rank) : null}
                                 </div>
                             </div>
-                            <div className="flex justify-around items-end">
-                                <ReturnButton />
-                                <Button disabled={isPending} type="submit">
-                                    {isPending ? "更新中..." : "更新"}
-                                </Button>
-                            </div>
                         </div>
+
+                        <div className="flex flex-col">
+                            <div className="my-5">ランク画像 変更</div>
+                            <input className="mb-5 ml-5 cursor-pointer  file:px-4 file:mr-4 file:py-1 file:border-r-1 file:bg-cyan-500/30 rounded-md border-1 mt-2 w-140" name="file" type="file"></input>
+                            {state?.file ? errorText(state?.file) : null}
+
+                            <div className="my-5">現在のランク画像</div>
+                            {image ? <Image className="ml-5" src={image} alt="ランク画像" width={300} height={300} ></Image> : <p className="pl-5 text-gray-500">ランク画像はありません</p>}
+                        </div>
+                    </div>
+
+                    <div className="flex mt-5 justify-around items-end">
+                        <ReturnButton />
+                        <Button disabled={isPending} type="submit">
+                            {isPending ? "更新中..." : "更新"}
+                        </Button>
                     </div>
                 </form>
             </div>
